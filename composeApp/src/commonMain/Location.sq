@@ -1,0 +1,15 @@
+-- store GPS coords and weather Data
+
+CREATE TABLE Location (
+    id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
+    latitude REAL NOT NULL,
+    longitude REAL NOT NULL,
+    weather TEXT NOT NULL,
+    timestamp TEXT NOT NULL
+);
+
+selectAllLocations:
+SELECT * FROM Location;
+
+insertLocation:
+INSERT INTO Location (latitude, longitude, weather, timestamp) VALUES (?, ?, ?, ?);
