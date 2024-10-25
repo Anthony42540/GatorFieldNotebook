@@ -17,6 +17,7 @@ fun HomeScreen(navController: NavController) {
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         Text("Gator Field Notebook")
+        NavigationButton("Home",onClick = { navController.navigate("home") })
         NavigationButton("Edit Sample",onClick = { navController.navigate("editSample") })
         NavigationButton("Print",onClick = { navController.navigate("print") })
         NavigationButton("View Sample Collection",onClick = { navController.navigate("viewSampleCollection") })
