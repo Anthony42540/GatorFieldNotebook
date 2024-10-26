@@ -13,14 +13,19 @@ import androidx.navigation.NavController
 fun ViewSampleCollectionScreen(navController: NavController) {
     Column(
         modifier = Modifier.fillMaxSize(),
-        verticalArrangement = Arrangement.Center,
+        verticalArrangement = Arrangement.Top,
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        Text("View Sample Collection Screen")
-        NavigationButton("Back to Home",onClick = { navController.navigate("home") })
-        NavigationButton("Edit Sample",onClick = { navController.navigate("editSample") })
-        NavigationButton("Print",onClick = { navController.navigate("print") })
-        NavigationButton("View Sample Collection",onClick = { navController.navigate("viewSampleCollection") })
-        NavigationButton("Settings",onClick = { navController.navigate("settings") })
+        NavBar(navController) // The navigation bar shows up at the top
+
+        // This is the actual home screen content
+        Column(
+            modifier = Modifier.fillMaxSize(),
+            verticalArrangement = Arrangement.Center,
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
+            // Shows up on screen here
+            Text(text = "View Sample Collection Screen!")
+        }
     }
 }
