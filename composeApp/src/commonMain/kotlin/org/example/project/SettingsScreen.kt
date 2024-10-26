@@ -18,7 +18,7 @@ fun SettingsScreen(navController: NavController) {
     ) {
         NavBar(navController) // The navigation bar shows up at the top
 
-        // This is the actual home screen content
+        // This is the actual settings screen content
         Column(
             modifier = Modifier.fillMaxSize(),
             verticalArrangement = Arrangement.Center,

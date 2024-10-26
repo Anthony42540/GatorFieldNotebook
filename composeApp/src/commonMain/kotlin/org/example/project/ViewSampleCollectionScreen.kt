@@ -18,7 +18,7 @@ fun ViewSampleCollectionScreen(navController: NavController) {
     ) {
         NavBar(navController) // The navigation bar shows up at the top
 
-        // This is the actual home screen content
+        // This is the actual view sample collection screen content
         Column(
             modifier = Modifier.fillMaxSize(),
             verticalArrangement = Arrangement.Center,
