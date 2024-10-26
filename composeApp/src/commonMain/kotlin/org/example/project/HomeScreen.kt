@@ -3,24 +3,29 @@ package org.example.project
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.navigation.NavController
+import androidx.compose.material.Text
 
 @Composable
 fun HomeScreen(navController: NavController) {
     Column(
         modifier = Modifier.fillMaxSize(),
-        verticalArrangement = Arrangement.Center,
+        verticalArrangement = Arrangement.Top,
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        Text("Gator Field Notebook")
-        NavigationButton("Home",onClick = { navController.navigate("home") })
-        NavigationButton("Edit Sample",onClick = { navController.navigate("editSample") })
-        NavigationButton("Print",onClick = { navController.navigate("print") })
-        NavigationButton("View Sample Collection",onClick = { navController.navigate("viewSampleCollection") })
-        NavigationButton("Settings",onClick = { navController.navigate("settings") })
+        NavBar(navController) // The navigation bar shows up at the top
+
+        // This is the actual home screen content
+        Column(
+            modifier = Modifier.fillMaxSize(),
+            verticalArrangement = Arrangement.Center,
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
+            // Shows up on screen here
+            Text(text = "Home Screen!")
+        }
     }
 }

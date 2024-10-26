@@ -1,24 +1,18 @@
 package org.example.project
 
-import androidx.compose.animation.AnimatedVisibility
-import androidx.compose.foundation.Image
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.material.Button
+import androidx.compose.material.ButtonDefaults
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
 import androidx.compose.runtime.*
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.navigation.NavController
-import androidx.navigation.Navigation
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
-import org.jetbrains.compose.resources.painterResource
 import org.jetbrains.compose.ui.tooling.preview.Preview
+import androidx.compose.foundation.layout.padding
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.unit.dp
 
 import gatorfieldnotebook.composeapp.generated.resources.Res
 import gatorfieldnotebook.composeapp.generated.resources.compose_multiplatform
@@ -33,7 +27,13 @@ fun App() {
 
 @Composable
 fun NavigationButton(text: String, onClick: () -> Unit) {
-    Button(onClick = onClick) {
+    Button(
+        onClick = onClick,
+        modifier = Modifier.padding(horizontal = 8.dp),
+        colors = ButtonDefaults.buttonColors(
+            backgroundColor = Color.Gray
+        )
+    ) {
         Text(text)
     }
 }
