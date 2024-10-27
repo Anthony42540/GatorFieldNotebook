@@ -135,7 +135,7 @@ compose.desktop {
 sqldelight {
     databases {
         create("AppDatabase") {
-            packageName.set("com.example.app.database")
+            packageName.set("com.dev.database")
         }
     }
 }
