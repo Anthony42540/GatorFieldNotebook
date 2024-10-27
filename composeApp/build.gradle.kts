@@ -79,6 +79,7 @@ kotlin {
             implementation(libs.runtime)
             implementation(libs.kotlinx.datetime)
             implementation(libs.koin.core)
+            implementation("org.jetbrains.androidx.navigation:navigation-compose:2.8.0-alpha10")
         }
         desktopMain.dependencies {
             implementation(compose.desktop.currentOs)
@@ -117,6 +118,12 @@ android {
 }
 
 dependencies {
+    implementation(libs.androidx.foundation.android)
+    implementation(libs.androidx.ui.graphics.android)
+    implementation(libs.androidx.foundation.layout.android)
+    implementation(libs.androidx.ui.android)
+    implementation(libs.androidx.ui.text.android)
+    implementation(libs.androidx.ui.text.google.fonts)
     debugImplementation(compose.uiTooling)
 }
 
