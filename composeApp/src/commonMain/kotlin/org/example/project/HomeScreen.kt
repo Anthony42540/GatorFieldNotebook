@@ -21,11 +21,22 @@ fun HomeScreen(navController: NavController) {
         // This is the actual home screen content
         Column(
             modifier = Modifier.fillMaxSize(),
-            verticalArrangement = Arrangement.Center,
+            verticalArrangement = Arrangement.Top,
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
             // Shows up on screen here
             Text(text = "Home Screen!")
+            // Displays recent sample data for quick selection (dummy data for now).
+            RecentSubmissionsSection(navController)
+
+            Column(
+                modifier = Modifier.fillMaxSize(),
+                verticalArrangement = Arrangement.Center,
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
+                // Quick button to add new selection
+                NavigationButton("Add new sample", onClick = { navController.navigate("editSample") })
+            }
         }
     }
 }

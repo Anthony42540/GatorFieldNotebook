@@ -1,6 +1,9 @@
 package org.example.project
 
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.material.Button
 import androidx.compose.material.ButtonDefaults
 import androidx.compose.material.MaterialTheme
@@ -13,8 +16,11 @@ import androidx.navigation.compose.rememberNavController
 import org.jetbrains.compose.ui.tooling.preview.Preview
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
+import androidx.navigation.NavController
 
 import gatorfieldnotebook.composeapp.generated.resources.Res
 import gatorfieldnotebook.composeapp.generated.resources.addSample
@@ -72,6 +78,7 @@ fun AppNavigation() {
 
 
 //Icon functions TODO: add to separate file
+//source: https://www.youtube.com/watch?v=vnHAT95p0JA&list=PL7W-WmzNxofK8lWAlb-v_6V1d3AOq0kub&index=18
 @Composable
 fun HomeIcon() {
     Image(
@@ -115,4 +122,35 @@ fun SettingsIcon() {
         contentDescription = null,
         modifier = Modifier.size(24.dp)
     )
+}
+
+//Recent submission section for home screen
+@Composable
+fun RecentSubmissionsSection(navController: NavController) {
+    // Dummy data for now
+    val recentSubmissions = listOf(
+        "Sample 1", "Sample 2", "Sample 3", "Sample 4", "Sample 5"
+    )
+
+    Column(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(16.dp)
+    ) {
+        Text(text = "Recent Submissions", modifier = Modifier.padding(bottom = 8.dp))
+
+        LazyColumn {
+            items(recentSubmissions) { submission ->
+                Text(
+                    text = submission,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(4.dp)
+                )
+            }
+        }
+
+        NavigationButton("View all submissions", onClick = { navController.navigate("viewSampleCollection") })
+
+    }
 }
