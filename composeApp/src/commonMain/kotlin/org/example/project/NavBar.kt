@@ -21,14 +21,14 @@ fun NavBar(navController: NavController) {
     Column(
         modifier = Modifier
             .fillMaxWidth()
-            .background(Color.White)
+            .background(Color(0x400021A5))
             .padding(8.dp)
             .wrapContentHeight(),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         Text(
             text = "Gator Field Notebook",
-            color = Color.Black,
+            color = Color(0xFF0021A5),
             fontSize = 30.sp,
             modifier = Modifier.padding(bottom = 8.dp)
         )
@@ -38,11 +38,11 @@ fun NavBar(navController: NavController) {
                 .fillMaxWidth(),
             horizontalArrangement = Arrangement.SpaceEvenly
         ) {
-            NavigationButton("H",onClick = { navController.navigate("home") })
-            NavigationButton("ES",onClick = { navController.navigate("editSample") })
-            NavigationButton("P",onClick = { navController.navigate("print") })
-            NavigationButton("VSC",onClick = { navController.navigate("viewSampleCollection") })
-            NavigationButton("S",onClick = { navController.navigate("settings") })
+            NavigationImgButton({ HomeIcon() }, onClick = { navController.navigate("home") })
+            NavigationImgButton({ AddSampleIcon() }, onClick = { navController.navigate("editSample") })
+            NavigationImgButton({ PrintIcon() }, onClick = { navController.navigate("print") })
+            NavigationImgButton({ ViewSamplesIcon() }, onClick = { navController.navigate("viewSampleCollection") })
+            NavigationImgButton({ SettingsIcon() }, onClick = { navController.navigate("settings") })
         }
     }
 }
