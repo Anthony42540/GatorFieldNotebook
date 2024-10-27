@@ -26,8 +26,7 @@ fun EditSampleScreen(navController: NavController) {
 
     Column(
         modifier = Modifier
-            .fillMaxSize()
-            .padding(16.dp),
+            .fillMaxSize(),
         verticalArrangement = Arrangement.Top,
         horizontalAlignment = Alignment.Start
     ) {
@@ -35,70 +34,78 @@ fun EditSampleScreen(navController: NavController) {
 
         Spacer(modifier = Modifier.height(16.dp))
 
-        // Choose Collection
-        SectionTitle("Choose Collection")
-        TextField(
-            value = collection,
-            onValueChange = { collection = it },
-            modifier = Modifier.fillMaxWidth()
-        )
-
-        // Date/Time
-        Spacer(modifier = Modifier.height(16.dp))
-        SectionTitle("Date/Time")
-        TextField(
-            value = date,
-            onValueChange = { date = it },
-            modifier = Modifier.fillMaxWidth(),
-            placeholder = { Text("Date") }
-        )
-        TextField(
-            value = time,
-            onValueChange = { time = it },
-            modifier = Modifier.fillMaxWidth(),
-            placeholder = { Text("Time") }
-        )
-
-        // Location
-        Spacer(modifier = Modifier.height(16.dp))
-        SectionTitle("Location")
-        TextField(
-            value = latitudeLongitude,
-            onValueChange = { latitudeLongitude = it },
-            modifier = Modifier.fillMaxWidth(),
-            placeholder = { Text("Latitude/Longitude") }
-        )
-        TextField(
-            value = altitude,
-            onValueChange = { altitude = it },
-            modifier = Modifier.fillMaxWidth(),
-            placeholder = { Text("Altitude") }
-        )
-
-        // Sample Name/Info
-        Spacer(modifier = Modifier.height(16.dp))
-        SectionTitle("Sample Name/Sample Info")
-        TextField(
-            value = sampleName,
-            onValueChange = { sampleName = it },
-            modifier = Modifier.fillMaxWidth(),
-            placeholder = { Text("Sample Name") }
-        )
-        TextField(
-            value = sampleInfo,
-            onValueChange = { sampleInfo = it },
-            modifier = Modifier.fillMaxWidth(),
-            placeholder = { Text("Sample Info") }
-        )
-
-        Spacer(modifier = Modifier.height(16.dp))
-
-        // Save Button
-        Button(
-            onClick = { /* Handle save logic here */ },
-            modifier = Modifier.align(Alignment.CenterHorizontally)
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(16.dp),
+            verticalArrangement = Arrangement.Top,
+            horizontalAlignment = Alignment.Start
         ) {
-            Text("Save")
+            // Choose Collection
+            SectionTitle("Choose Collection")
+            TextField(
+                value = collection,
+                onValueChange = { collection = it },
+                modifier = Modifier.fillMaxWidth()
+            )
+
+            // Date/Time
+            Spacer(modifier = Modifier.height(16.dp))
+            SectionTitle("Date/Time")
+            TextField(
+                value = date,
+                onValueChange = { date = it },
+                modifier = Modifier.fillMaxWidth(),
+                placeholder = { Text("Date") }
+            )
+            TextField(
+                value = time,
+                onValueChange = { time = it },
+                modifier = Modifier.fillMaxWidth(),
+                placeholder = { Text("Time") }
+            )
+
+            // Location
+            Spacer(modifier = Modifier.height(16.dp))
+            SectionTitle("Location")
+            TextField(
+                value = latitudeLongitude,
+                onValueChange = { latitudeLongitude = it },
+                modifier = Modifier.fillMaxWidth(),
+                placeholder = { Text("Latitude/Longitude") }
+            )
+            TextField(
+                value = altitude,
+                onValueChange = { altitude = it },
+                modifier = Modifier.fillMaxWidth(),
+                placeholder = { Text("Altitude") }
+            )
+
+            // Sample Name/Info
+            Spacer(modifier = Modifier.height(16.dp))
+            SectionTitle("Sample Name/Sample Info")
+            TextField(
+                value = sampleName,
+                onValueChange = { sampleName = it },
+                modifier = Modifier.fillMaxWidth(),
+                placeholder = { Text("Sample Name") }
+            )
+            TextField(
+                value = sampleInfo,
+                onValueChange = { sampleInfo = it },
+                modifier = Modifier.fillMaxWidth(),
+                placeholder = { Text("Sample Info") }
+            )
+
+            Spacer(modifier = Modifier.height(16.dp))
+
+            // Save Button
+            Button(
+                onClick = { /* Handle save logic here */ },
+                modifier = Modifier.align(Alignment.CenterHorizontally)
+            ) {
+                Text("Save")
+            }
         }
     }
 }
