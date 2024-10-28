@@ -1,21 +1,56 @@
-This is a Kotlin Multiplatform project targeting Android, iOS, Web, Desktop.
+# Gator Field Notebook
+An app streamlining environmental data collection. This repository contains all source code and documentation.
 
-* `/composeApp` is for code that will be shared across your Compose Multiplatform applications.
-  It contains several subfolders:
-  - `commonMain` is for code that’s common for all targets.
-  - Other folders are for Kotlin code that will be compiled for only the platform indicated in the folder name.
-    For example, if you want to use Apple’s CoreCrypto for the iOS part of your Kotlin app,
-    `iosMain` would be the right folder for such calls.
+## Table of Contents ## 
+- [Project Overview](https://github.com/Anthony42540/GatorFieldNotebook/edit/master/README.md#project-overview)
+- [Architecture](https://github.com/Anthony42540/GatorFieldNotebook/edit/master/README.md#architecture)
+- [Features](https://github.com/Anthony42540/GatorFieldNotebook/edit/master/README.md#features)
+- [Completed Work](https://github.com/Anthony42540/GatorFieldNotebook/edit/master/README.md#completed-work)
+- [Known Bugs](https://github.com/Anthony42540/GatorFieldNotebook/edit/master/README.md#known-bugs)
 
-* `/iosApp` contains iOS applications. Even if you’re sharing your UI with Compose Multiplatform, 
-  you need this entry point for your iOS app. This is also where you should add SwiftUI code for your project.
+### Project Overview
+The Gator Field Notebook is a field notebook application that enhances field data collection by integrating GPS logging, customizable data fields, and Bluetooth printing for on-site label creation. The application also enables users to export collected data to Excel for analysis and reporting.
 
+### Architecture
+The Gator Field Notebook has distinct modules that work together to manage data collection, storage, processing, and output. The key architectural elements are as follows:
 
-Learn more about [Kotlin Multiplatform](https://www.jetbrains.com/help/kotlin-multiplatform-dev/get-started.html),
-[Compose Multiplatform](https://github.com/JetBrains/compose-multiplatform/#compose-multiplatform),
-[Kotlin/Wasm](https://kotl.in/wasm/)…
+- **External Interface (Mobile Application)** \
+The mobile application is the primary user interface, allowing users to input data, such as sample information, environmental conditions, and location coordinates. The interface transmits the collected data to the persistent database, allowing a seamless transfer from user interaction to storage.
 
-We would appreciate your feedback on Compose/Web and Kotlin/Wasm in the public Slack channel [#compose-web](https://slack-chats.kotlinlang.org/c/compose-web).
-If you face any issues, please report them on [GitHub](https://github.com/JetBrains/compose-multiplatform/issues).
+- **Persistent State (MySQL Database)** \
+The SQLDelight database acts as the app's persistant storage, where all field data are securely stored. It is the connection between the external interface, the connection responsible for data input and retrieval, and the internal systems, which process and utilize the stored data.
 
-You can open the web application by running the `:composeApp:wasmJsBrowserDevelopmentRun` Gradle task.
+- **Internal Systems** \
+Internal systems are responsible for processing the data from the database. They also retrieve relevant information that is not entered in by the user, such as GPS coordinates, and prepare the necessary information for the Bluetooth label for printing, such that the data flows efficiently to the label functionality.
+
+- **Printer** \
+The printer has a Bluetooth connection that recieves the label information and prints it.
+
+### Features
+Features that we would like to have fully implemented into the Gator Field Notebook:
+
+- **GPS Integration** \
+Automatically records location data for each entry.
+
+- **Customizable Data Fields** \
+Allows users to modify data fields and label format, allowing for adaptability of the labels for different projects.
+
+- **Data Export** \
+Provides an option to export collected data to Excel.
+
+- **Bluetooth Printing** \
+Connects via Bluetooth to a portable printer to print the generated labels in real time.
+
+- **Device Compatibility** \
+Works on iOS and Android devices.
+
+### Completed Work
+- Basic UI: different screen navigation via button interaction
+- Navbar implementation
+- SQL setup: hooks for connection to the database have been implemented
+
+### Known Bugs
+Known bugs will be added as we continue.
+
+This is not a bug, but something to note for future work: Some styling (like importing icons) and logic (e.g. database connection) might have to be done twice for iOS and Android, respectively.
+
