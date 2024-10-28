@@ -2,11 +2,11 @@
 An app streamlining environmental data collection. This repository contains all source code and documentation.
 
 ## Table of Contents ## 
-- [Project Overview](https://github.com/Anthony42540/GatorFieldNotebook/edit/master/README.md#project-overview)
-- [Architecture](https://github.com/Anthony42540/GatorFieldNotebook/edit/master/README.md#architecture)
-- [Features](https://github.com/Anthony42540/GatorFieldNotebook/edit/master/README.md#features)
-- [Completed Work](https://github.com/Anthony42540/GatorFieldNotebook/edit/master/README.md#completed-work)
-- [Known Bugs](https://github.com/Anthony42540/GatorFieldNotebook/edit/master/README.md#known-bugs)
+- [Project Overview](https://github.com/Anthony42540/GatorFieldNotebook#project-overview)
+- [Architecture](https://github.com/Anthony42540/GatorFieldNotebook#architecture)
+- [Features](https://github.com/Anthony42540/GatorFieldNotebook?tab=readme-ov-file#features)
+- [Completed Work](https://github.com/Anthony42540/GatorFieldNotebook?tab=readme-ov-file#completed-work)
+- [Known Bugs](https://github.com/Anthony42540/GatorFieldNotebook?tab=readme-ov-file#known-bugs)
 
 ### Project Overview
 The Gator Field Notebook is a field notebook application that enhances field data collection by integrating GPS logging, customizable data fields, and Bluetooth printing for on-site label creation. The application also enables users to export collected data to Excel for analysis and reporting.
