@@ -1,7 +1,9 @@
 package org.example.project
 
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.material.Button
@@ -15,6 +17,8 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import org.jetbrains.compose.ui.tooling.preview.Preview
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.shape.CutCornerShape
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 
@@ -33,7 +37,7 @@ fun NavigationButton(text: String, onClick: () -> Unit) {
         onClick = onClick,
         modifier = Modifier.padding(horizontal = 8.dp),
         colors = ButtonDefaults.buttonColors(
-            backgroundColor = Color.Gray
+            backgroundColor = Color.White
         )
     ) {
         Text(text)
@@ -46,7 +50,7 @@ fun NavigationImgButton(icon: @Composable () -> Unit, onClick: () -> Unit) {
         onClick = onClick,
         modifier = Modifier.padding(horizontal = 8.dp),
         colors = ButtonDefaults.buttonColors(
-            backgroundColor = Color.Gray
+            backgroundColor = Color.White
         )
     ) {
         icon()

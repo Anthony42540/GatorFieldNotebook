@@ -30,14 +30,14 @@ fun NavBar(navController: NavController) {
     Column(
         modifier = Modifier
             .fillMaxWidth()
-            .background(Color(0x400021A5))
+            .background(Color(0xFFFFFF).copy(alpha = 1.0f))
             .padding(8.dp)
             .wrapContentHeight(),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         Text(
             text = "Gator Field Notebook",
-            color = Color(0xFF0021A5),
+            color = Color(0x000000).copy(alpha = 1.0f),
             fontSize = 30.sp,
             modifier = Modifier.padding(bottom = 8.dp)
         )

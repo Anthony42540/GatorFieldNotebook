@@ -1,5 +1,6 @@
 package org.example.project
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
@@ -12,12 +13,39 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.navigation.NavController
 import androidx.compose.material.Text
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
+import dev.jordond.compass.Location
+import dev.jordond.compass.Priority
+import dev.jordond.compass.geolocation.Geolocator
+import dev.jordond.compass.geolocation.GeolocatorResult
+import dev.jordond.compass.geolocation.mobile
+
+suspend fun GetCurrentLocation(): GeolocatorResult {
+    val geolocator: Geolocator = Geolocator.mobile()
+    return geolocator.current(Priority.HighAccuracy)
+}
 
 @Composable
 fun HomeScreen(navController: NavController) {
+    val locationState = remember { mutableStateOf<Location?>(null) }
+
+    LaunchedEffect(Unit) {
+        // Run the suspending function and update the state when the composable is launched
+        GetCurrentLocation().onSuccess {
+            location -> locationState.value = location
+        }.onFailed {
+            exception -> locationState.value = null
+        }
+    }
+
     Column(
-        modifier = Modifier.fillMaxSize(),
+        modifier = Modifier
+            .background(Color.White)
+            .fillMaxSize(),
         verticalArrangement = Arrangement.Top,
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
@@ -29,8 +57,6 @@ fun HomeScreen(navController: NavController) {
             verticalArrangement = Arrangement.Top,
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            // Shows up on screen here
-            Text(text = "Home Screen!")
             // Displays recent sample data for quick selection (dummy data for now).
             RecentSubmissionsSection(navController)
 
