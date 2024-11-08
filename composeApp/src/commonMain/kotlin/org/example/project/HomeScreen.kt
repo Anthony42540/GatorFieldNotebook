@@ -2,17 +2,18 @@ package org.example.project
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.navigation.NavController
-import androidx.compose.material.Text
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -65,8 +66,17 @@ fun HomeScreen(navController: NavController) {
                 verticalArrangement = Arrangement.Center,
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
-                // Quick button to add new selection
-                NavigationButton("Add new sample", onClick = { navController.navigate("editSample") })
+                Box(
+                    modifier = Modifier.fillMaxWidth()
+                ) {
+                    GoogleMaps(locationState.value?.coordinates?.latitude.toString(), locationState.value?.coordinates?.longitude.toString())
+                    // Quick button to add new selection
+                    Box(
+                        modifier = Modifier.align(Alignment.BottomCenter).padding(20.dp)
+                    ) {
+                        NavigationButton("Add new sample", onClick = { navController.navigate("editSample") })
+                    }
+                }
             }
         }
     }

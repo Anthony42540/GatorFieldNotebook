@@ -1,12 +1,14 @@
 package org.example.project
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.*
-import androidx.compose.material.Button
-import androidx.compose.material.ButtonDefaults
-import androidx.compose.material.CircularProgressIndicator
-import androidx.compose.material.Text
-import androidx.compose.material.TextField
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.Text
+import androidx.compose.material3.TextField
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -119,12 +121,12 @@ fun EditSampleScreen(navController: NavController) {
                     fontSize = 18.sp,
                     color = Color(0xFFFFFFFF)
                 )
-                Button( onClick = { refreshLocationAndAltitude() }, colors = ButtonDefaults.buttonColors (backgroundColor = Color.White)) {
+                Button( onClick = { refreshLocationAndAltitude() }, colors = ButtonDefaults.buttonColors (containerColor = Color.White)) {
                     if (isLoading == "true") {
                         CircularProgressIndicator(modifier = Modifier.size(24.dp), color = Color.Black)
                     }
                     else {
-                        Text("Refresh")
+                        Text("Refresh", color = Color.Black)
                     }
                 }
             }
@@ -158,17 +160,17 @@ fun EditSampleScreen(navController: NavController) {
                 placeholder = { Text("Sample Info") }
             )
 
-            Spacer(modifier = Modifier.height(16.dp))
+            Spacer(modifier = Modifier.height(12.dp))
 
             // Save Button
             Button(
                 onClick = { /* Handle save logic here */ },
-                modifier = Modifier.align(Alignment.CenterHorizontally),
+                modifier = Modifier.align(Alignment.CenterHorizontally).border(1.dp, Color.Black, RoundedCornerShape(30.dp)),
                 colors = ButtonDefaults.buttonColors (
-                    backgroundColor = Color(0xFF5ba476)
+                    containerColor = Color.White
                 )
             ) {
-                Text(text = "Save", color = Color.White)
+                Text(text = "Save", color = Color.Black)
             }
         }
     }
