@@ -62,11 +62,14 @@ kotlin {
             implementation(libs.androidx.activity.compose)
             implementation(libs.ktor.client.android)
             implementation(libs.android.driver)
+            implementation(libs.maps.compose)
+            implementation(libs.maps.compose.utils)
+            implementation(libs.play.services.maps)
         }
         commonMain.dependencies {
             implementation(compose.runtime)
             implementation(compose.foundation)
-            implementation(compose.material)
+            implementation(compose.material3)
             implementation(compose.ui)
             implementation(compose.components.resources)
             implementation(compose.components.uiToolingPreview)
@@ -79,7 +82,10 @@ kotlin {
             implementation(libs.runtime)
             implementation(libs.kotlinx.datetime)
             implementation(libs.koin.core)
-            implementation( "org.jetbrains.androidx.navigation:navigation-compose:2.8.0-alpha10")
+            implementation( libs.navigation.compose)
+            implementation(libs.compass.geolocation)
+            implementation(libs.compass.geolocation.mobile)
+            implementation(libs.kotlinx.datetime.v040)
         }
         desktopMain.dependencies {
             implementation(compose.desktop.currentOs)
@@ -126,7 +132,9 @@ dependencies {
     implementation(libs.androidx.ui.android)
     implementation(libs.androidx.ui.text.android)
     implementation(libs.androidx.ui.text.google.fonts)
+    implementation(libs.androidx.runtime.android)
     debugImplementation(compose.uiTooling)
+    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.8.1")
 }
 
 compose.desktop {
