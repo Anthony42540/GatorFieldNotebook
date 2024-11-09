@@ -165,12 +165,12 @@ fun EditSampleScreen(navController: NavController) {
             // Save Button
             Button(
                 onClick = { /* Handle save logic here */ },
-                modifier = Modifier.align(Alignment.CenterHorizontally).border(1.dp, Color.Black, RoundedCornerShape(30.dp)),
+                modifier = Modifier.align(Alignment.CenterHorizontally),
                 colors = ButtonDefaults.buttonColors (
-                    containerColor = Color.White
+                    containerColor = Color(0xFF12BF7A)
                 )
             ) {
-                Text(text = "Save", color = Color.Black)
+                Text(text = "Save", color = Color.White)
             }
         }
     }
