@@ -74,7 +74,7 @@ fun HomeScreen(navController: NavController) {
                     Box(
                         modifier = Modifier.align(Alignment.BottomCenter).padding(20.dp)
                     ) {
-                        NavigationButton("Add new sample", onClick = { navController.navigate("editSample") })
+                        NavigationButton("Add New Sample", onClick = { navController.navigate("editSample") }, Color(0xFF12BF7A), Color.White)
                     }
                 }
             }
@@ -109,7 +109,7 @@ fun RecentSubmissionsSection(navController: NavController) {
             }
         }
 
-        NavigationButton("View all submissions", onClick = { navController.navigate("viewSampleCollection") })
+        NavigationButton("View all submissions", onClick = { navController.navigate("viewSampleCollection") }, Color.White, Color.Black)
 
     }
 }
