@@ -26,15 +26,15 @@ fun App() {
 }
 
 @Composable
-fun NavigationButton(text: String, onClick: () -> Unit, buttonColor: Color, textColor: Color) {
+fun NavigationButton(text: String, onClick: () -> Unit) {
     Button(
         onClick = onClick,
         modifier = Modifier.padding(horizontal = 8.dp),
         colors = ButtonDefaults.buttonColors(
-            containerColor = buttonColor
+            containerColor = Color.White
         )
     ) {
-        Text(text, color = textColor)
+        Text(text, color = Color.Black)
     }
 }
 
