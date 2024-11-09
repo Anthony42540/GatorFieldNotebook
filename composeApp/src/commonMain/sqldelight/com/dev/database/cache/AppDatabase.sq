@@ -1,5 +1,42 @@
 import kotlin.Boolean;
 
+-- table stores the forms that are created. Contains unique form ID and non unique name.
+CREATE TABLE SampleForm (
+    form_id INTEGER PRIMARY KEY AUTOINCREMENT,
+    form_name TEXT NOT NULL
+);
+-- table stores fields assocaited with each form, form_id links the fields to their form
+CREATE TABLE Field (
+    field_id INTEGER PRIMARY KEY AUTOINCREMENT,
+    form_id INTEGER NOT NULL,
+    field_name TEXT NOT NULL,
+    order_num INTEGER NOT NULL,         -- the order of the field within the form
+    field_type TEXT NOT NULL,
+    is_required INTEGER DEFAULT 0,
+    dropdown_options TEXT,              -- like ["Red", "Green", "Blue"]
+    multi_select_options TEXT,
+    FOREIGN KEY (form_id) REFERENCES SampleForm(form_id) ON DELETE CASCADE
+);
+--table stores samples collected (additional sample data stored in dataEntry table, linked to sampleData)
+CREATE TABLE SampleData (
+    sample_id INTEGER PRIMARY KEY AUTOINCREMENT,
+    form_id INTEGER NOT NULL,
+    form_name TEXT NOT NULL,
+    date_collected_utc TEXT NOT NULL,
+    location TEXT NOT NULL,
+    FOREIGN KEY (form_id) REFERENCES SampleForm(form_id) ON DELETE CASCADE
+);
+--data entries stored here. field name
+CREATE TABLE DataEntry (
+    entry_id INTEGER PRIMARY KEY AUTOINCREMENT,
+    sample_id INTEGER NOT NULL,
+    field_id INTEGER NOT NULL,
+    user_input TEXT NOT NULL,
+    FOREIGN KEY (sample_id) REFERENCES SampleData(sample_id) ON DELETE CASCADE,
+    FOREIGN KEY (field_id) REFERENCES Field(field_id) ON DELETE CASCADE
+);
+
+
 CREATE TABLE Launch (
     flightNumber INTEGER NOT NULL,
     missionName TEXT NOT NULL,

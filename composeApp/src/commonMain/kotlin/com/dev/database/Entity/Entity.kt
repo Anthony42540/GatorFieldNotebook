@@ -23,12 +23,13 @@ enum class FieldType {
 data class Field(
     @SerialName("field_name") val fieldName: String,
     @SerialName("field_type") val fieldType: FieldType,
+    @SerialName("order_num") val orderNumber : Int,
     @SerialName("is_required") val isRequired: Boolean = false,
     @SerialName("dropdown_options") val dropdownOptions: List<String>? = null,
     @SerialName("multi_select_options") val multiSelectOptions: List<String>? = null
 )
 
-// Stores the forms that the user has created (NOT form entries, just  forms themselves).
+// Stores the forms that the user has created (NOT form entries, just forms themselves).
 @Serializable
 data class SampleForm(
     @SerialName("form_name") val formName: String,
@@ -45,6 +46,9 @@ data class SampleData(
     @SerialName("location") val location: String,
     @SerialName("data_entries") val dataEntries: Map<String, String> //First value contains field name, second value contains user input
 )
+
+
+
 
 @Serializable
 data class RocketLaunch(
