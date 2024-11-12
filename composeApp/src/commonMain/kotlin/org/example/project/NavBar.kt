@@ -9,7 +9,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.wrapContentHeight
-import androidx.compose.material.Text
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -30,14 +30,14 @@ fun NavBar(navController: NavController) {
     Column(
         modifier = Modifier
             .fillMaxWidth()
-            .background(Color(0x400021A5))
+            .background(Color(0xFFFFFF).copy(alpha = 1.0f))
             .padding(8.dp)
             .wrapContentHeight(),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         Text(
             text = "Gator Field Notebook",
-            color = Color(0xFF0021A5),
+            color = Color(0x000000).copy(alpha = 1.0f),
             fontSize = 30.sp,
             modifier = Modifier.padding(bottom = 8.dp)
         )
