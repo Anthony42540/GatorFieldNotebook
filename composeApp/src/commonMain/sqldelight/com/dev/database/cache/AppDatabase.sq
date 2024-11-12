@@ -5,6 +5,14 @@ CREATE TABLE SampleForm (
     form_id INTEGER PRIMARY KEY AUTOINCREMENT,
     form_name TEXT NOT NULL
 );
+
+insertSampleForm:
+INSERT INTO SampleForm(form_name)
+VALUES(?);
+
+getAllSampleForms:
+SELECT * FROM SampleForm;
+
 -- table stores fields assocaited with each form, form_id links the fields to their form
 CREATE TABLE Field (
     field_id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -17,15 +25,39 @@ CREATE TABLE Field (
     multi_select_options TEXT,
     FOREIGN KEY (form_id) REFERENCES SampleForm(form_id) ON DELETE CASCADE
 );
+
+insertField:
+INSERT INTO Field(field_id, form_id, field_name, order_num, field_type, is_required, dropdown_options, multi_select_options)
+VALUES(?,?,?,?,?,?,?,?);
+
+getFormFields:
+SELECT * FROM Field WHERE form_id = ? ORDER BY order_num ASC;
+
+changeFieldOrder:
+UPDATE Field SET order_num = ? WHERE field_id = ?;
+
 --table stores samples collected (additional sample data stored in dataEntry table, linked to sampleData)
 CREATE TABLE SampleData (
     sample_id INTEGER PRIMARY KEY AUTOINCREMENT,
     form_id INTEGER NOT NULL,
-    form_name TEXT NOT NULL,
     date_collected_utc TEXT NOT NULL,
     location TEXT NOT NULL,
     FOREIGN KEY (form_id) REFERENCES SampleForm(form_id) ON DELETE CASCADE
 );
+
+insertSampleData:
+INSERT INTO SampleData(form_id, date_collected_utc, location)
+VALUES(?,?,?);
+
+getAllSampleData:
+SELECT * FROM SampleData;
+
+getSampleDataByForm:
+SELECT * FROM SampleData WHERE form_id = ?;
+
+getSampleData:
+SELECT * FROM SampleData WHERE sample_id = ?;
+
 --data entries stored here. field name
 CREATE TABLE DataEntry (
     entry_id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -36,14 +68,5 @@ CREATE TABLE DataEntry (
     FOREIGN KEY (field_id) REFERENCES Field(field_id) ON DELETE CASCADE
 );
 
-
-CREATE TABLE Launch (
-    flightNumber INTEGER NOT NULL,
-    missionName TEXT NOT NULL,
-    details TEXT,
-    launchSuccess INTEGER AS Boolean DEFAULT NULL,
-    launchDateUTC TEXT NOT NULL,
-    patchUrlSmall TEXT,
-    patchUrlLarge TEXT,
-    articleUrl TEXT
-);
+getDataEntry:
+SELECT * FROM DataEntry WHERE sample_id = ?;

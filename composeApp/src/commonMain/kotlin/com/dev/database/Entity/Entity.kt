@@ -44,7 +44,7 @@ data class SampleData(
     @SerialName("form_name") val formName: String,
     @SerialName("date_collected_utc") val dateCollectedUTC: String,
     @SerialName("location") val location: String,
-    @SerialName("data_entries") val dataEntries: Map<String, String> //First value contains field name, second value contains user input
+    @SerialName("data_entries") val dataEntries: Map<Long, String> //First value contains field id, second value contains user input
 )
 
 
