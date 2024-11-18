@@ -1,35 +1,119 @@
 package org.example.project
 
 import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.border
+import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Text
-import androidx.compose.runtime.Composable
+import androidx.compose.material3.TextField
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 
 @Composable
 fun PrintScreen(navController: NavController) {
+    var sampleName by remember { mutableStateOf("") }
+    var sampleDetails by remember { mutableStateOf("Sample details will appear here...") }
+    var selectedPrinter by remember { mutableStateOf("Sample Printer 223442") }
+    var printerStatus by remember { mutableStateOf("online") }
+
     Column(
         modifier = Modifier
-            .background(Color.White)
-            .fillMaxSize(),
+            .fillMaxSize()
+            .background(Color.White),
         verticalArrangement = Arrangement.Top,
-        horizontalAlignment = Alignment.CenterHorizontally
+        horizontalAlignment = Alignment.Start
     ) {
-        NavBar(navController) // The navigation bar shows up at the top
+        NavBar(navController)
 
-        // This is the actual print screen content
         Column(
-            modifier = Modifier.fillMaxSize(),
-            verticalArrangement = Arrangement.Center,
-            horizontalAlignment = Alignment.CenterHorizontally
+            modifier = Modifier
+                .fillMaxSize(),
+            verticalArrangement = Arrangement.Top,
+            horizontalAlignment = Alignment.Start
         ) {
-            // Shows up on screen here
-            Text(text = "Print Screen")
+            // Choose Sample Section
+            SectionTitle("Choose Sample")
+            TextField(
+                value = sampleName,
+                onValueChange = { sampleName = it },
+                modifier = Modifier.fillMaxWidth(),
+                placeholder = { Text("Sample Name") }
+            )
+
+            Spacer(modifier = Modifier.height(16.dp))
+
+            // Sample Details Section
+            SectionTitle("Sample Details")
+            TextField(
+                value = sampleDetails,
+                onValueChange = { sampleDetails = it },
+                modifier = Modifier.fillMaxWidth(),
+                readOnly = true
+            )
+
+            Spacer(modifier = Modifier.height(16.dp))
+
+            // Printer Options Section
+            SectionTitle("Printer Options")
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .background(Color(0xFF0021A5))
+                    .padding(vertical = 6.dp)
+                    .padding(horizontal = 8.dp),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Text(
+                    text = "Choose Printer",
+                    fontSize = 18.sp,
+                    color = Color.White
+                )
+                Text(
+                    text = "Status",
+                    fontSize = 18.sp,
+                    color = Color.White
+                )
+            }
+
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 8.dp),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Text(
+                    text = selectedPrinter,
+                    fontSize = 16.sp,
+                    color = Color.Black
+                )
+                Text(
+                    text = if (printerStatus == "online") "online" else "offline",
+                    fontSize = 16.sp,
+                    color = if (printerStatus == "online") Color.Green else Color.Red
+                )
+            }
+
+            Spacer(modifier = Modifier.height(16.dp))
+
+            // Print Button
+            Button(
+                onClick = { /* Handle print logic here */ },
+                modifier = Modifier.align(Alignment.CenterHorizontally),
+                colors = ButtonDefaults.buttonColors(
+                    containerColor = Color(0xFF0021A5)
+                )
+            ) {
+                Text(text = "Print", color = Color.White)
+            }
         }
     }
 }
