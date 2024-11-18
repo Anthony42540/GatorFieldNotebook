@@ -65,6 +65,8 @@ kotlin {
             implementation(libs.maps.compose)
             implementation(libs.maps.compose.utils)
             implementation(libs.play.services.maps)
+            implementation(libs.koin.android)
+            implementation(libs.koin.core)
         }
         commonMain.dependencies {
             implementation(compose.runtime)
@@ -82,7 +84,7 @@ kotlin {
             implementation(libs.runtime)
             implementation(libs.kotlinx.datetime)
             implementation(libs.koin.core)
-            implementation( libs.navigation.compose)
+            implementation(libs.navigation.compose)
             implementation(libs.compass.geolocation)
             implementation(libs.compass.geolocation.mobile)
             implementation(libs.kotlinx.datetime.v040)
