@@ -1,4 +1,3 @@
-import kotlin.Boolean;
 
 -- table stores the forms that are created. Contains unique form ID and non unique name.
 CREATE TABLE SampleForm (
@@ -26,8 +25,8 @@ CREATE TABLE Field (
 );
 
 insertField:
-INSERT INTO Field(field_id, form_id, field_name, order_num, field_type, is_required, options)
-VALUES(?,?,?,?,?,?,?);
+INSERT INTO Field(form_id, field_name, order_num, field_type, is_required, options)
+VALUES(?,?,?,?,?,?);
 
 getFormFields:
 SELECT * FROM Field WHERE form_id = ? ORDER BY order_num ASC;
@@ -70,5 +69,12 @@ CREATE TABLE DataEntry (
     FOREIGN KEY (field_id) REFERENCES Field(field_id) ON DELETE CASCADE
 );
 
+insertDataEntry:
+INSERT INTO DataEntry(sample_id, field_id, user_input)
+VALUES(?,?,?);
+
 getDataEntry:
 SELECT * FROM DataEntry WHERE sample_id = ?;
+
+getLastRowID:
+SELECT last_insert_rowid();

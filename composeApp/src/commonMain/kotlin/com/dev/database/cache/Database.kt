@@ -12,41 +12,30 @@ internal class Database(databaseDriverFactory: DatabaseDriverFactory) {
     private val database = AppDatabase(databaseDriverFactory.createDriver())
     private val dbQuery = database.appDatabaseQueries
 
-    //get a list of all sample forms (to choose from when adding new sample)
-    internal fun getAllSampleForms(): List<SampleForm> {
+    /************************** GETTER FUNCTIONS **************************/
+    internal fun getAllSampleForms(): List<SampleForm> { //get a list of all sample forms (to choose from when adding new sample)
         return dbQuery.getAllSampleForms(::mapSampleForm).executeAsList()
     }
-
-    //get the list of fields for specific form (to display for form field entry)
-    internal fun getFormFields(formId: Long): List<Field> {
+    internal fun getFormFields(formId: Long): List<Field> { //get the list of fields for specific form (to display for form field entry)
         return dbQuery.getFormFields(formId, ::mapField).executeAsList()
     }
-
-    //get all sample data
-    internal fun getAllSampleData(): List<SampleData> {
+    internal fun getAllSampleData(): List<SampleData> { //get all samples collected
         return dbQuery.getAllSampleData(::mapSampleData).executeAsList()
     }
-    //get all sample data from specific form
-    internal fun getSampleDataByForm(formId: Long): List<SampleData> {
+    internal fun getSampleDataByForm(formId: Long): List<SampleData> { //get all sample data from specific form
         return dbQuery.getSampleDataByForm(formId, ::mapSampleData).executeAsList()
     }
-    //gets single sample by sample ID
-    internal fun getSampleData(sampleId: Long): SampleData {
+    internal fun getSampleData(sampleId: Long): SampleData { //gets single sample by sample ID
         return dbQuery.getSampleData(sampleId, ::mapSampleData).executeAsOne()
     }
-
-    //get list of all data entries for a sample type
-    internal fun getDataEntry(sampleId: Long): List<DataEntry> {
+    internal fun getDataEntry(sampleId: Long): List<DataEntry> { //get list of all data entries for a sample type
         return dbQuery.getDataEntry(sampleId, ::mapDataEntry).executeAsList()
     }
-
-    //uses getSampleData and getDataEntry to create data class object SampleAndData (easier to use in frontend)
-    internal fun getSampleAndData(sampleId: Long): SampleAndData {
+    internal fun getSampleAndData(sampleId: Long): SampleAndData { //uses getSampleData and getDataEntry to create data class object SampleAndData (easier to use in frontend)
         val sampleData = getSampleData(sampleId)
         val dataEntries = getDataEntry(sampleId)
         //converts list of data entries into map<Long, String> (iterates through list)
         val dataEntriesMap = dataEntries.associate{it.fieldId.toLong() to it.userInput}
-
         return SampleAndData(
             sampleId = sampleData.sampleId,
             formId = sampleData.formId,
@@ -55,6 +44,41 @@ internal class Database(databaseDriverFactory: DatabaseDriverFactory) {
             dataEntries = dataEntriesMap
         )
     }
+    /************************** GETTER FUNCTIONS **************************/
+
+    /************************** INSERT FUNCTIONS **************************/
+    internal fun insertSampleForm(formName: String): Long { //add new sample form and return unique sample ID
+        dbQuery.insertSampleForm(formName)
+        return dbQuery.getLastRowID().executeAsOne()
+    }
+    internal fun insertField( //add new field to a sample form
+        formId: Long,
+        fieldName: String,
+        orderNum: Long,
+        fieldType: FieldType,
+        isRequired: Boolean,
+        options: List<String>?
+    ): Long {
+        dbQuery.insertField(formId, fieldName, orderNum, ftToStr(fieldType), if (isRequired) 1 else 0, listToJsonString(options))
+        return dbQuery.getLastRowID().executeAsOne()
+    }
+    internal fun insertSampleData( //add new sample collected
+        formId: Long,
+        dateCollectedUtc: String,
+        location: String,
+    ): Long {
+        dbQuery.insertSampleData(formId, dateCollectedUtc, location)
+        return dbQuery.getLastRowID().executeAsOne()
+    }
+    internal fun insertDataEntry(
+        sampleId: Long,
+        fieldId: Long,
+        userInput: String
+    ): Long {
+        dbQuery.insertDataEntry(sampleId, fieldId, userInput)
+        return dbQuery.getLastRowID().executeAsOne()
+    }
+    /************************** INSERT FUNCTIONS **************************/
 }
 
 private fun mapSampleForm(
@@ -123,6 +147,10 @@ private fun strToFT(fieldType: String): FieldType {
     } catch (e: IllegalArgumentException) {
         throw IllegalArgumentException("Unknown FieldType: $fieldType")
     }
+}
+
+private fun ftToStr(fieldType: FieldType): String {
+    return fieldType.toString()
 }
 
 private fun listToJsonString(list: List<String>?): String? {
