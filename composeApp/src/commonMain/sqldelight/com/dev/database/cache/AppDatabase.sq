@@ -1,4 +1,3 @@
-import kotlin.Boolean;
 
 -- table stores the forms that are created. Contains unique form ID and non unique name.
 CREATE TABLE SampleForm (
@@ -21,14 +20,13 @@ CREATE TABLE Field (
     order_num INTEGER NOT NULL,         -- the order of the field within the form
     field_type TEXT NOT NULL,
     is_required INTEGER DEFAULT 0,
-    dropdown_options TEXT,              -- like ["Red", "Green", "Blue"]
-    multi_select_options TEXT,
+    options TEXT,              -- like ["Red", "Green", "Blue"]
     FOREIGN KEY (form_id) REFERENCES SampleForm(form_id) ON DELETE CASCADE
 );
 
 insertField:
-INSERT INTO Field(field_id, form_id, field_name, order_num, field_type, is_required, dropdown_options, multi_select_options)
-VALUES(?,?,?,?,?,?,?,?);
+INSERT INTO Field(form_id, field_name, order_num, field_type, is_required, options)
+VALUES(?,?,?,?,?,?);
 
 getFormFields:
 SELECT * FROM Field WHERE form_id = ? ORDER BY order_num ASC;
@@ -58,7 +56,10 @@ SELECT * FROM SampleData WHERE form_id = ?;
 getSampleData:
 SELECT * FROM SampleData WHERE sample_id = ?;
 
---data entries stored here. field name
+--data entries stored here. this is an INDIVIDUAL data entry.
+--sample ID links it to specific sample taken
+--field ID links to type of field (specifies field attributes)
+--user input is actual data stored in field. any data type must be stored as string in here and transcribed using fieldType from field ID
 CREATE TABLE DataEntry (
     entry_id INTEGER PRIMARY KEY AUTOINCREMENT,
     sample_id INTEGER NOT NULL,
@@ -68,5 +69,12 @@ CREATE TABLE DataEntry (
     FOREIGN KEY (field_id) REFERENCES Field(field_id) ON DELETE CASCADE
 );
 
+insertDataEntry:
+INSERT INTO DataEntry(sample_id, field_id, user_input)
+VALUES(?,?,?);
+
 getDataEntry:
 SELECT * FROM DataEntry WHERE sample_id = ?;
+
+getLastRowID:
+SELECT last_insert_rowid();
