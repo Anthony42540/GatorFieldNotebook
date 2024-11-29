@@ -50,15 +50,16 @@ Works on iOS and Android devices.
 - SQL setup: hooks for connection to the database have been implemented, tables have been added, and a database class has been made for interaction
 
 ### SQLLight tables
-# SampleForm
+#### SampleForm
 | Field Name  | Field Type | Description |
 |-------------|------------|-------------|
 | `form_id`   | INTEGER    | Primary key |
 | `form_name` | TEXT       | Form name   |
+
 **Description:**  
 This stores the "head" of each form. For example, if there was a form for bug samples, this table would store the name "Bug Samples" and the ID. The form's fields are linked through the Field table.
 
-# Field
+#### Field
 | Field Name  | Field Type | Description                                                                 |
 |-------------|------------|-----------------------------------------------------------------------------|
 | `field_id`  | INTEGER    | Primary Key                                                                 |
@@ -68,26 +69,29 @@ This stores the "head" of each form. For example, if there was a form for bug sa
 | `field_type`| TEXT       | Field type (i.e. short text, number, multi-select)                          |
 | `is_required` | INTEGER  | Indicates if field is required                                              |
 | `options`   | TEXT       | List of options if field is dropdown or multi-select (optional field)       |
+
 **Description:**  
 Stores the fields associated with each form. Each field is linked to a form by form id.
 
-# SampleData
+#### SampleData
 | Field Name           | Field Type | Description                             |
 |-----------------------|------------|-----------------------------------------|
 | `sample_id`          | INTEGER    | Primary Key                             |
 | `form_id`            | INTEGER    | Links sample data to the connected form |
 | `date_collected_utc` | TEXT       | Date and time of sample                 |
 | `location`           | TEXT       | Location of sample                      |
+
 **Description:**  
 This is the "head" of each sample collected. It is associated with a form and contains the date and location, since those will always be required fields. Each field submission for a sample is stored as a data entry in the next table.
 
-# DataEntry
+#### DataEntry
 | Field Name  | Field Type | Description                           |
 |-------------|------------|---------------------------------------|
 | `entry_id`  | INTEGER    | Primary key                           |
 | `sample_id` | INTEGER    | Links data to the sample it is from   |
 | `field_id`  | INTEGER    | Links data to the type of field it is |
 | `user_input`| TEXT       | The actual data stored as a string    |
+
 **Description:**  
 Stores individual data entries for each sample. It is linked to the sample it is from and the type of field that it is. In the future, if fields are to be reused for multiple forms, the SampleData table will have to store a list linking each dataEntry to its fields. This will save space in the database.
 
