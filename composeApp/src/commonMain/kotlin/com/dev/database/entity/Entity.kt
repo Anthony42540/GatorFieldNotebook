@@ -8,6 +8,7 @@ import kotlinx.serialization.Serializable
 enum class FieldType {
     SHORT_STRING,
     LONG_STRING,
+    NUMBER,
     DROPDOWN,
     MULTI_SELECT
 }
