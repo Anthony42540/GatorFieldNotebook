@@ -4,26 +4,41 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.Alignment
-import androidx.compose.ui.Modifier
-import androidx.navigation.NavController
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
+import androidx.navigation.NavController
+import com.dev.database.cache.Database
+import com.dev.database.entity.SampleAndData
 import dev.jordond.compass.Location
 import dev.jordond.compass.Priority
 import dev.jordond.compass.geolocation.Geolocator
 import dev.jordond.compass.geolocation.GeolocatorResult
 import dev.jordond.compass.geolocation.mobile
+import kotlinx.datetime.Instant
+import kotlinx.datetime.TimeZone
+import kotlinx.datetime.toLocalDateTime
+import kotlinx.coroutines.launch
 
 suspend fun GetCurrentLocation(): GeolocatorResult {
     val geolocator: Geolocator = Geolocator.mobile()
@@ -31,15 +46,14 @@ suspend fun GetCurrentLocation(): GeolocatorResult {
 }
 
 @Composable
-fun HomeScreen(navController: NavController) {
-    val locationState = remember { mutableStateOf<Location?>(null) }
+fun HomeScreen(navController: NavController, database: Database? = null) {
+    var locationState by remember { mutableStateOf<Location?>(null) }
 
     LaunchedEffect(Unit) {
-        // Run the suspending function and update the state when the composable is launched
-        GetCurrentLocation().onSuccess {
-            location -> locationState.value = location
-        }.onFailed {
-            exception -> locationState.value = null
+        GetCurrentLocation().onSuccess { location ->
+            locationState = location
+        }.onFailed { exception ->
+            locationState = null
         }
     }
 
@@ -50,16 +64,14 @@ fun HomeScreen(navController: NavController) {
         verticalArrangement = Arrangement.Top,
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        NavBar(navController) // The navigation bar shows up at the top
+        NavBar(navController)
 
-        // This is the actual home screen content
         Column(
             modifier = Modifier.fillMaxSize(),
             verticalArrangement = Arrangement.Top,
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            // Displays recent sample data for quick selection (dummy data for now).
-            RecentSubmissionsSection(navController)
+            RecentSubmissionsSection(navController, database)
 
             Column(
                 modifier = Modifier.fillMaxSize(),
@@ -69,12 +81,18 @@ fun HomeScreen(navController: NavController) {
                 Box(
                     modifier = Modifier.fillMaxWidth()
                 ) {
-                    GoogleMaps(locationState.value?.coordinates?.latitude.toString(), locationState.value?.coordinates?.longitude.toString())
-                    // Quick button to add new selection
+                    GoogleMaps(locationState?.coordinates?.latitude.toString(), locationState?.coordinates?.longitude.toString())
                     Box(
-                        modifier = Modifier.align(Alignment.BottomCenter).padding(20.dp)
+                        modifier = Modifier
+                            .align(Alignment.BottomCenter)
+                            .padding(20.dp)
                     ) {
-                        NavigationButton("Add New Sample", onClick = { navController.navigate("editSample") }, Color(0xFF12BF7A), Color.White)
+                        NavigationButton(
+                            "Add New Sample",
+                            onClick = { navController.navigate("editSample") },
+                            Color(0xFF12BF7A),
+                            Color.White
+                        )
                     }
                 }
             }
@@ -82,32 +100,163 @@ fun HomeScreen(navController: NavController) {
     }
 }
 
-
-//Recent submission section for home screen
 @Composable
-fun RecentSubmissionsSection(navController: NavController) {
-    // Dummy data for now
-    val recentSubmissions = listOf(
-        "Sample 1", "Sample 2", "Sample 3", "Sample 4", "Sample 5"
-    )
+fun RecentSubmissionsSection(
+    navController: NavController,
+    database: Database? = null
+) {
+    var recentSamples by remember { mutableStateOf<List<SampleAndData>>(emptyList()) }
+    var isLoading by remember { mutableStateOf(true) }
+    var error by remember { mutableStateOf<String?>(null) }
+
+    LaunchedEffect(Unit) {
+        if (database == null) {
+            isLoading = false
+            error = "Database not initialized"
+            return@LaunchedEffect
+        }
+
+        try {
+            val allSamples = database.getAllSampleData()
+            val recentSampleIds = allSamples
+                .sortedByDescending { it.dateCollectedUTC }
+                .take(5)
+                .map { it.sampleId }
+
+            recentSamples = recentSampleIds.map { sampleId ->
+                database.getSampleAndData(sampleId.toLong())
+            }
+        } catch (e: Exception) {
+            error = "Failed to load recent submissions: ${e.message}"
+        } finally {
+            isLoading = false
+        }
+    }
 
     Column(
         modifier = Modifier
             .fillMaxWidth()
             .padding(16.dp)
     ) {
-        Text(text = "Recent Submissions", modifier = Modifier.padding(bottom = 8.dp))
+        Text(
+            text = "Recent Submissions",
+            style = MaterialTheme.typography.titleMedium,
+            modifier = Modifier.padding(bottom = 8.dp)
+        )
 
-        LazyColumn {
-            items(recentSubmissions) { submission ->
-                Text(
-                    text = submission,
+        when {
+            isLoading -> {
+                Box(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .padding(4.dp)
+                        .height(200.dp),
+                    contentAlignment = Alignment.Center
+                ) {
+                    CircularProgressIndicator()
+                }
+            }
+            error != null -> {
+                Text(
+                    text = error!!,
+                    color = Color.Red,
+                    modifier = Modifier.padding(vertical = 8.dp)
                 )
             }
+            recentSamples.isEmpty() -> {
+                Text(
+                    text = "No submissions yet",
+                    modifier = Modifier.padding(vertical = 8.dp)
+                )
+            }
+            else -> {
+                LazyColumn(
+                    modifier = Modifier.height(200.dp)
+                ) {
+                    items(recentSamples) { sample ->
+                        SampleCard(sample)
+                    }
+                }
+            }
         }
-        NavigationButton("View all submissions", onClick = { navController.navigate("viewSampleCollection") }, Color.White, Color.Black)
+
+        Spacer(modifier = Modifier.height(8.dp))
+
+        NavigationButton(
+            text = "View all submissions",
+            onClick = { navController.navigate("viewSampleCollection") },
+            buttonColor = Color.White,
+            textColor = Color.Black
+        )
+    }
+}
+
+@Composable
+private fun SampleCard(sample: SampleAndData) {
+    Card(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(vertical = 4.dp),
+        colors = CardDefaults.cardColors(
+            containerColor = Color.White
+        ),
+        elevation = CardDefaults.cardElevation(
+            defaultElevation = 2.dp
+        )
+    ) {
+        Column(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(12.dp)
+        ) {
+            // Debug print to see what's in dataEntries
+            println("DataEntries: ${sample.dataEntries}")
+
+            // Look for the Sample Name in data entries
+            val sampleNameEntry = sample.dataEntries.entries.find { (_, value) ->
+                !value.isNullOrBlank()
+            }?.value ?: "Unnamed Sample"
+
+            Text(
+                text = sampleNameEntry,
+                style = MaterialTheme.typography.bodyLarge,
+                color = Color.Black
+            )
+
+            Spacer(modifier = Modifier.height(4.dp))
+
+            Text(
+                text = "Collected: ${formatDate(sample.dateCollectedUTC)}",
+                style = MaterialTheme.typography.bodyMedium,
+                color = Color.Gray
+            )
+
+            Text(
+                text = "Location: ${formatLocation(sample.location)}",
+                style = MaterialTheme.typography.bodySmall,
+                color = Color.Gray
+            )
+        }
+    }
+}
+
+private fun formatDate(dateString: String): String {
+    return try {
+        val instant = Instant.parse(dateString)
+        val localDateTime = instant.toLocalDateTime(TimeZone.currentSystemDefault())
+
+        "${localDateTime.month.name.take(3)} ${localDateTime.dayOfMonth}, ${localDateTime.year} " +
+                "${localDateTime.hour % 12}:${localDateTime.minute.toString().padStart(2, '0')} " +
+                "${if (localDateTime.hour >= 12) "PM" else "AM"}"
+    } catch (e: Exception) {
+        dateString
+    }
+}
+
+private fun formatLocation(location: String): String {
+    return try {
+        val parts = location.split("|")
+        parts[0]
+    } catch (e: Exception) {
+        location
     }
 }

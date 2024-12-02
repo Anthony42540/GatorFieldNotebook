@@ -8,7 +8,7 @@ import com.dev.database.entity.SampleAndData
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 
-internal class Database(databaseDriverFactory: DatabaseDriverFactory) {
+class Database(databaseDriverFactory: DatabaseDriverFactory) {
     private val database = AppDatabase(databaseDriverFactory.createDriver())
     private val dbQuery = database.appDatabaseQueries
 
