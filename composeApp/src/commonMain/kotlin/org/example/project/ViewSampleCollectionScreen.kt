@@ -78,16 +78,23 @@ fun ViewSampleCollectionScreen(navController: NavController, database: Database?
             )
             return@Column
         }
-
-        Button(
-            onClick = { showDeleteConfirmation = true },
-            colors = ButtonDefaults.buttonColors(containerColor = Color.Red),
+        Box(
             modifier = Modifier
-                .align(Alignment.End)
-                .padding(16.dp)
+                .fillMaxWidth()
+                .padding(16.dp),
+            contentAlignment = Alignment.Center
         ) {
-            Text("Clear All Samples", color = Color.White)
+            Button(
+                onClick = { showDeleteConfirmation = true },
+                colors = ButtonDefaults.buttonColors(containerColor = Color.Red),
+
+            ) {
+                Text("Clear All Samples", color = Color.White)
+            }
+
         }
+
+
 
 
         if (showDeleteConfirmation) {
@@ -109,6 +116,7 @@ fun ViewSampleCollectionScreen(navController: NavController, database: Database?
                             }
                         },
                         colors = ButtonDefaults.buttonColors(containerColor = Color.Red)
+
                     ) {
                         Text("Delete All", color = Color.White)
                     }
