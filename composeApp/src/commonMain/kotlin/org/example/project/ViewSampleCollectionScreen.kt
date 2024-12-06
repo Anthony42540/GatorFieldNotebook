@@ -206,12 +206,7 @@ private fun SampleRow(sample: SampleAndData, onSampleClick: (Long) -> Unit) {
             modifier = Modifier.padding(8.dp),
             color = Color.Black
         )
-        Text(
-            text = sample.sampleId.toString(),
-            fontSize = 16.sp,
-            modifier = Modifier.padding(8.dp),
-            color = Color.Black
-        )
+
         Text(
             text = formatDate(sample.dateCollectedUTC),
             fontSize = 16.sp,
