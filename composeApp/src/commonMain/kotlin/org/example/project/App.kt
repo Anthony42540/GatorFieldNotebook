@@ -82,7 +82,7 @@ fun AppNavigation() {
             EditSampleScreen(navController, database)
         }
         composable("print") { PrintScreen(navController) }
-        composable("viewSampleCollection") { ViewSampleCollectionScreen(navController) }
+        composable("viewSampleCollection") { ViewSampleCollectionScreen(navController, database) }
         composable("settings") { SettingsScreen(navController) }
     }
 }
