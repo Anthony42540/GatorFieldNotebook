@@ -99,7 +99,12 @@ private fun DetailedSampleContent(sample: SampleAndData) {
                 )
 
                 sample.dataEntries.forEach { (fieldId, value) ->
-                    DetailRow("Field $fieldId", value)
+                    if(fieldId.toInt() == 1) {
+                        DetailRow("Name", value)
+                    } else{
+                        DetailRow("Info", value)
+                    }
+
                 }
             }
         }
