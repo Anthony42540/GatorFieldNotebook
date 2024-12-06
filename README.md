@@ -48,6 +48,8 @@ Works on iOS and Android devices.
 - Basic UI: different screen navigation via button interaction
 - Navbar implementation
 - SQL setup: hooks for connection to the database have been implemented, tables have been added, and a database class has been made for interaction
+- -Sample Saving: user can input sample information, save, and view all samples
+- Bluetooth library: implemented a base for bluetooth library implementation
 
 ### SQLLight tables
 #### SampleForm
