@@ -4,7 +4,6 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -38,7 +37,6 @@ import dev.jordond.compass.geolocation.mobile
 import kotlinx.datetime.Instant
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.toLocalDateTime
-import kotlinx.coroutines.launch
 
 suspend fun GetCurrentLocation(): GeolocatorResult {
     val geolocator: Geolocator = Geolocator.mobile()
@@ -87,12 +85,23 @@ fun HomeScreen(navController: NavController, database: Database? = null) {
                             .align(Alignment.BottomCenter)
                             .padding(20.dp)
                     ) {
-                        NavigationButton(
-                            "Add New Sample",
-                            onClick = { navController.navigate("editSample") },
-                            Color(0xFF12BF7A),
-                            Color.White
-                        )
+                        Column(
+                            verticalArrangement = Arrangement.spacedBy(8.dp),
+                            horizontalAlignment = Alignment.CenterHorizontally
+                        ) {
+                            MapNavigationButton(
+                                "New Sample",
+                                onClick = { navController.navigate("selectCollection") },
+                                Color(0xFF12BF7A),
+                                Color.White
+                            )
+                            MapNavigationButton(
+                                "New Form",
+                                onClick = { navController.navigate("newForm") },
+                                Color(0xFF12BF7A),
+                                Color.White
+                            )
+                        }
                     }
                 }
             }
@@ -173,7 +182,8 @@ fun RecentSubmissionsSection(
                     modifier = Modifier.height(200.dp)
                 ) {
                     items(recentSamples) { sample ->
-                        SampleCard(sample)
+                        database?.getSampleForm(sample.formId.toLong())
+                            ?.let { SampleCard(sample, it.formName) }
                     }
                 }
             }
@@ -185,13 +195,17 @@ fun RecentSubmissionsSection(
             text = "View all submissions",
             onClick = { navController.navigate("viewSampleCollection") },
             buttonColor = Color.White,
-            textColor = Color.Black
+            textColor = Color.Black,
+
         )
     }
 }
 
 @Composable
-private fun SampleCard(sample: SampleAndData) {
+private fun SampleCard(
+    sample: SampleAndData,
+    collectionName: String
+) {
     Card(
         modifier = Modifier
             .fillMaxWidth()
@@ -211,21 +225,18 @@ private fun SampleCard(sample: SampleAndData) {
             // Debug print to see what's in dataEntries
             println("DataEntries: ${sample.dataEntries}")
 
-            // Look for the Sample Name in data entries
-            val sampleNameEntry = sample.dataEntries.entries.find { (_, value) ->
-                !value.isNullOrBlank()
-            }?.value ?: "Unnamed Sample"
-
             Text(
-                text = sampleNameEntry,
+                text = "Collection: $collectionName",
                 style = MaterialTheme.typography.bodyLarge,
                 color = Color.Black
             )
 
             Spacer(modifier = Modifier.height(4.dp))
 
+            val pair = formatDate(sample.dateCollectedUTC).split("T")
+
             Text(
-                text = "Collected: ${formatDate(sample.dateCollectedUTC)}",
+                text = "${pair[0]} at ${pair[1]}",
                 style = MaterialTheme.typography.bodyMedium,
                 color = Color.Gray
             )

@@ -48,7 +48,7 @@ fun NavBar(navController: NavController) {
             horizontalArrangement = Arrangement.SpaceEvenly
         ) {
             NavigationImgButton({ HomeIcon() }, onClick = { navController.navigate("home") })
-            NavigationImgButton({ AddSampleIcon() }, onClick = { navController.navigate("editSample") })
+            NavigationImgButton({ AddSampleIcon() }, onClick = { navController.navigate("selectCollection") })
             NavigationImgButton({ PrintIcon() }, onClick = { navController.navigate("print") })
             NavigationImgButton({ ViewSamplesIcon() }, onClick = { navController.navigate("viewSampleCollection") })
             NavigationImgButton({ SettingsIcon() }, onClick = { navController.navigate("settings") })

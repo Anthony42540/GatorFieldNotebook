@@ -1,5 +1,6 @@
 package com.dev.database.cache
 import com.dev.database.entity.Field
+import com.dev.database.entity.FieldNoID
 import com.dev.database.entity.FieldType
 import com.dev.database.entity.SampleForm
 import com.dev.database.entity.SampleData
@@ -12,9 +13,16 @@ class Database(databaseDriverFactory: DatabaseDriverFactory) {
     private val database = AppDatabase(databaseDriverFactory.createDriver())
     private val dbQuery = database.appDatabaseQueries
 
+    //list to track new fields when creating a new form
+    var newFieldsList = mutableListOf<FieldNoID>()
+    private var newFormName = ""
+
     /************************** GETTER FUNCTIONS **************************/
     internal fun getAllSampleForms(): List<SampleForm> { //get a list of all sample forms (to choose from when adding new sample)
         return dbQuery.getAllSampleForms(::mapSampleForm).executeAsList()
+    }
+    internal fun getSampleForm(formId: Long): SampleForm { //get a form by form ID
+        return dbQuery.getSampleForm(formId, ::mapSampleForm).executeAsOne()
     }
     internal fun getFormFields(formId: Long): List<Field> { //get the list of fields for specific form (to display for form field entry)
         return dbQuery.getFormFields(formId, ::mapField).executeAsList()
@@ -79,6 +87,27 @@ class Database(databaseDriverFactory: DatabaseDriverFactory) {
         return dbQuery.getLastRowID().executeAsOne()
     }
     /************************** INSERT FUNCTIONS **************************/
+
+    /************************** HELPER FUNCTIONS **************************/
+    internal fun insertFieldsFromList(
+        formId: Long
+    ) {
+        newFieldsList.forEachIndexed { index, field ->
+            insertField(
+                formId = formId,
+                fieldName = field.fieldName,
+                orderNum = index.toLong(),
+                fieldType = field.fieldType,
+                isRequired = field.isRequired,
+                options = field.options
+            )
+        }
+        newFieldsList.clear()
+    }
+    internal fun clearFieldsList() {
+        newFieldsList.clear()
+    }
+    /************************** HELPER FUNCTIONS **************************/
 }
 
 private fun mapSampleForm(
@@ -141,7 +170,7 @@ private fun mapDataEntry(
     )
 }
 
-private fun strToFT(fieldType: String): FieldType {
+fun strToFT(fieldType: String): FieldType {
     return try {
         FieldType.valueOf(fieldType.uppercase())
     } catch (e: IllegalArgumentException) {
@@ -149,14 +178,33 @@ private fun strToFT(fieldType: String): FieldType {
     }
 }
 
-private fun ftToStr(fieldType: FieldType): String {
+fun ftToStr(fieldType: FieldType): String {
     return fieldType.toString()
 }
 
-private fun listToJsonString(list: List<String>?): String? {
+fun readableToFT(fieldType: String): FieldType {
+    val tmp : FieldType;
+    if (fieldType == "small text box") {
+        return FieldType.SHORT_STRING
+    }
+    else if (fieldType == "large text box") {
+        return FieldType.LONG_STRING
+    }
+    else if (fieldType == "numerical") {
+        return FieldType.NUMBER
+    }
+    else if (fieldType == "dropdown") {
+        return FieldType.DROPDOWN
+    }
+    else {
+        return FieldType.MULTI_SELECT
+    }
+}
+
+fun listToJsonString(list: List<String>?): String? {
     return list?.let { Json.encodeToString(it) }
 }
 
-private fun jsonStringToList(json: String?): List<String>? {
+fun jsonStringToList(json: String?): List<String>? {
     return json?.let { Json.decodeFromString(it) }
 }

@@ -12,6 +12,9 @@ VALUES(?);
 getAllSampleForms:
 SELECT * FROM SampleForm;
 
+getSampleForm:
+SELECT * FROM SampleForm WHERE form_id = ?;
+
 -- table stores fields assocaited with each form, form_id links the fields to their form
 CREATE TABLE Field (
     field_id INTEGER PRIMARY KEY AUTOINCREMENT,
