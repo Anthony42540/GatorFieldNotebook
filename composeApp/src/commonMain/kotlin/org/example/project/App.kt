@@ -14,6 +14,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
@@ -60,9 +61,10 @@ fun MapNavigationButton(text: String, onClick: () -> Unit, buttonColor: Color, t
             .size(width = 200.dp, height = 50.dp),
         colors = ButtonDefaults.buttonColors(
             containerColor = buttonColor
-        )
+        ),
+        contentPadding = PaddingValues(0.dp)
     ) {
-        Text(text, color = textColor)
+        Text(text, color = textColor, fontSize = 20.sp)
     }
 }
 
@@ -109,7 +111,12 @@ fun AppNavigation() {
                 HomeScreen(navController, database)
             }
             composable("selectCollection") {
-                SelectCollectionScreen(navController, database, collectionViewModel, collectionValueState)
+                SelectCollectionScreen(
+                    navController,
+                    database,
+                    collectionViewModel,
+                    collectionValueState
+                )
             }
             composable("editSample") {
                 EditSampleScreen(navController, database, collectionViewModel, collectionValueState)

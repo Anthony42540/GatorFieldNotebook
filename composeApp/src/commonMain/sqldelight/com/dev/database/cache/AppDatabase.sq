@@ -34,6 +34,9 @@ VALUES(?,?,?,?,?,?);
 getFormFields:
 SELECT * FROM Field WHERE form_id = ? ORDER BY order_num ASC;
 
+getFieldByID:
+SELECT * FROM Field WHERE field_id = ?;
+
 changeFieldOrder:
 UPDATE Field SET order_num = ? WHERE field_id = ?;
 

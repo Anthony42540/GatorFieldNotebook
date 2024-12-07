@@ -1,16 +1,20 @@
 package org.example.project
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import com.dev.database.cache.Database
 import com.dev.database.entity.SampleAndData
+import kotlinx.coroutines.launch
 import kotlinx.datetime.Instant
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.toLocalDateTime
@@ -40,71 +44,115 @@ fun DetailedSampleScreen(
         }
     }
 
+    fun back() {
+        navController.navigate("viewSampleCollection")
+    }
+
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .background(Color.White)
+            .padding(16.dp),
+        verticalArrangement = Arrangement.Top,
+        horizontalAlignment = Alignment.Start
     ) {
-        NavBar(navController)
+        Column(
+            modifier = Modifier
+                .fillMaxWidth()
+                .wrapContentHeight(),
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
+            Text(
+                text = "Sample Details",
+                color = Color(0xFF000000),
+                fontSize = 30.sp,
+            )
+        }
+        Column(
+            modifier = Modifier
+                .fillMaxWidth()
+                .wrapContentHeight()
+                .padding(16.dp)
+        ) {
+            when {
+                isLoading -> {
+                    CircularProgressIndicator(
+                        modifier = Modifier
+                            .size(50.dp)
+                            .align(Alignment.CenterHorizontally)
+                    )
+                }
 
-        when {
-            isLoading -> {
-                CircularProgressIndicator(
-                    modifier = Modifier
-                        .size(50.dp)
-                        .align(Alignment.CenterHorizontally)
-                )
+                error != null -> {
+                    Text(
+                        text = error!!,
+                        color = Color.Red,
+                        modifier = Modifier.padding(16.dp)
+                    )
+                }
+
+                sample != null -> {
+                    DetailedSampleContent(sample!!, database)
+                }
             }
-            error != null -> {
-                Text(
-                    text = error!!,
-                    color = Color.Red,
-                    modifier = Modifier.padding(16.dp)
-                )
-            }
-            sample != null -> {
-                DetailedSampleContent(sample!!)
+        }
+        Button(
+            onClick = {}, //TODO: Add view all samples for specified collection screen
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(vertical = 4.dp)
+                .border(1.dp, Color.Black, RoundedCornerShape(24.dp)),
+            colors = ButtonDefaults.buttonColors(
+                containerColor = Color.White
+            ),
+        ) {
+            Text("View all samples for this collection", color = Color.Black)
+        }
+        Box(
+            modifier = Modifier
+                .fillMaxSize()
+        ) {
+            Row(
+                horizontalArrangement = Arrangement.SpaceBetween,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .align(Alignment.BottomCenter)
+            ) {
+                Button(onClick = { back() }) {
+                    Text("Back")
+                }
             }
         }
     }
 }
 
 @Composable
-private fun DetailedSampleContent(sample: SampleAndData) {
-    Column(
+private fun DetailedSampleContent(
+    sample: SampleAndData,
+    database: Database?
+) {
+    var datePair = formatDetailedDate(sample.dateCollectedUTC).split("T")
+    var locationPair = sample.location.split("|")
+
+    Card(
         modifier = Modifier
-            .fillMaxSize()
-            .padding(16.dp)
+            .fillMaxWidth()
+            .padding(vertical = 8.dp),
+        colors = CardDefaults.cardColors(containerColor = Color.White),
+        elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
     ) {
-        SectionTitle("Sample Details")
+        Column(modifier = Modifier.padding(16.dp)) {
+            DetailRow("Sample ID", sample.sampleId.toString())
+            DetailRow("Date Collected", datePair[0])
+            DetailRow("Time Collected", datePair[1])
+            DetailRow("Coordinates", locationPair[0])
+            DetailRow("Altitude", locationPair[1])
 
-        Card(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(vertical = 8.dp),
-            colors = CardDefaults.cardColors(containerColor = Color.White),
-            elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
-        ) {
-            Column(modifier = Modifier.padding(16.dp)) {
-                DetailRow("Sample ID", sample.sampleId.toString())
-                DetailRow("Collection Date", formatDetailedDate(sample.dateCollectedUTC))
-                DetailRow("Location", sample.location)
+            Divider(modifier = Modifier.padding(vertical = 8.dp))
 
-                Divider(modifier = Modifier.padding(vertical = 8.dp))
-
-                Text(
-                    text = "Field Entries",
-                    style = MaterialTheme.typography.titleMedium,
-                    modifier = Modifier.padding(vertical = 8.dp)
-                )
-
-                sample.dataEntries.forEach { (fieldId, value) ->
-                    if(fieldId.toInt() == 1) {
-                        DetailRow("Name", value)
-                    } else{
-                        DetailRow("Info", value)
-                    }
-
+            sample.dataEntries.forEach { (fieldId, value) ->
+                val field = database?.getFieldByID(fieldId)
+                if (field != null) {
+                    DetailRow(field.fieldName, value)
                 }
             }
         }
@@ -125,7 +173,7 @@ private fun DetailRow(label: String, value: String) {
             color = Color.Gray
         )
         Text(
-            text = value,
+            text = value.replace("{", "").replace("}", ""),
             style = MaterialTheme.typography.bodyMedium
         )
     }

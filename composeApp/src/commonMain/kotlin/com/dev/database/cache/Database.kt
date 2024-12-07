@@ -27,6 +27,9 @@ class Database(databaseDriverFactory: DatabaseDriverFactory) {
     internal fun getFormFields(formId: Long): List<Field> { //get the list of fields for specific form (to display for form field entry)
         return dbQuery.getFormFields(formId, ::mapField).executeAsList()
     }
+    internal fun getFieldByID(fieldId: Long): Field {
+        return dbQuery.getFieldByID(fieldId, ::mapField).executeAsOne()
+    }
     internal fun getAllSampleData(): List<SampleData> { //get all samples collected
         return dbQuery.getAllSampleData(::mapSampleData).executeAsList()
     }
