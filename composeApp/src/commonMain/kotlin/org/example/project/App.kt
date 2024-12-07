@@ -15,13 +15,16 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
+import org.example.project.BlueFalconApplication
+import dev.bluefalcon.BlueFalcon
+import dev.bluefalcon.ApplicationContext
 
 
 @Composable
 @Preview
-fun App() {
+fun App(blueFalconApplication: BlueFalconApplication) {
     MaterialTheme {
-        AppNavigation()
+        AppNavigation(blueFalconApplication)
     }
 }
 
@@ -52,7 +55,7 @@ fun NavigationImgButton(icon: @Composable () -> Unit, onClick: () -> Unit) {
 }
 
 @Composable
-fun AppNavigation() {
+fun AppNavigation(blueFalconApplication: BlueFalconApplication) {
     val navController = rememberNavController()
     NavHost(navController, startDestination = "home") {
         composable("home") { HomeScreen(navController) }
@@ -60,5 +63,8 @@ fun AppNavigation() {
         composable("print") { PrintScreen(navController) }
         composable("viewSampleCollection") { ViewSampleCollectionScreen(navController) }
         composable("settings") { SettingsScreen(navController) }
+        composable("bluetooth") {
+            BluetoothScreen(navController, blueFalconApplication.bluetoothViewModel)
+        }
     }
 }

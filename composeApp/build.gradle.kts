@@ -86,6 +86,9 @@ kotlin {
             implementation(libs.compass.geolocation)
             implementation(libs.compass.geolocation.mobile)
             implementation(libs.kotlinx.datetime.v040)
+            implementation("dev.bluefalcon:blue-falcon:2.1.0")
+            implementation("androidx.lifecycle:lifecycle-viewmodel-ktx:2.8.7")
+            implementation("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.6.4")
         }
         desktopMain.dependencies {
             implementation(compose.desktop.currentOs)

@@ -5,6 +5,7 @@ android-minSdk = "24"
 android-targetSdk = "34"
 androidx-activityCompose = "1.9.2"
 androidx-lifecycle = "2.8.2"
+blueFalcon = "2.0.0"
 compose-plugin = "1.6.11"
 kotlin = "2.0.20"
 kotlinx-coroutines = "1.9.0"
@@ -30,6 +31,7 @@ pods-google-maps = "9.1.1"
 pods-google-ios-maps-utils = "6.0.0"
 
 [libraries]
+blue-falcon = { module = "dev.bluefalcon:blue-falcon", version.ref = "blueFalcon" }
 maps-compose = { module = "com.google.maps.android:maps-compose", version.ref = "mapsCompose" }
 maps-compose-utils = { module = "com.google.maps.android:maps-compose-utils", version.ref = "mapsCompose"}
 play-services-maps = { module = "com.google.android.gms:play-services-maps", version.ref = "playServicesMaps"}
