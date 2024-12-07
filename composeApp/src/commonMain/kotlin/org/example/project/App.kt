@@ -14,6 +14,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
@@ -21,8 +22,12 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
 import com.dev.database.cache.DatabaseProvider
+import org.example.project.viewModels.CollectionViewModel
+import org.example.project.viewModels.FormViewModel
 import org.jetbrains.compose.ui.tooling.preview.Preview
 import org.example.project.ViewSampleCollectionScreen
+import org.koin.compose.KoinContext
+import org.koin.compose.viewmodel.koinViewModel
 
 @Composable
 @Preview
@@ -36,7 +41,9 @@ fun App() {
 fun NavigationButton(text: String, onClick: () -> Unit, buttonColor: Color, textColor: Color) {
     Button(
         onClick = onClick,
-        modifier = Modifier.padding(horizontal = 8.dp),
+        modifier = Modifier
+            .padding(horizontal = 4.dp)
+            .border(1.dp, Color.Black, RoundedCornerShape(24.dp)),
         colors = ButtonDefaults.buttonColors(
             containerColor = buttonColor
         )
@@ -46,12 +53,28 @@ fun NavigationButton(text: String, onClick: () -> Unit, buttonColor: Color, text
 }
 
 @Composable
+fun MapNavigationButton(text: String, onClick: () -> Unit, buttonColor: Color, textColor: Color) {
+    Button(
+        onClick = onClick,
+        modifier = Modifier
+            .padding(horizontal = 4.dp)
+            .size(width = 200.dp, height = 50.dp),
+        colors = ButtonDefaults.buttonColors(
+            containerColor = buttonColor
+        ),
+        contentPadding = PaddingValues(0.dp)
+    ) {
+        Text(text, color = textColor, fontSize = 20.sp)
+    }
+}
+
+@Composable
 fun NavigationImgButton(icon: @Composable () -> Unit, onClick: () -> Unit) {
     Button(
         onClick = onClick,
         modifier = Modifier
             .padding(horizontal = 4.dp)
-            .border(1.dp, Color.Black, RoundedCornerShape(4.dp)),
+            .border(1.dp, Color.Black, RoundedCornerShape(24.dp)),
         colors = ButtonDefaults.buttonColors(
             containerColor = Color.White
         )
@@ -61,41 +84,78 @@ fun NavigationImgButton(icon: @Composable () -> Unit, onClick: () -> Unit) {
 }
 @Composable
 fun AppNavigation() {
-    val navController = rememberNavController()
+    KoinContext{
+        val formViewModel = koinViewModel<FormViewModel>()
+        val formValueState by formViewModel.formName.collectAsState()
 
-    // Get database instance from DatabaseProvider with error logging
-    val database = remember {
-        try {
-            val db = DatabaseProvider.getInstance().database
-            println("Database initialized successfully") // Add debug logging
-            db
-        } catch (e: Exception) {
-            println("Failed to get database: ${e.message}") // Add debug logging
-            e.printStackTrace()
-            null
-        }
-    }
+        val collectionViewModel = koinViewModel<CollectionViewModel>()
+        val collectionValueState by collectionViewModel.collectionID.collectAsState()
 
-    NavHost(navController, startDestination = "home") {
-        composable("home") {
-            HomeScreen(navController, database)
+        val navController = rememberNavController()
+
+        // Get database instance from DatabaseProvider with error logging
+        val database = remember {
+            try {
+                val db = DatabaseProvider.getInstance().database
+                println("Database initialized successfully") // Add debug logging
+                db
+            } catch (e: Exception) {
+                println("Failed to get database: ${e.message}") // Add debug logging
+                e.printStackTrace()
+                null
+            }
         }
-        composable("editSample") {
-            EditSampleScreen(navController, database)
-        }
-        composable("print") { PrintScreen(navController) }
-        composable("viewSampleCollection") { ViewSampleCollectionScreen(navController, database) }
-        composable("settings") { SettingsScreen(navController) }
-        composable(
-            route = "sampleDetail/{sampleId}",
-            arguments = listOf(navArgument("sampleId") { type = NavType.LongType })
-        ) { backStackEntry ->
-            val sampleId = backStackEntry.arguments?.getLong("sampleId") ?: return@composable
-            DetailedSampleScreen(
-                navController = navController,
-                database = database,
-                sampleId = sampleId
-            )
+
+        NavHost(navController, startDestination = "home") {
+            composable("home") {
+                HomeScreen(navController, database)
+            }
+            composable("selectCollection") {
+                SelectCollectionScreen(
+                    navController,
+                    database,
+                    collectionViewModel,
+                    collectionValueState
+                )
+            }
+            composable("editSample") {
+                EditSampleScreen(navController, database, collectionViewModel, collectionValueState)
+            }
+            composable("print") {
+                PrintScreen(navController)
+            }
+            composable("viewSampleCollection") {
+                ViewSampleCollectionScreen(navController)
+            }
+            composable("settings") {
+                SettingsScreen(navController)
+            }
+            composable("newForm") {
+                NewFormScreen(navController, database, formViewModel, formValueState)
+            }
+            composable("addField") {
+                AddFieldScreen(navController, database)
+            }
+            composable("print") {
+                PrintScreen(navController)
+            }
+            composable("viewSampleCollection") {
+                ViewSampleCollectionScreen(navController, database)
+            }
+            composable("settings") {
+                SettingsScreen(navController)
+            }
+            composable(
+                route = "sampleDetail/{sampleId}",
+                arguments = listOf(navArgument("sampleId") { type = NavType.LongType })
+            ) { backStackEntry ->
+                val sampleId = backStackEntry.arguments?.getLong("sampleId") ?: return@composable
+                DetailedSampleScreen(
+                    navController = navController,
+                    database = database,
+                    sampleId = sampleId
+                )
+            }
         }
     }
 }

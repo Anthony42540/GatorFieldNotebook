@@ -31,6 +31,14 @@ data class Field(
     @SerialName("options") val options: List<String>? = null, //list of options, if drop down or multi-select field type
 )
 
+@Serializable
+data class FieldNoID(
+    @SerialName("field_name") val fieldName: String,
+    @SerialName("field_type") val fieldType: FieldType,
+    @SerialName("is_required") val isRequired: Boolean,
+    @SerialName("options") val options: List<String>? = null, //list of options, if drop down or multi-select field type
+)
+
 // Stores actual form entries (Combines sample data and data entries for that sample)
 @Serializable
 data class SampleData(

@@ -12,6 +12,9 @@ VALUES(?);
 getAllSampleForms:
 SELECT * FROM SampleForm;
 
+getSampleForm:
+SELECT * FROM SampleForm WHERE form_id = ?;
+
 -- table stores fields assocaited with each form, form_id links the fields to their form
 CREATE TABLE Field (
     field_id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -30,6 +33,9 @@ VALUES(?,?,?,?,?,?);
 
 getFormFields:
 SELECT * FROM Field WHERE form_id = ? ORDER BY order_num ASC;
+
+getFieldByID:
+SELECT * FROM Field WHERE field_id = ?;
 
 changeFieldOrder:
 UPDATE Field SET order_num = ? WHERE field_id = ?;

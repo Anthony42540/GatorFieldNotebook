@@ -2,6 +2,7 @@ package org.example.project
 
 import androidx.compose.ui.window.Window
 import androidx.compose.ui.window.application
+import initKoin
 
 fun main() = application {
     Window(
@@ -9,5 +10,6 @@ fun main() = application {
         title = "GatorFieldNotebook",
     ) {
         App()
+        initKoin()
     }
 }

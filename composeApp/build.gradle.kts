@@ -59,6 +59,7 @@ kotlin {
             implementation(libs.play.services.maps)
             implementation(libs.koin.android)
             implementation(libs.koin.core)
+            implementation(libs.koin.androidx.compose)
         }
         commonMain.dependencies {
             implementation(compose.runtime)
@@ -80,6 +81,10 @@ kotlin {
             implementation(libs.compass.geolocation)
             implementation(libs.compass.geolocation.mobile)
             implementation(libs.kotlinx.datetime.v040)
+            implementation(libs.lifecycle.viewmodel.compose)
+            api(libs.koin.core)
+            implementation(libs.koin.compose)
+            implementation(libs.koin.composeVM)
         }
         desktopMain.dependencies {
             implementation(compose.desktop.currentOs)
@@ -130,7 +135,7 @@ dependencies {
     implementation(libs.androidx.material3.android)
     implementation(libs.androidx.appcompat)
     debugImplementation(compose.uiTooling)
-    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.8.1")
+    implementation(libs.kotlinx.coroutines.core.v181)
 }
 
 compose.desktop {
