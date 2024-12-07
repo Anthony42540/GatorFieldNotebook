@@ -48,8 +48,10 @@ Works on iOS and Android devices.
 - Basic UI: different screen navigation via button interaction
 - Navbar implementation
 - SQL setup: hooks for connection to the database have been implemented, tables have been added, and a database class has been made for interaction
-- -Sample Saving: user can input sample information, save, and view all samples
+- Sample Saving: user can input sample information, save, and view all samples
 - Bluetooth library: implemented a base for bluetooth library implementation
+- Form Creation: user can create forms for new collections and select their forms when adding a new sample
+- Sample deletion: user can delete ALL samples from database
 
 ### SQLLight tables
 #### SampleForm
@@ -98,7 +100,9 @@ This is the "head" of each sample collected. It is associated with a form and co
 Stores individual data entries for each sample. It is linked to the sample it is from and the type of field that it is. In the future, if fields are to be reused for multiple forms, the SampleData table will have to store a list linking each dataEntry to its fields. This will save space in the database.
 
 ### Known Bugs
-Upon saving a sample, the print screen sometimes pops up
-
-This is not a bug, but something to note for future work: Some styling (like importing icons) and logic (e.g. database connection) might have to be done twice for iOS and Android, respectively.
+- Upon saving a sample, the print screen sometimes pops up
+- There is no form field validation so leaving some fields empty might break the app
+- There is no scroll window implemented when fields overflow the screen, so for now sample fields are limited to one screen
+- There is no safeguard for submitting text with curly braces, but this should be implemented because it could mess up lists stored as json strings in the database
+- This is not a bug, but something to note for future work: Some logic (e.g. database connection) might have to be done twice for iOS and Android, respectively
 
