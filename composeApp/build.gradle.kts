@@ -127,6 +127,8 @@ dependencies {
     implementation(libs.androidx.ui.text.android)
     implementation(libs.androidx.ui.text.google.fonts)
     implementation(libs.androidx.runtime.android)
+    implementation(libs.androidx.material3.android)
+    implementation(libs.androidx.appcompat)
     debugImplementation(compose.uiTooling)
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.8.1")
 }

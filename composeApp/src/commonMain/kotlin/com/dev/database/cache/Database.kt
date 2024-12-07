@@ -46,6 +46,7 @@ class Database(databaseDriverFactory: DatabaseDriverFactory) {
     }
     /************************** GETTER FUNCTIONS **************************/
 
+
     /************************** INSERT FUNCTIONS **************************/
     internal fun insertSampleForm(formName: String): Long { //add new sample form and return unique sample ID
         dbQuery.insertSampleForm(formName)
@@ -79,6 +80,16 @@ class Database(databaseDriverFactory: DatabaseDriverFactory) {
         return dbQuery.getLastRowID().executeAsOne()
     }
     /************************** INSERT FUNCTIONS **************************/
+
+    internal fun deleteAllSamples() {
+        dbQuery.transaction {
+            // First delete all data entries
+            dbQuery.clearAllDataEntries()
+            // Then delete all samples
+            dbQuery.clearAllSamples()
+        }
+    }
+    /************************** DELETE FUNCTIONS **************************/
 }
 
 private fun mapSampleForm(
@@ -160,3 +171,4 @@ private fun listToJsonString(list: List<String>?): String? {
 private fun jsonStringToList(json: String?): List<String>? {
     return json?.let { Json.decodeFromString(it) }
 }
+
