@@ -132,6 +132,8 @@ dependencies {
     implementation(libs.androidx.ui.text.android)
     implementation(libs.androidx.ui.text.google.fonts)
     implementation(libs.androidx.runtime.android)
+    implementation(libs.androidx.material3.android)
+    implementation(libs.androidx.appcompat)
     debugImplementation(compose.uiTooling)
     implementation(libs.kotlinx.coroutines.core.v181)
 }

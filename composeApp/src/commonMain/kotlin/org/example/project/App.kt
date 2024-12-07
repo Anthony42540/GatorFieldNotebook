@@ -15,13 +15,16 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
+import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import androidx.navigation.navArgument
 import com.dev.database.cache.DatabaseProvider
 import org.example.project.viewModels.CollectionViewModel
 import org.example.project.viewModels.FormViewModel
 import org.jetbrains.compose.ui.tooling.preview.Preview
+import org.example.project.ViewSampleCollectionScreen
 import org.koin.compose.KoinContext
 import org.koin.compose.viewmodel.koinViewModel
 
@@ -125,6 +128,26 @@ fun AppNavigation() {
             }
             composable("addField") {
                 AddFieldScreen(navController, database)
+            }
+            composable("print") {
+                PrintScreen(navController)
+            }
+            composable("viewSampleCollection") {
+                ViewSampleCollectionScreen(navController, database)
+            }
+            composable("settings") {
+                SettingsScreen(navController)
+            }
+            composable(
+                route = "sampleDetail/{sampleId}",
+                arguments = listOf(navArgument("sampleId") { type = NavType.LongType })
+            ) { backStackEntry ->
+                val sampleId = backStackEntry.arguments?.getLong("sampleId") ?: return@composable
+                DetailedSampleScreen(
+                    navController = navController,
+                    database = database,
+                    sampleId = sampleId
+                )
             }
         }
     }

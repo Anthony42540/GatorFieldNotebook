@@ -81,3 +81,9 @@ SELECT * FROM DataEntry WHERE sample_id = ?;
 
 getLastRowID:
 SELECT last_insert_rowid();
+
+clearAllDataEntries:
+DELETE FROM DataEntry;
+
+clearAllSamples:
+DELETE FROM SampleData;
