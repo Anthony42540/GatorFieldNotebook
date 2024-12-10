@@ -11,6 +11,11 @@ plugins {
     alias(libs.plugins.compose.compiler)
     alias(libs.plugins.kotlinxSerialization)
     alias(libs.plugins.sqldelight)
+
+
+//    alias(libs.plugins.androidLibrary)
+//    id("com.google.devtools.ksp") version "2.0.0-1.0.21"
+    id("com.rickclephas.kmp.nativecoroutines") version "1.0.0-ALPHA-31"
 }
 
 kotlin {
@@ -89,6 +94,8 @@ kotlin {
             implementation("dev.bluefalcon:blue-falcon:2.1.0")
             implementation("androidx.lifecycle:lifecycle-viewmodel-ktx:2.8.7")
             implementation("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.6.4")
+//            implementation(libs.blue.falcon)
+//            api(libs.kmm.viewmodel)
         }
         desktopMain.dependencies {
             implementation(compose.desktop.currentOs)

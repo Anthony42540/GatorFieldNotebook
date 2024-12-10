@@ -11,6 +11,12 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import dev.bluefalcon.BluetoothPeripheral
+//import com.dawidraszka.composepermissionhandler.core.ExperimentalPermissionHandlerApi
+//import com.dawidraszka.composepermissionhandler.core.PermissionHandlerHost
+//import com.dawidraszka.composepermissionhandler.core.PermissionHandlerHostState
+//import com.dawidraszka.composepermissionhandler.core.PermissionHandlerResult
+import android.Manifest
+import android.os.Build
 import org.example.project.BluetoothViewModel
 import kotlinx.coroutines.launch
 import java.lang.Exception
@@ -19,6 +25,14 @@ import java.lang.Exception
 actual fun DevicesView(viewModel: BluetoothViewModel) {
     val devices = viewModel.devices.collectAsState(emptyList())
     val coroutineScope = rememberCoroutineScope()
+
+    val bluetoothPermissions: List<String> =
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+            listOf(
+                Manifest.permission.BLUETOOTH_CONNECT,
+                Manifest.permission.BLUETOOTH_SCAN,
+            )
+        } else listOf(Manifest.permission.BLUETOOTH)
 
     Column(modifier = Modifier.fillMaxSize().padding(16.dp)) {
         // Scan Button
