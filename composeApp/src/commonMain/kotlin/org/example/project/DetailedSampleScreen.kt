@@ -14,6 +14,7 @@ import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import com.dev.database.cache.Database
 import com.dev.database.entity.SampleAndData
+import com.dev.database.entity.SampleForm
 import kotlinx.coroutines.launch
 import kotlinx.datetime.Instant
 import kotlinx.datetime.TimeZone
@@ -132,6 +133,7 @@ private fun DetailedSampleContent(
 ) {
     var datePair = formatDetailedDate(sample.dateCollectedUTC).split("T")
     var locationPair = sample.location.split("|")
+    var form = database?.getSampleForm(sample.formId.toLong())
 
     Card(
         modifier = Modifier
@@ -141,7 +143,9 @@ private fun DetailedSampleContent(
         elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
     ) {
         Column(modifier = Modifier.padding(16.dp)) {
-            DetailRow("Sample ID", sample.sampleId.toString())
+            if (form != null) {
+                DetailRow("Sample from Collection", form.formName)
+            }
             DetailRow("Date Collected", datePair[0])
             DetailRow("Time Collected", datePair[1])
             DetailRow("Coordinates", locationPair[0])
