@@ -26,6 +26,7 @@ import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.CircularProgressIndicator
 import com.dev.database.cache.Database
 import com.dev.database.entity.SampleAndData
+import com.dev.database.entity.SampleForm
 import kotlinx.coroutines.launch
 import kotlinx.datetime.Instant
 import kotlinx.datetime.TimeZone
@@ -144,12 +145,15 @@ fun ViewSampleCollectionScreen(navController: NavController, database: Database?
                 modifier = Modifier.fillMaxSize()
             ) {
                 items(samples) { sample ->
-                    SampleRow(
-                        sample = sample,
-                        onSampleClick = { sampleId ->
-                            navController.navigate("sampleDetail/$sampleId")
-                        }
-                    )
+                    if (database != null) {
+                        SampleRow(
+                            sample = sample,
+                            form = database.getSampleForm((sample.formId).toLong()),
+                            onSampleClick = { sampleId ->
+                                navController.navigate("sampleDetail/$sampleId")
+                            }
+                        )
+                    }
                 }
             }
         }
@@ -187,7 +191,8 @@ private suspend fun loadAllSamples(
 }
 
 @Composable
-private fun SampleRow(sample: SampleAndData, onSampleClick: (Long) -> Unit) {
+private fun SampleRow(sample: SampleAndData, form: SampleForm, onSampleClick: (Long) -> Unit) {
+        var pair = formatDate(sample.dateCollectedUTC).split("T")
 
         Row(
             modifier = Modifier
@@ -198,17 +203,16 @@ private fun SampleRow(sample: SampleAndData, onSampleClick: (Long) -> Unit) {
             horizontalArrangement = Arrangement.SpaceBetween,
             verticalAlignment = Alignment.CenterVertically
         ) {
-        val sampleName = sample.dataEntries.values.firstOrNull() ?: "Unnamed Sample"
 
         Text(
-            text = sampleName,
+            text = form.formName,
             fontSize = 16.sp,
             modifier = Modifier.padding(8.dp),
             color = Color.Black
         )
 
         Text(
-            text = formatDate(sample.dateCollectedUTC),
+            text = "${pair[0]}, ${pair[1]}",
             fontSize = 16.sp,
             modifier = Modifier.padding(8.dp),
             color = Color.Black
@@ -217,7 +221,7 @@ private fun SampleRow(sample: SampleAndData, onSampleClick: (Long) -> Unit) {
             imageVector = Icons.Default.Edit,
             contentDescription = "Edit sample",
             modifier = Modifier
-                .size(24.dp)
+                .size(32.dp)
                 .padding(8.dp),
             tint = Color.Black
         )
