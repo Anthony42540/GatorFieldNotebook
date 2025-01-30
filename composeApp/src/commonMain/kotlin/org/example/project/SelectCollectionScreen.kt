@@ -1,22 +1,21 @@
 package org.example.project
 
-import androidx.compose.foundation.background
-import androidx.compose.foundation.border
+import KhandFontFamily
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.interaction.PressInteraction
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import com.dev.database.cache.Database
 import kotlinx.coroutines.launch
-import kotlinx.datetime.*
 import org.example.project.viewModels.CollectionViewModel
 
 @Composable
@@ -123,9 +122,10 @@ fun SelectCollectionScreen(
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
                 Text(
+                    style = TextStyle(fontFamily = KhandFontFamily(), fontWeight = FontWeight.Medium),
                     text = "Select Collection",
                     color = Color(0x000000).copy(alpha = 1.0f),
-                    fontSize = 30.sp,
+                    fontSize = 40.sp,
                 )
             }
 
@@ -153,6 +153,12 @@ fun SelectCollectionScreen(
                     readOnly = true,
                     label = { Text("Choose Collection") },
                     modifier = Modifier.fillMaxWidth(),
+                    colors = OutlinedTextFieldDefaults.colors(
+                        focusedBorderColor = Color(0xFF0021A5),
+                        unfocusedBorderColor = Color(0xFF0021A5),
+                        focusedContainerColor = Color(0xFF0021A5).copy(0.1f),
+                        unfocusedContainerColor = Color(0xFF0021A5).copy(0.1f)
+                    ),
                     interactionSource = remember { MutableInteractionSource() }
                         .also { interactionSource ->
                             LaunchedEffect(interactionSource) {
@@ -202,14 +208,20 @@ fun SelectCollectionScreen(
             // cancel Button
             Button(
                 onClick = { onCancel() },
-                enabled = !isCancelling
+                enabled = !isCancelling,
+                colors = ButtonDefaults.buttonColors(
+                    containerColor = Color(0xFF0021A5)
+                )
             ) {
-                Text(text = "Cancel", color = Color.White)
+                Text(text = "Cancel", color = Color.White, fontSize = 25.sp, style = TextStyle(fontFamily = KhandFontFamily(), fontWeight = FontWeight.Medium))
             }
             // next button
             Button(
                 onClick = { onNext() },
-                enabled = !isSaving
+                enabled = !isSaving,
+                colors = ButtonDefaults.buttonColors(
+                    containerColor = Color(0xFF0021A5)
+                )
             ) {
                 if (isSaving) {
                     CircularProgressIndicator(
@@ -217,7 +229,7 @@ fun SelectCollectionScreen(
                         color = Color.White
                     )
                 } else {
-                    Text(text = "Next", color = Color.White)
+                    Text(text = "Next", color = Color.White, fontSize = 25.sp, style = TextStyle(fontFamily = KhandFontFamily(), fontWeight = FontWeight.Medium))
                 }
             }
         }

@@ -1,5 +1,6 @@
 package org.example.project
 
+import KhandFontFamily
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
@@ -14,6 +15,8 @@ import androidx.navigation.NavController
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.Text
+import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.font.FontWeight
 
 
 @Composable
@@ -44,7 +47,7 @@ fun SettingsScreen(navController: NavController) {
             horizontalAlignment = Alignment.Start
         ) {
             // General Settings Section
-            SettingsSectionTitle("General Settings")
+            SectionTitle("General Settings")
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.SpaceBetween
@@ -56,7 +59,7 @@ fun SettingsScreen(navController: NavController) {
             Spacer(modifier = Modifier.height(16.dp))
 
             // Printer Settings Section
-            SettingsSectionTitle("Printer Settings")
+            SectionTitle("Printer Settings")
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.SpaceBetween
@@ -75,7 +78,7 @@ fun SettingsScreen(navController: NavController) {
             Spacer(modifier = Modifier.height(16.dp))
 
             // App Appearance Section
-            SettingsSectionTitle("App Appearance")
+            SectionTitle("App Appearance")
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.SpaceBetween
@@ -87,7 +90,7 @@ fun SettingsScreen(navController: NavController) {
             Spacer(modifier = Modifier.height(16.dp))
 
             // About Section
-            SettingsSectionTitle("About")
+            SectionTitle("About")
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.SpaceBetween
@@ -112,30 +115,14 @@ fun SettingsScreen(navController: NavController) {
             Spacer(modifier = Modifier.height(16.dp))
 
             // Save Button
-            Button(
-                onClick = { /* Handle save action */ },
-                modifier = Modifier.align(Alignment.CenterHorizontally),
-                colors = ButtonDefaults.buttonColors(
-                    containerColor = Color(0xFF0021A5)
-                )
+            Column (
+                horizontalAlignment = Alignment.CenterHorizontally,
+                modifier = Modifier.fillMaxWidth()
             ) {
-                Text(text = "Save", color = Color.White)
+                ActionButton("Save", onClick = {}, Color(0xFF12BF7A), Color.White)
             }
         }
     }
-}
-
-@Composable
-fun SettingsSectionTitle(title: String) {
-    Text(
-        text = title,
-        fontSize = 18.sp,
-        color = Color.White,
-        modifier = Modifier
-            .fillMaxWidth()
-            .background(Color(0xFF0021A5))
-            .padding(vertical = 6.dp, horizontal = 8.dp)
-    )
 }
 
 @Composable

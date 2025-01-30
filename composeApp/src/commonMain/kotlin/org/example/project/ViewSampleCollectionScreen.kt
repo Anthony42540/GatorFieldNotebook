@@ -1,6 +1,7 @@
 package org.example.project
 
 
+import KhandFontFamily
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -24,6 +25,8 @@ import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.font.FontWeight
 import com.dev.database.cache.Database
 import com.dev.database.entity.SampleAndData
 import com.dev.database.entity.SampleForm
@@ -79,29 +82,11 @@ fun ViewSampleCollectionScreen(navController: NavController, database: Database?
             )
             return@Column
         }
-        Box(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(16.dp),
-            contentAlignment = Alignment.Center
-        ) {
-            Button(
-                onClick = { showDeleteConfirmation = true },
-                colors = ButtonDefaults.buttonColors(containerColor = Color.Red),
-
-            ) {
-                Text("Clear All Samples", color = Color.White)
-            }
-
-        }
-
-
-
 
         if (showDeleteConfirmation) {
             AlertDialog(
                 onDismissRequest = { showDeleteConfirmation = false },
-                title = { Text("Clear All Samples") },
+                title = { Text("Delete Samples") },
                 text = { Text("Are you sure you want to delete all samples? This action cannot be undone.") },
                 confirmButton = {
                     Button(
@@ -119,20 +104,29 @@ fun ViewSampleCollectionScreen(navController: NavController, database: Database?
                         colors = ButtonDefaults.buttonColors(containerColor = Color.Red)
 
                     ) {
-                        Text("Delete All", color = Color.White)
+                        Text(
+                            style = TextStyle(fontFamily = KhandFontFamily(), fontWeight = FontWeight.Medium),
+                            text = "Delete All", color = Color.White,
+                            fontSize = 20.sp
+                        )
                     }
                 },
                 dismissButton = {
                     Button(
-                        onClick = { showDeleteConfirmation = false }
+                        onClick = { showDeleteConfirmation = false },
+                        colors = ButtonDefaults.buttonColors(
+                            containerColor = Color(0xFF0021A5)
+                        )
                     ) {
-                        Text("Cancel")
+                        Text(
+                            style = TextStyle(fontFamily = KhandFontFamily(), fontWeight = FontWeight.Medium),
+                            text = "Cancel",
+                            fontSize = 20.sp
+                        )
                     }
                 }
             )
         }
-
-        Spacer(modifier = Modifier.height(4.dp))
 
         Column(
             modifier = Modifier.fillMaxSize(),
@@ -141,19 +135,35 @@ fun ViewSampleCollectionScreen(navController: NavController, database: Database?
         ) {
             SectionTitle("Samples")
 
-            LazyColumn(
+            Box (
                 modifier = Modifier.fillMaxSize()
             ) {
-                items(samples) { sample ->
-                    if (database != null) {
-                        SampleRow(
-                            sample = sample,
-                            form = database.getSampleForm((sample.formId).toLong()),
-                            onSampleClick = { sampleId ->
-                                navController.navigate("sampleDetail/$sampleId")
-                            }
-                        )
+                LazyColumn(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .padding(bottom = 70.dp)
+                ) {
+                    items(samples) { sample ->
+                        if (database != null) {
+                            SampleRow(
+                                sample = sample,
+                                form = database.getSampleForm((sample.formId).toLong()),
+                                onSampleClick = { sampleId ->
+                                    navController.navigate("sampleDetail/$sampleId")
+                                }
+                            )
+                        }
                     }
+                }
+
+                Box(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(16.dp)
+                        .align(Alignment.BottomCenter),
+                    contentAlignment = Alignment.Center
+                ) {
+                    ActionButton("Delete All", onClick = { showDeleteConfirmation = true }, Color.Red, Color.White)
                 }
             }
         }
