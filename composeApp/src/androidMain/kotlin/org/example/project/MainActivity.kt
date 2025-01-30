@@ -38,9 +38,6 @@ class MainActivity : ComponentActivity() {
 
         setContent {
             App(blueFalconManager)
-            // THIS CAUSES AN ERROR (crash)
-//            App(BlueFalconApplication(context = ApplicationContext()))
-            // let's just create the viewmodel here, and not pass in?
         }
     }
 }
