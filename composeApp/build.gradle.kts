@@ -60,6 +60,8 @@ kotlin {
             implementation(libs.koin.android)
             implementation(libs.koin.core)
             implementation(libs.koin.androidx.compose)
+            implementation("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.6.4")
+            implementation("androidx.lifecycle:lifecycle-viewmodel-ktx:2.8.7")
         }
         commonMain.dependencies {
             implementation(compose.runtime)
@@ -85,6 +87,7 @@ kotlin {
             api(libs.koin.core)
             implementation(libs.koin.compose)
             implementation(libs.koin.composeVM)
+            implementation("dev.bluefalcon:blue-falcon:2.2.3")
         }
         desktopMain.dependencies {
             implementation(compose.desktop.currentOs)

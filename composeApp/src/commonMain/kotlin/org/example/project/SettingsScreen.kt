@@ -14,6 +14,8 @@ import androidx.navigation.NavController
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.Text
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 
 
 @Composable
@@ -29,6 +31,9 @@ fun SettingsScreen(navController: NavController) {
     val appVersion = "1.1.1"
     val userGuideLink = "link"
 
+    //scroll
+    val verticalScrollState = rememberScrollState(0)
+
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -39,7 +44,8 @@ fun SettingsScreen(navController: NavController) {
         NavBar(navController)
 
         Column(
-            modifier = Modifier.fillMaxSize(),
+            modifier = Modifier.fillMaxSize()
+            .verticalScroll(verticalScrollState),
             verticalArrangement = Arrangement.Top,
             horizontalAlignment = Alignment.Start
         ) {
@@ -70,6 +76,23 @@ fun SettingsScreen(navController: NavController) {
             ) {
                 DropdownField("Orientation", orientation, listOf("Portrait", "Landscape")) { orientation = it }
                 DropdownField("Label Margins", labelMargins, listOf("Small", "Normal", "Large")) { labelMargins = it }
+            }
+
+            Spacer(modifier = Modifier.height(16.dp))
+
+            // Bluetooth section (jump to BT page)
+            SettingsSectionTitle("Bluetooth")
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween
+            ) {
+                Button(
+                    onClick = { navController.navigate("bluetooth")},
+                    colors = ButtonDefaults.buttonColors(containerColor = Color.Blue),
+
+                    ) {
+                    Text("Scan for Devices", color = Color.White)
+                }
             }
 
             Spacer(modifier = Modifier.height(16.dp))

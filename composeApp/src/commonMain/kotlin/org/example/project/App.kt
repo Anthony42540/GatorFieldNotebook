@@ -1,12 +1,10 @@
 package org.example.project
 
-import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
-import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.*
@@ -25,17 +23,24 @@ import com.dev.database.cache.DatabaseProvider
 import org.example.project.viewModels.CollectionViewModel
 import org.example.project.viewModels.FormViewModel
 import org.jetbrains.compose.ui.tooling.preview.Preview
-import org.example.project.ViewSampleCollectionScreen
 import org.koin.compose.KoinContext
 import org.koin.compose.viewmodel.koinViewModel
+import org.example.project.bluetooth.BluetoothManager
 
 @Composable
 @Preview
-fun App() {
+fun App(bluetoothManager: BluetoothManager) {
     MaterialTheme {
-        AppNavigation()
+        AppNavigation(bluetoothManager)
     }
 }
+
+//fun App() {
+//    val bluetoothManager = remember { createBlueToothManager() }
+//    MaterialTheme {
+//        AppNavigation(bluetoothManager)
+//    }
+//}
 
 @Composable
 fun NavigationButton(text: String, onClick: () -> Unit, buttonColor: Color, textColor: Color) {
@@ -83,7 +88,9 @@ fun NavigationImgButton(icon: @Composable () -> Unit, onClick: () -> Unit) {
     }
 }
 @Composable
-fun AppNavigation() {
+//fun AppNavigation(blueFalconApplication: BlueFalconApplication) {
+fun AppNavigation(bluetoothManager: BluetoothManager) {
+//    fun AppNavigation() {
     KoinContext{
         val formViewModel = koinViewModel<FormViewModel>()
         val formValueState by formViewModel.formName.collectAsState()
@@ -144,6 +151,10 @@ fun AppNavigation() {
             }
             composable("settings") {
                 SettingsScreen(navController)
+            }
+            composable("bluetooth") {
+//                BluetoothTestScreen(navController)
+                BluetoothScreen(navController, bluetoothManager)
             }
             composable(
                 route = "sampleDetail/{sampleId}",

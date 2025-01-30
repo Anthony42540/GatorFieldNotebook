@@ -1,5 +1,6 @@
 package org.example.project
 
+import android.content.Context
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
@@ -8,8 +9,18 @@ import com.dev.database.cache.AndroidDatabaseProvider
 import com.dev.database.cache.DatabaseProvider
 import com.dev.database.cache.DatabaseSetup
 import kotlinx.coroutines.launch
+import org.example.project.bluetooth.BluetoothManager
+import dev.bluefalcon.ApplicationContext
+//import dev.bluefalcon.BlueFalcon
 
 class MainActivity : ComponentActivity() {
+//    private val blueFalconApp : BlueFalconApplication by lazy {
+//        BlueFalconApplication(context = application)
+//    }
+    private val blueFalconManager : BluetoothManager by lazy {
+        BluetoothManager(context = application)
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
@@ -26,7 +37,10 @@ class MainActivity : ComponentActivity() {
         }
 
         setContent {
-            App()
+            App(blueFalconManager)
+            // THIS CAUSES AN ERROR (crash)
+//            App(BlueFalconApplication(context = ApplicationContext()))
+            // let's just create the viewmodel here, and not pass in?
         }
     }
 }
