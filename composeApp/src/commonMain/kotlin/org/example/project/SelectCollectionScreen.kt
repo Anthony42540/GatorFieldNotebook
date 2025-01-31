@@ -220,7 +220,7 @@ fun SelectCollectionScreen(
                 ),
                 contentPadding = PaddingValues(0.dp)
             ) {
-                Text(text = "Cancel", color = Color.White, fontSize = 25.sp, style = TextStyle(fontFamily = KhandFontFamily(), fontWeight = FontWeight.Medium))
+                Text(text = "Back", color = Color.White, fontSize = 25.sp, style = TextStyle(fontFamily = KhandFontFamily(), fontWeight = FontWeight.Medium))
             }
             // next button
             Button(

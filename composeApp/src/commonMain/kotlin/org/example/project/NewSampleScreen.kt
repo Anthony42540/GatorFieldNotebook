@@ -146,7 +146,7 @@ fun EditSampleScreen(
                 errorMessage = null
 
                 viewModel.clearCollectionID()
-                navController.navigate("home")
+                navController.navigate("selectCollection")
 
             } catch (e: Exception) {
                 errorMessage = "Failed to save sample: ${e.message}"
@@ -313,15 +313,14 @@ fun EditSampleScreen(
         Row(
             horizontalArrangement = Arrangement.SpaceBetween,
             modifier = Modifier
-                .fillMaxWidth()
                 .padding(16.dp)
+                .fillMaxWidth()
                 .align(Alignment.BottomCenter)
         ) {
-            ActionButton("Cancel", onClick = { cancel() }, Color(0xFF0021A5), Color.White)
+            ActionButton("Back", onClick = { cancel() }, Color(0xFF0021A5), Color.White)
             // Save Button
             Button(
                 modifier = Modifier
-                    .padding(horizontal = 2.dp)
                     .size(width = 160.dp, height = 45.dp),
                 onClick = { saveSample() },
                 enabled = !isSaving,

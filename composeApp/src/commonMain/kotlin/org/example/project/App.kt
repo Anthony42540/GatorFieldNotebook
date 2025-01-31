@@ -45,7 +45,6 @@ fun ActionButton(text: String, onClick: () -> Unit, buttonColor: Color, textColo
     Button(
         onClick = onClick,
         modifier = Modifier
-            .padding(horizontal = 2.dp)
             .size(width = 160.dp, height = 45.dp),
         colors = ButtonDefaults.buttonColors(
             containerColor = buttonColor
