@@ -152,7 +152,7 @@ private fun DetailedSampleContent(
             DetailRow("Coordinates", locationPair[0])
             DetailRow("Altitude", locationPair[1])
 
-            Divider(modifier = Modifier.padding(vertical = 8.dp))
+            HorizontalDivider(modifier = Modifier.padding(vertical = 8.dp))
 
             sample.dataEntries.forEach { (fieldId, value) ->
                 val field = database?.getFieldByID(fieldId)

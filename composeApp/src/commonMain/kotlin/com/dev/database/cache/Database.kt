@@ -195,7 +195,7 @@ fun ftToStr(fieldType: FieldType): String {
 }
 
 fun readableToFT(fieldType: String): FieldType {
-    val tmp : FieldType;
+    val tmp : FieldType
     if (fieldType == "small text box") {
         return FieldType.SHORT_STRING
     }

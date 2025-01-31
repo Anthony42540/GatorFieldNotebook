@@ -329,7 +329,7 @@ fun DisplayField(
     onChange: (String) -> Unit
 ) {
     var collectedData by remember { mutableStateOf("") }
-    Column() {
+    Column {
         when (ftToStr(field.fieldType)) {
             "SHORT_STRING", "NUMBER" -> {
                 TextField(

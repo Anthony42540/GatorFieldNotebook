@@ -272,7 +272,7 @@ fun NewFormScreen(
 //function to display added fields
 @Composable
 fun FieldDisplay(field: FieldNoID) {
-    Column() {
+    Column {
         when (ftToStr(field.fieldType)) {
             "SHORT_STRING", "NUMBER" -> {
                 TextField(
