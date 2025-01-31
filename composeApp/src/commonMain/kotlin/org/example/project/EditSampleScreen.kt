@@ -1,16 +1,16 @@
 package org.example.project
 
-import androidx.compose.foundation.background
-import androidx.compose.foundation.border
+import KhandFontFamily
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.interaction.PressInteraction
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
@@ -18,12 +18,10 @@ import com.dev.database.cache.Database
 import com.dev.database.cache.ftToStr
 import com.dev.database.cache.listToJsonString
 import com.dev.database.entity.Field
-import com.dev.database.entity.FieldNoID
 import dev.jordond.compass.Location
 import kotlinx.coroutines.launch
 import kotlinx.datetime.*
 import org.example.project.viewModels.CollectionViewModel
-import org.example.project.viewModels.FormViewModel
 
 @Composable
 fun EditSampleScreen(
@@ -176,6 +174,7 @@ fun EditSampleScreen(
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
             Text(
+                style = TextStyle(fontFamily = KhandFontFamily(), fontWeight = FontWeight.Medium),
                 text = collectionName,
                 color = Color(0xFF000000),
                 fontSize = 30.sp,
@@ -197,6 +196,12 @@ fun EditSampleScreen(
             value = date,
             onValueChange = { date = it },
             modifier = Modifier.fillMaxWidth(),
+            colors = OutlinedTextFieldDefaults.colors(
+                focusedBorderColor = Color(0xFF0021A5),
+                unfocusedBorderColor = Color(0xFF0021A5),
+                focusedContainerColor = Color(0xFF0021A5).copy(0.1f),
+                unfocusedContainerColor = Color(0xFF0021A5).copy(0.1f)
+            ),
             label = { Text( "Date") },
             readOnly = true
         )
@@ -204,6 +209,12 @@ fun EditSampleScreen(
             value = time,
             onValueChange = { time = it },
             modifier = Modifier.fillMaxWidth(),
+            colors = OutlinedTextFieldDefaults.colors(
+                focusedBorderColor = Color(0xFF0021A5),
+                unfocusedBorderColor = Color(0xFF0021A5),
+                focusedContainerColor = Color(0xFF0021A5).copy(0.1f),
+                unfocusedContainerColor = Color(0xFF0021A5).copy(0.1f)
+            ),
             label = { Text("Time") },
             readOnly = true
         )
@@ -215,6 +226,12 @@ fun EditSampleScreen(
             value = coordinates,
             onValueChange = { coordinates = it },
             modifier = Modifier.fillMaxWidth(),
+            colors = OutlinedTextFieldDefaults.colors(
+                focusedBorderColor = Color(0xFF0021A5),
+                unfocusedBorderColor = Color(0xFF0021A5),
+                focusedContainerColor = Color(0xFF0021A5).copy(0.1f),
+                unfocusedContainerColor = Color(0xFF0021A5).copy(0.1f)
+            ),
             label = { Text("Latitude, Longitude") },
             readOnly = true
         )
@@ -222,6 +239,12 @@ fun EditSampleScreen(
             value = metersAltitude,
             onValueChange = { metersAltitude = it },
             modifier = Modifier.fillMaxWidth(),
+            colors = OutlinedTextFieldDefaults.colors(
+                focusedBorderColor = Color(0xFF0021A5),
+                unfocusedBorderColor = Color(0xFF0021A5),
+                focusedContainerColor = Color(0xFF0021A5).copy(0.1f),
+                unfocusedContainerColor = Color(0xFF0021A5).copy(0.1f)
+            ),
             label = { Text("Altitude") },
             readOnly = true
         )
@@ -229,24 +252,23 @@ fun EditSampleScreen(
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(vertical = 6.dp),
-            horizontalArrangement = Arrangement.End,
+            horizontalArrangement = Arrangement.Center,
             verticalAlignment = Alignment.CenterVertically
         ) {
             Button(
                 onClick = { refreshLocationAndAltitude() },
-                colors = ButtonDefaults.buttonColors(containerColor = Color.White),
+                colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF0021A5)),
                 modifier = Modifier
                     .padding(horizontal = 4.dp)
-                    .border(1.dp, Color(0xFF888888), RoundedCornerShape(24.dp))
-                    .size(width = 170.dp, height = 50.dp),
+                    .size(width = 200.dp, height = 50.dp),
             ) {
                 if (isLoading == "true") {
                     CircularProgressIndicator(
                         modifier = Modifier.size(24.dp),
-                        color = Color.Black
+                        color = Color.White
                     )
                 } else {
-                    Text("Refresh Location", color = Color.Black)
+                    Text("Refresh Location", color = Color.White, fontSize = 25.sp, style = TextStyle(fontFamily = KhandFontFamily(), fontWeight = FontWeight.Medium))
                 }
             }
         }
@@ -275,13 +297,16 @@ fun EditSampleScreen(
                     .fillMaxWidth()
                     .align(Alignment.BottomCenter)
             ) {
-                Button(onClick = { cancel() }) {
-                    Text("Cancel")
-                }
+                ActionButton("Cancel", onClick = { cancel() }, Color(0xFF0021A5), Color.White)
                 // Save Button
                 Button(
+                    modifier = Modifier
+                        .padding(horizontal = 2.dp)
+                        .size(width = 160.dp, height = 45.dp),
                     onClick = { saveSample() },
-                    enabled = !isSaving
+                    enabled = !isSaving,
+                    colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF0021A5)),
+                    contentPadding = PaddingValues(0.dp)
                 ) {
                     if (isSaving) {
                         CircularProgressIndicator(
@@ -289,7 +314,7 @@ fun EditSampleScreen(
                             color = Color.White
                         )
                     } else {
-                        Text(text = "Save")
+                        Text(text = "Save", color = Color.White, fontSize = 25.sp, style = TextStyle(fontFamily = KhandFontFamily(), fontWeight = FontWeight.Medium))
                     }
                 }
             }
@@ -304,7 +329,7 @@ fun DisplayField(
     onChange: (String) -> Unit
 ) {
     var collectedData by remember { mutableStateOf("") }
-    Column() {
+    Column {
         when (ftToStr(field.fieldType)) {
             "SHORT_STRING", "NUMBER" -> {
                 TextField(
@@ -314,7 +339,13 @@ fun DisplayField(
                         onChange(collectedData)
                     },
                     label = { Text(field.fieldName) },
-                    modifier = Modifier.fillMaxWidth()
+                    modifier = Modifier.fillMaxWidth(),
+                    colors = OutlinedTextFieldDefaults.colors(
+                        focusedBorderColor = Color(0xFF0021A5),
+                        unfocusedBorderColor = Color(0xFF0021A5),
+                        focusedContainerColor = Color(0xFF0021A5).copy(0.1f),
+                        unfocusedContainerColor = Color(0xFF0021A5).copy(0.1f)
+                    ),
                 )
             }
 
@@ -328,7 +359,13 @@ fun DisplayField(
                     label = { Text(field.fieldName) },
                     modifier = Modifier
                         .fillMaxWidth()
-                        .height(100.dp)
+                        .height(100.dp),
+                    colors = OutlinedTextFieldDefaults.colors(
+                        focusedBorderColor = Color(0xFF0021A5),
+                        unfocusedBorderColor = Color(0xFF0021A5),
+                        focusedContainerColor = Color(0xFF0021A5).copy(0.1f),
+                        unfocusedContainerColor = Color(0xFF0021A5).copy(0.1f)
+                    ),
                 )
             }
 
@@ -340,6 +377,12 @@ fun DisplayField(
                     readOnly = true,
                     label = { Text(field.fieldName) },
                     modifier = Modifier.fillMaxWidth(),
+                    colors = OutlinedTextFieldDefaults.colors(
+                        focusedBorderColor = Color(0xFF0021A5),
+                        unfocusedBorderColor = Color(0xFF0021A5),
+                        focusedContainerColor = Color(0xFF0021A5).copy(0.1f),
+                        unfocusedContainerColor = Color(0xFF0021A5).copy(0.1f)
+                    ),
                     interactionSource = remember { MutableInteractionSource() }
                         .also { interactionSource ->
                             LaunchedEffect(interactionSource) {
@@ -389,6 +432,12 @@ fun DisplayField(
                     readOnly = true,
                     label = { Text(field.fieldName) },
                     modifier = Modifier.fillMaxWidth(),
+                    colors = OutlinedTextFieldDefaults.colors(
+                        focusedBorderColor = Color(0xFF0021A5),
+                        unfocusedBorderColor = Color(0xFF0021A5),
+                        focusedContainerColor = Color(0xFF0021A5).copy(0.1f),
+                        unfocusedContainerColor = Color(0xFF0021A5).copy(0.1f)
+                    ),
                     interactionSource = remember { MutableInteractionSource() }
                         .also { interactionSource ->
                             LaunchedEffect(interactionSource) {

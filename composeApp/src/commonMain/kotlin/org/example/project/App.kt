@@ -1,18 +1,19 @@
 package org.example.project
 
-import androidx.compose.foundation.background
+import KhandFontFamily
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
-import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
@@ -25,7 +26,6 @@ import com.dev.database.cache.DatabaseProvider
 import org.example.project.viewModels.CollectionViewModel
 import org.example.project.viewModels.FormViewModel
 import org.jetbrains.compose.ui.tooling.preview.Preview
-import org.example.project.ViewSampleCollectionScreen
 import org.koin.compose.KoinContext
 import org.koin.compose.viewmodel.koinViewModel
 
@@ -38,33 +38,18 @@ fun App() {
 }
 
 @Composable
-fun NavigationButton(text: String, onClick: () -> Unit, buttonColor: Color, textColor: Color) {
+fun ActionButton(text: String, onClick: () -> Unit, buttonColor: Color, textColor: Color) {
     Button(
         onClick = onClick,
         modifier = Modifier
-            .padding(horizontal = 4.dp)
-            .border(1.dp, Color.Black, RoundedCornerShape(24.dp)),
-        colors = ButtonDefaults.buttonColors(
-            containerColor = buttonColor
-        )
-    ) {
-        Text(text, color = textColor)
-    }
-}
-
-@Composable
-fun MapNavigationButton(text: String, onClick: () -> Unit, buttonColor: Color, textColor: Color) {
-    Button(
-        onClick = onClick,
-        modifier = Modifier
-            .padding(horizontal = 4.dp)
-            .size(width = 200.dp, height = 50.dp),
+            .padding(horizontal = 2.dp)
+            .size(width = 160.dp, height = 45.dp),
         colors = ButtonDefaults.buttonColors(
             containerColor = buttonColor
         ),
         contentPadding = PaddingValues(0.dp)
     ) {
-        Text(text, color = textColor, fontSize = 20.sp)
+        Text(text, color = textColor, fontSize = 25.sp, style = TextStyle(fontFamily = KhandFontFamily(), fontWeight = FontWeight.Medium))
     }
 }
 
@@ -73,7 +58,7 @@ fun NavigationImgButton(icon: @Composable () -> Unit, onClick: () -> Unit) {
     Button(
         onClick = onClick,
         modifier = Modifier
-            .padding(horizontal = 4.dp)
+            .padding(horizontal = 2.dp)
             .border(1.dp, Color.Black, RoundedCornerShape(24.dp)),
         colors = ButtonDefaults.buttonColors(
             containerColor = Color.White
