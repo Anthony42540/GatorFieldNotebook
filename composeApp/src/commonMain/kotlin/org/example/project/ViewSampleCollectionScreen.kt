@@ -52,7 +52,6 @@ fun ViewSampleCollectionScreen(navController: NavController, database: Database?
         }
     }
 
-
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -61,8 +60,6 @@ fun ViewSampleCollectionScreen(navController: NavController, database: Database?
         horizontalAlignment = Alignment.Start
     ) {
         NavBar(navController)
-
-
 
         if (isLoading) {
             CircularProgressIndicator(
