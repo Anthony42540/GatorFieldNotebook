@@ -38,6 +38,9 @@ fun App() {
 }
 
 @Composable
+expect fun getScreenWidth(): Int
+
+@Composable
 fun ActionButton(text: String, onClick: () -> Unit, buttonColor: Color, textColor: Color) {
     Button(
         onClick = onClick,
@@ -112,9 +115,6 @@ fun AppNavigation() {
             composable("viewSampleCollection") {
                 ViewSampleCollectionScreen(navController)
             }
-            composable("settings") {
-                SettingsScreen(navController)
-            }
             composable("newForm") {
                 NewFormScreen(navController, database, formViewModel, formValueState)
             }
@@ -126,9 +126,6 @@ fun AppNavigation() {
             }
             composable("viewSampleCollection") {
                 ViewSampleCollectionScreen(navController, database)
-            }
-            composable("settings") {
-                SettingsScreen(navController)
             }
             composable(
                 route = "sampleDetail/{sampleId}",

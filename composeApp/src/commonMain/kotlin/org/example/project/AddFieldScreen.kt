@@ -31,9 +31,7 @@ import com.dev.database.cache.Database
 import com.dev.database.cache.readableToFT
 import gatorfieldnotebook.composeapp.generated.resources.Res
 import gatorfieldnotebook.composeapp.generated.resources.close
-import gatorfieldnotebook.composeapp.generated.resources.home
 import kotlinx.coroutines.launch
-import org.example.project.viewModels.FormViewModel
 import org.jetbrains.compose.resources.painterResource
 
 @Composable

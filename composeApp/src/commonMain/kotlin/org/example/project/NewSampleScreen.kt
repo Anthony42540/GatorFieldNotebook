@@ -4,6 +4,8 @@ import KhandFontFamily
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.interaction.PressInteraction
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -160,162 +162,179 @@ fun EditSampleScreen(
         refreshLocationAndAltitude()
     }
 
-    Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .padding(16.dp),
-        verticalArrangement = Arrangement.Top,
-        horizontalAlignment = Alignment.Start
+    Box (
+        modifier = Modifier.fillMaxSize()
     ) {
-        Column(
+        LazyColumn(
             modifier = Modifier
-                .fillMaxWidth()
-                .wrapContentHeight(),
-            horizontalAlignment = Alignment.CenterHorizontally
+                .fillMaxSize()
+                .padding(16.dp)
+                .padding(bottom = 70.dp),
+            verticalArrangement = Arrangement.Top,
+            horizontalAlignment = Alignment.Start
         ) {
-            Text(
-                style = TextStyle(fontFamily = KhandFontFamily(), fontWeight = FontWeight.Medium),
-                text = collectionName,
-                color = Color(0xFF000000),
-                fontSize = 30.sp,
-            )
+            item {
+                Column(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(16.dp),
+                    verticalArrangement = Arrangement.Top,
+                    horizontalAlignment = Alignment.CenterHorizontally
+                ) {
+                    Text(
+                        style = TextStyle(fontFamily = KhandFontFamily(), fontWeight = FontWeight.Medium),
+                        text = collectionName,
+                        color = Color(0xFF000000),
+                        fontSize = 30.sp,
+                    )
+                }
+            }
+
+            // Error message display
+            item {
+                errorMessage?.let { error ->
+                    Text(
+                        text = error,
+                        color = Color.Red,
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(horizontal = 16.dp, vertical = 8.dp)
+                    )
+                }
+            }
+            // Date/Time
+            item {
+                TextField(
+                    value = date,
+                    onValueChange = { date = it },
+                    modifier = Modifier.fillMaxWidth(),
+                    colors = OutlinedTextFieldDefaults.colors(
+                        focusedBorderColor = Color(0xFF0021A5),
+                        unfocusedBorderColor = Color(0xFF0021A5),
+                        focusedContainerColor = Color(0xFF0021A5).copy(0.1f),
+                        unfocusedContainerColor = Color(0xFF0021A5).copy(0.1f)
+                    ),
+                    label = { Text( "Date") },
+                    readOnly = true
+                )
+            }
+            item {
+                TextField(
+                    value = time,
+                    onValueChange = { time = it },
+                    modifier = Modifier.fillMaxWidth(),
+                    colors = OutlinedTextFieldDefaults.colors(
+                        focusedBorderColor = Color(0xFF0021A5),
+                        unfocusedBorderColor = Color(0xFF0021A5),
+                        focusedContainerColor = Color(0xFF0021A5).copy(0.1f),
+                        unfocusedContainerColor = Color(0xFF0021A5).copy(0.1f)
+                    ),
+                    label = { Text("Time") },
+                    readOnly = true
+                )
+            }
+
+            // Location
+            item {
+                Spacer(modifier = Modifier.height(16.dp))
+            }
+
+            item {
+                TextField(
+                    value = coordinates,
+                    onValueChange = { coordinates = it },
+                    modifier = Modifier.fillMaxWidth(),
+                    colors = OutlinedTextFieldDefaults.colors(
+                        focusedBorderColor = Color(0xFF0021A5),
+                        unfocusedBorderColor = Color(0xFF0021A5),
+                        focusedContainerColor = Color(0xFF0021A5).copy(0.1f),
+                        unfocusedContainerColor = Color(0xFF0021A5).copy(0.1f)
+                    ),
+                    label = { Text("Latitude, Longitude") },
+                    readOnly = true
+                )
+            }
+            item {
+                TextField(
+                    value = metersAltitude,
+                    onValueChange = { metersAltitude = it },
+                    modifier = Modifier.fillMaxWidth(),
+                    colors = OutlinedTextFieldDefaults.colors(
+                        focusedBorderColor = Color(0xFF0021A5),
+                        unfocusedBorderColor = Color(0xFF0021A5),
+                        focusedContainerColor = Color(0xFF0021A5).copy(0.1f),
+                        unfocusedContainerColor = Color(0xFF0021A5).copy(0.1f)
+                    ),
+                    label = { Text("Altitude") },
+                    readOnly = true
+                )
+            }
+            item {
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(vertical = 6.dp),
+                    horizontalArrangement = Arrangement.End,
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Button(
+                        onClick = { refreshLocationAndAltitude() },
+                        colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF0021A5)),
+                        modifier = Modifier
+                            .padding(horizontal = 4.dp)
+                            .size(width = 200.dp, height = 50.dp),
+                    ) {
+                        if (isLoading == "true") {
+                            CircularProgressIndicator(
+                                modifier = Modifier.size(24.dp),
+                                color = Color.White
+                            )
+                        } else {
+                            Text("Refresh Location", color = Color.White, fontSize = 25.sp, style = TextStyle(fontFamily = KhandFontFamily(), fontWeight = FontWeight.Medium))
+                        }
+                    }
+                }
+            }
+
+            items(fields) { field ->
+                //displays each field for user input
+                DisplayField(
+                    field = field,
+                    //maps user input to its field ID for submission (on save)
+                    onChange = { value ->
+                        collectedData = collectedData.toMutableMap().apply {
+                            this[field.fieldId] = value
+                        }
+                    }
+                )
+                Spacer(modifier = Modifier.height(16.dp))
+            }
         }
-
-        // Error message display
-        errorMessage?.let { error ->
-            Text(
-                text = error,
-                color = Color.Red,
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(horizontal = 16.dp, vertical = 8.dp)
-            )
-        }
-        // Date/Time
-        TextField(
-            value = date,
-            onValueChange = { date = it },
-            modifier = Modifier.fillMaxWidth(),
-            colors = OutlinedTextFieldDefaults.colors(
-                focusedBorderColor = Color(0xFF0021A5),
-                unfocusedBorderColor = Color(0xFF0021A5),
-                focusedContainerColor = Color(0xFF0021A5).copy(0.1f),
-                unfocusedContainerColor = Color(0xFF0021A5).copy(0.1f)
-            ),
-            label = { Text( "Date") },
-            readOnly = true
-        )
-        TextField(
-            value = time,
-            onValueChange = { time = it },
-            modifier = Modifier.fillMaxWidth(),
-            colors = OutlinedTextFieldDefaults.colors(
-                focusedBorderColor = Color(0xFF0021A5),
-                unfocusedBorderColor = Color(0xFF0021A5),
-                focusedContainerColor = Color(0xFF0021A5).copy(0.1f),
-                unfocusedContainerColor = Color(0xFF0021A5).copy(0.1f)
-            ),
-            label = { Text("Time") },
-            readOnly = true
-        )
-
-        // Location
-        Spacer(modifier = Modifier.height(16.dp))
-
-        TextField(
-            value = coordinates,
-            onValueChange = { coordinates = it },
-            modifier = Modifier.fillMaxWidth(),
-            colors = OutlinedTextFieldDefaults.colors(
-                focusedBorderColor = Color(0xFF0021A5),
-                unfocusedBorderColor = Color(0xFF0021A5),
-                focusedContainerColor = Color(0xFF0021A5).copy(0.1f),
-                unfocusedContainerColor = Color(0xFF0021A5).copy(0.1f)
-            ),
-            label = { Text("Latitude, Longitude") },
-            readOnly = true
-        )
-        TextField(
-            value = metersAltitude,
-            onValueChange = { metersAltitude = it },
-            modifier = Modifier.fillMaxWidth(),
-            colors = OutlinedTextFieldDefaults.colors(
-                focusedBorderColor = Color(0xFF0021A5),
-                unfocusedBorderColor = Color(0xFF0021A5),
-                focusedContainerColor = Color(0xFF0021A5).copy(0.1f),
-                unfocusedContainerColor = Color(0xFF0021A5).copy(0.1f)
-            ),
-            label = { Text("Altitude") },
-            readOnly = true
-        )
         Row(
+            horizontalArrangement = Arrangement.SpaceBetween,
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(vertical = 6.dp),
-            horizontalArrangement = Arrangement.Center,
-            verticalAlignment = Alignment.CenterVertically
+                .padding(16.dp)
+                .align(Alignment.BottomCenter)
         ) {
+            ActionButton("Cancel", onClick = { cancel() }, Color(0xFF0021A5), Color.White)
+            // Save Button
             Button(
-                onClick = { refreshLocationAndAltitude() },
-                colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF0021A5)),
                 modifier = Modifier
-                    .padding(horizontal = 4.dp)
-                    .size(width = 200.dp, height = 50.dp),
+                    .padding(horizontal = 2.dp)
+                    .size(width = 160.dp, height = 45.dp),
+                onClick = { saveSample() },
+                enabled = !isSaving,
+                colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF0021A5)),
+                contentPadding = PaddingValues(0.dp)
             ) {
-                if (isLoading == "true") {
+                if (isSaving) {
                     CircularProgressIndicator(
                         modifier = Modifier.size(24.dp),
                         color = Color.White
                     )
                 } else {
-                    Text("Refresh Location", color = Color.White, fontSize = 25.sp, style = TextStyle(fontFamily = KhandFontFamily(), fontWeight = FontWeight.Medium))
-                }
-            }
-        }
-
-        fields.forEach { field ->
-            //displays each field for user input
-            DisplayField(
-                field = field,
-                //maps user input to its field ID for submission (on save)
-                onChange = { value ->
-                    collectedData = collectedData.toMutableMap().apply {
-                        this[field.fieldId] = value
-                    }
-                }
-            )
-            Spacer(modifier = Modifier.height(16.dp))
-        }
-
-        Box(
-            modifier = Modifier
-                .fillMaxSize()
-        ) {
-            Row(
-                horizontalArrangement = Arrangement.SpaceBetween,
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .align(Alignment.BottomCenter)
-            ) {
-                ActionButton("Cancel", onClick = { cancel() }, Color(0xFF0021A5), Color.White)
-                // Save Button
-                Button(
-                    modifier = Modifier
-                        .padding(horizontal = 2.dp)
-                        .size(width = 160.dp, height = 45.dp),
-                    onClick = { saveSample() },
-                    enabled = !isSaving,
-                    colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF0021A5)),
-                    contentPadding = PaddingValues(0.dp)
-                ) {
-                    if (isSaving) {
-                        CircularProgressIndicator(
-                            modifier = Modifier.size(24.dp),
-                            color = Color.White
-                        )
-                    } else {
-                        Text(text = "Save", color = Color.White, fontSize = 25.sp, style = TextStyle(fontFamily = KhandFontFamily(), fontWeight = FontWeight.Medium))
-                    }
+                    Text(text = "Save", color = Color.White, fontSize = 25.sp, style = TextStyle(fontFamily = KhandFontFamily(), fontWeight = FontWeight.Medium))
                 }
             }
         }

@@ -36,6 +36,10 @@ import kotlinx.datetime.toLocalDateTime
 
 data class Sample(val name: String, val id: String, val date: String)
 
+object GlobalState {
+    var sampleId: Long? = null
+}
+
 @Composable
 fun ViewSampleCollectionScreen(navController: NavController, database: Database? = null) {
     var showDeleteConfirmation by remember { mutableStateOf(false) }
@@ -60,9 +64,8 @@ fun ViewSampleCollectionScreen(navController: NavController, database: Database?
         verticalArrangement = Arrangement.Top,
         horizontalAlignment = Alignment.Start
     ) {
-        NavBar(navController)
 
-
+        Header()
 
         if (isLoading) {
             CircularProgressIndicator(
@@ -148,6 +151,7 @@ fun ViewSampleCollectionScreen(navController: NavController, database: Database?
                                 sample = sample,
                                 form = database.getSampleForm((sample.formId).toLong()),
                                 onSampleClick = { sampleId ->
+                                    GlobalState.sampleId = sampleId
                                     navController.navigate("sampleDetail/$sampleId")
                                 }
                             )
@@ -155,13 +159,14 @@ fun ViewSampleCollectionScreen(navController: NavController, database: Database?
                     }
                 }
 
-                Box(
+                Row(
                     modifier = Modifier
                         .fillMaxWidth()
                         .padding(16.dp)
                         .align(Alignment.BottomCenter),
-                    contentAlignment = Alignment.Center
+                    horizontalArrangement = Arrangement.SpaceBetween
                 ) {
+                    ActionButton("Back", onClick = { navController.navigate("home") }, Color(0xFF0021A5), Color.White)
                     ActionButton("Delete All", onClick = { showDeleteConfirmation = true }, Color.Red, Color.White)
                 }
             }

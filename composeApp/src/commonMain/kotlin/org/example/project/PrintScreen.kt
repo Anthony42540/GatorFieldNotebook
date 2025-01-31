@@ -29,7 +29,8 @@ fun PrintScreen(navController: NavController) {
         verticalArrangement = Arrangement.Top,
         horizontalAlignment = Alignment.Start
     ) {
-        NavBar(navController)
+
+        Header()
 
         Column(
             modifier = Modifier
@@ -103,19 +104,21 @@ fun PrintScreen(navController: NavController) {
                 )
             }
 
-            Spacer(modifier = Modifier.height(16.dp))
-
             // Print Button
-            Column (
-                horizontalAlignment = Alignment.CenterHorizontally,
-                modifier = Modifier.fillMaxWidth()
+            Box(
+                modifier = Modifier
+                    .fillMaxSize()
             ) {
-                ActionButton(
-                    "Print",
-                    onClick = {  },
-                    Color(0xFF12BF7A),
-                    Color.White
-                )
+                Row (
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .align(Alignment.BottomCenter)
+                        .padding(16.dp)
+                ) {
+                    ActionButton("Back", onClick = { navController.navigate("sampleDetail/"+GlobalState.sampleId) }, Color(0xFF0021A5), Color.White)
+                    ActionButton("Print", onClick = {  }, Color(0xFF12BF7A), Color.White)
+                }
             }
         }
     }

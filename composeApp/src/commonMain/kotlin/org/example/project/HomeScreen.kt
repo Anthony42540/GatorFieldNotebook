@@ -69,7 +69,8 @@ fun HomeScreen(navController: NavController, database: Database? = null) {
         verticalArrangement = Arrangement.Top,
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        NavBar(navController)
+
+        Header()
 
         Column(
             modifier = Modifier.fillMaxSize(),
@@ -207,6 +208,7 @@ fun RecentSubmissionsSection(
                         containerColor = Color.White
                     ),
                     modifier = Modifier.padding(0.dp),
+
                     contentPadding = PaddingValues(2.dp)
                 ) {
                     Text("View all submissions", color = Color.Black, fontSize = 23.sp, style = TextStyle(fontFamily = KhandFontFamily(), fontWeight = FontWeight.Medium))
