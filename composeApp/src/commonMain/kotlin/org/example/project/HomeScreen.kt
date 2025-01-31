@@ -41,6 +41,7 @@ import dev.jordond.compass.geolocation.mobile
 import kotlinx.datetime.Instant
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.toLocalDateTime
+import androidx.compose.foundation.clickable
 
 suspend fun GetCurrentLocation(): GeolocatorResult {
     val geolocator: Geolocator = Geolocator.mobile()
@@ -187,7 +188,13 @@ fun RecentSubmissionsSection(
                 ) {
                     items(recentSamples) { sample ->
                         database?.getSampleForm(sample.formId.toLong())
-                            ?.let { SampleCard(sample, it.formName) }
+                            ?.let {
+                                SampleCard(sample,
+                                    it.formName,
+                                    onSampleClick = { sampleId ->
+                                        navController.navigate("sampleDetail/$sampleId")
+                                })
+                            }
                     }
                 }
                 Spacer(modifier = Modifier.height(2.dp))
@@ -212,12 +219,14 @@ fun RecentSubmissionsSection(
 @Composable
 private fun SampleCard(
     sample: SampleAndData,
-    collectionName: String
+    collectionName: String,
+    onSampleClick: (Long) -> Unit
 ) {
     Card(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(vertical = 4.dp),
+            .padding(vertical = 4.dp)
+            .clickable { onSampleClick(sample.sampleId.toLong()) },
         colors = CardDefaults.cardColors(
             containerColor = Color.White
         ),
