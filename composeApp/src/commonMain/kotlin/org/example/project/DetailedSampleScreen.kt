@@ -1,5 +1,6 @@
 package org.example.project
 
+import KhandFontFamily
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.*
@@ -9,6 +10,8 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
@@ -106,7 +109,7 @@ fun DetailedSampleScreen(
                 containerColor = Color.White
             ),
         ) {
-            Text("View all samples for this collection", color = Color.Black)
+            Text("View all samples for this collection", color = Color.Black, fontSize = 25.sp, style = TextStyle(fontFamily = KhandFontFamily(), fontWeight = FontWeight.Medium))
         }
         Box(
             modifier = Modifier
@@ -118,9 +121,7 @@ fun DetailedSampleScreen(
                     .fillMaxWidth()
                     .align(Alignment.BottomCenter)
             ) {
-                Button(onClick = { back() }) {
-                    Text("Back")
-                }
+                ActionButton("Back", onClick = { back() }, Color(0xFF0021A5), Color.White)
             }
         }
     }
@@ -151,7 +152,7 @@ private fun DetailedSampleContent(
             DetailRow("Coordinates", locationPair[0])
             DetailRow("Altitude", locationPair[1])
 
-            Divider(modifier = Modifier.padding(vertical = 8.dp))
+            HorizontalDivider(modifier = Modifier.padding(vertical = 8.dp))
 
             sample.dataEntries.forEach { (fieldId, value) ->
                 val field = database?.getFieldByID(fieldId)

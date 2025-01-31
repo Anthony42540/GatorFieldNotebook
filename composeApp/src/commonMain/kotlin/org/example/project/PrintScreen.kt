@@ -1,17 +1,16 @@
 package org.example.project
 
+import KhandFontFamily
 import androidx.compose.foundation.background
-import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material3.Button
-import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
@@ -72,13 +71,15 @@ fun PrintScreen(navController: NavController) {
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 Text(
+                    style = TextStyle(fontFamily = KhandFontFamily(), fontWeight = FontWeight.Medium),
                     text = "Choose Printer",
-                    fontSize = 18.sp,
+                    fontSize = 20.sp,
                     color = Color.White
                 )
                 Text(
+                    style = TextStyle(fontFamily = KhandFontFamily(), fontWeight = FontWeight.Medium),
                     text = "Status",
-                    fontSize = 18.sp,
+                    fontSize = 20.sp,
                     color = Color.White
                 )
             }
@@ -105,14 +106,16 @@ fun PrintScreen(navController: NavController) {
             Spacer(modifier = Modifier.height(16.dp))
 
             // Print Button
-            Button(
-                onClick = { /* Handle print logic here */ },
-                modifier = Modifier.align(Alignment.CenterHorizontally),
-                colors = ButtonDefaults.buttonColors(
-                    containerColor = Color(0xFF0021A5)
-                )
+            Column (
+                horizontalAlignment = Alignment.CenterHorizontally,
+                modifier = Modifier.fillMaxWidth()
             ) {
-                Text(text = "Print", color = Color.White)
+                ActionButton(
+                    "Print",
+                    onClick = {  },
+                    Color(0xFF12BF7A),
+                    Color.White
+                )
             }
         }
     }

@@ -1,5 +1,6 @@
 package org.example.project
 
+import KhandFontFamily
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -14,6 +15,8 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
@@ -31,15 +34,15 @@ fun NavBar(navController: NavController) {
         modifier = Modifier
             .fillMaxWidth()
             .background(Color(0xFFFFFF).copy(alpha = 1.0f))
-            .padding(8.dp)
+            .padding(6.dp)
             .wrapContentHeight(),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         Text(
             text = "Gator Field Notebook",
+            style = TextStyle(fontFamily = KhandFontFamily(), fontWeight = FontWeight.SemiBold),
             color = Color(0x000000).copy(alpha = 1.0f),
-            fontSize = 30.sp,
-            modifier = Modifier.padding(bottom = 8.dp)
+            fontSize = 45.sp
         )
 
         Row(
