@@ -7,7 +7,6 @@ import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.interaction.PressInteraction
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
@@ -98,12 +97,14 @@ fun NewFormScreen(
         }
     }
 
+    val fontSizeVal = if (getScreenWidth() <= 360) 20.sp else 25.sp
+
     Box(modifier = Modifier.fillMaxSize()) {
         Column(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(16.dp)
-                .padding(bottom = 72.dp)
+                .padding(bottom = 70.dp)
                 .verticalScroll(state = scrollState),
             verticalArrangement = Arrangement.Top,
             horizontalAlignment = Alignment.Start
@@ -207,7 +208,7 @@ fun NewFormScreen(
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(vertical = 6.dp),
-                horizontalArrangement = Arrangement.Center,
+                horizontalArrangement = Arrangement.End,
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 Button(
@@ -216,7 +217,7 @@ fun NewFormScreen(
                     modifier = Modifier
                         .padding(horizontal = 4.dp),
                 ) {
-                    Text("Refresh Location", color = Color.White, fontSize = 25.sp, style = TextStyle(fontFamily = KhandFontFamily(), fontWeight = FontWeight.Medium))
+                    Text("Refresh Location", color = Color.White, fontSize = fontSizeVal, style = TextStyle(fontFamily = KhandFontFamily(), fontWeight = FontWeight.Medium))
                 }
             }
 
@@ -228,18 +229,19 @@ fun NewFormScreen(
         }
 
         Row(
-            horizontalArrangement = Arrangement.SpaceBetween,
+            horizontalArrangement = Arrangement.spacedBy(8.dp),
             modifier = Modifier
                 .padding(8.dp)
                 .fillMaxWidth()
                 .align(Alignment.BottomCenter)
         ) {
+
             //cancel button
             Button(
                 onClick = { cancel() },
                 colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF0021A5))
             ) {
-                Text("Cancel", color = Color.White, fontSize = 25.sp, style = TextStyle(fontFamily = KhandFontFamily(), fontWeight = FontWeight.Medium))
+                Text("Cancel", color = Color.White, fontSize = fontSizeVal, style = TextStyle(fontFamily = KhandFontFamily(), fontWeight = FontWeight.Medium))
             }
             //add new field button
             Button(
@@ -248,7 +250,7 @@ fun NewFormScreen(
                 },
                 colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF0021A5))
             ) {
-                Text(text = "Add New Field", color = Color.White, fontSize = 25.sp, style = TextStyle(fontFamily = KhandFontFamily(), fontWeight = FontWeight.Medium))
+                Text(text = "Add New Field", color = Color.White, fontSize = fontSizeVal, style = TextStyle(fontFamily = KhandFontFamily(), fontWeight = FontWeight.Medium))
             }
             //save button
             Button(
@@ -262,7 +264,7 @@ fun NewFormScreen(
                         color = Color.White
                     )
                 } else {
-                    Text(text = "Save", color = Color.White, fontSize = 25.sp, style = TextStyle(fontFamily = KhandFontFamily(), fontWeight = FontWeight.Medium))
+                    Text(text = "Save", color = Color.White, fontSize = fontSizeVal, style = TextStyle(fontFamily = KhandFontFamily(), fontWeight = FontWeight.Medium))
                 }
             }
         }
