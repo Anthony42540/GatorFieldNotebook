@@ -1,6 +1,8 @@
 package org.example.project
 
+import KhandFontFamily
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.interaction.PressInteraction
@@ -21,6 +23,8 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import com.dev.database.cache.Database
@@ -116,15 +120,22 @@ fun AddFieldScreen(
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
             Text(
+                style = TextStyle(fontFamily = KhandFontFamily(), fontWeight = FontWeight.Medium),
                 text = "Add New Field",
                 color = Color(0x000000).copy(alpha = 1.0f),
-                fontSize = 30.sp,
+                fontSize = 40.sp,
             )
         }
 
         TextField(
             value = fieldName,
             onValueChange = { fieldName = it },
+            colors = OutlinedTextFieldDefaults.colors(
+                focusedBorderColor = Color(0xFF0021A5),
+                unfocusedBorderColor = Color(0xFF0021A5),
+                focusedContainerColor = Color(0xFF0021A5).copy(0.1f),
+                unfocusedContainerColor = Color(0xFF0021A5).copy(0.1f)
+            ),
             label = { Text("Field Name") },
             modifier = Modifier.fillMaxWidth()
         )
@@ -148,6 +159,12 @@ fun AddFieldScreen(
             readOnly = true,
             label = { Text("Field Type") },
             modifier = Modifier.fillMaxWidth(),
+            colors = OutlinedTextFieldDefaults.colors(
+                focusedBorderColor = Color(0xFF0021A5),
+                unfocusedBorderColor = Color(0xFF0021A5),
+                focusedContainerColor = Color(0xFF0021A5).copy(0.1f),
+                unfocusedContainerColor = Color(0xFF0021A5).copy(0.1f)
+            ),
             interactionSource = remember { MutableInteractionSource() }
                 .also { interactionSource ->
                     LaunchedEffect(interactionSource) {
@@ -170,7 +187,8 @@ fun AddFieldScreen(
                 onDismissRequest = { expanded = false },
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(16.dp)
+                    .background(Color(0xFFFFFFFF))
+                    .border(1.dp, Color(0xFF0021A5))
             ) {
                 fieldTypes.forEach { type ->
                     DropdownMenuItem(
@@ -192,6 +210,12 @@ fun AddFieldScreen(
             TextField(
                 value = newOption,
                 onValueChange = { newOption = it },
+                colors = OutlinedTextFieldDefaults.colors(
+                    focusedBorderColor = Color(0xFF0021A5),
+                    unfocusedBorderColor = Color(0xFF0021A5),
+                    focusedContainerColor = Color(0xFF0021A5).copy(0.1f),
+                    unfocusedContainerColor = Color(0xFF0021A5).copy(0.1f)
+                ),
                 label = { Text("Add $fieldType option") },
                 modifier = Modifier.fillMaxWidth()
             )
@@ -201,9 +225,14 @@ fun AddFieldScreen(
                     options = options + newOption
                     newOption = ""
                 },
-                modifier = Modifier.align(Alignment.End)
+                modifier = Modifier
+                    .align(Alignment.End)
+                    .padding(4.dp)
+                    .size(width = 160.dp, height = 45.dp),
+                colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF0021A5)),
+                contentPadding = PaddingValues(0.dp)
             ) {
-                Text("Add Option")
+                Text("Add Option", color = Color.White, fontSize = 25.sp, style = TextStyle(fontFamily = KhandFontFamily(), fontWeight = FontWeight.Medium))
             }
 
             Spacer(modifier = Modifier.height(16.dp))
@@ -251,14 +280,17 @@ fun AddFieldScreen(
                     .fillMaxWidth()
                     .align(Alignment.BottomCenter)
             ) {
-                Button(onClick = { cancel() }) {
-                    Text("Cancel")
-                }
+                ActionButton("Cancel", onClick = { cancel() }, Color(0xFF0021A5), Color.White)
                 Button(
+                    modifier = Modifier
+                        .padding(horizontal = 2.dp)
+                        .size(width = 160.dp, height = 45.dp),
                     onClick = { saveField() },
-                    enabled = !isSaving && fieldName.isNotBlank()
+                    enabled = !isSaving && fieldName.isNotBlank(),
+                    colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF0021A5)),
+                    contentPadding = PaddingValues(0.dp)
                 ) {
-                    Text("Save")
+                    Text(text = "Save", color = Color.White, fontSize = 25.sp, style = TextStyle(fontFamily = KhandFontFamily(), fontWeight = FontWeight.Medium))
                 }
             }
         }

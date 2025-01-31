@@ -1,6 +1,8 @@
 package org.example.project
 
 import KhandFontFamily
+import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.interaction.PressInteraction
 import androidx.compose.foundation.layout.*
@@ -181,6 +183,8 @@ fun SelectCollectionScreen(
                         onDismissRequest = { expanded = false },
                         modifier = Modifier
                             .fillMaxWidth()
+                            .background(Color(0xFFFFFFFF))
+                            .border(1.dp, Color(0xFF0021A5))
                     ) {
                         availableForms.forEach { type ->
                             DropdownMenuItem(
@@ -207,21 +211,27 @@ fun SelectCollectionScreen(
         ) {
             // cancel Button
             Button(
+                modifier = Modifier
+                    .size(width = 160.dp, height = 45.dp),
                 onClick = { onCancel() },
                 enabled = !isCancelling,
                 colors = ButtonDefaults.buttonColors(
                     containerColor = Color(0xFF0021A5)
-                )
+                ),
+                contentPadding = PaddingValues(0.dp)
             ) {
                 Text(text = "Cancel", color = Color.White, fontSize = 25.sp, style = TextStyle(fontFamily = KhandFontFamily(), fontWeight = FontWeight.Medium))
             }
             // next button
             Button(
+                modifier = Modifier
+                    .size(width = 160.dp, height = 45.dp),
                 onClick = { onNext() },
                 enabled = !isSaving,
                 colors = ButtonDefaults.buttonColors(
                     containerColor = Color(0xFF0021A5)
-                )
+                ),
+                contentPadding = PaddingValues(0.dp)
             ) {
                 if (isSaving) {
                     CircularProgressIndicator(

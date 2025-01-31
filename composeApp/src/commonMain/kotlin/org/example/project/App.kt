@@ -49,7 +49,7 @@ fun ActionButton(text: String, onClick: () -> Unit, buttonColor: Color, textColo
         ),
         contentPadding = PaddingValues(0.dp)
     ) {
-        Text(text, color = textColor, fontSize = 25.sp, style = TextStyle(fontFamily = KhandFontFamily(), fontWeight = FontWeight.Medium),)
+        Text(text, color = textColor, fontSize = 25.sp, style = TextStyle(fontFamily = KhandFontFamily(), fontWeight = FontWeight.Medium))
     }
 }
 
