@@ -90,3 +90,21 @@ DELETE FROM DataEntry;
 
 clearAllSamples:
 DELETE FROM SampleData;
+
+deleteDataEntryBySampleId:
+DELETE FROM DataEntry WHERE sample_id = ?;
+deleteSample:
+DELETE FROM SampleData WHERE sample_id = ?;
+
+updateSampleData:
+UPDATE SampleData
+SET date_collected_utc = ?,
+    location = ?
+WHERE sample_id = ?;
+
+updateDataEntry:
+UPDATE DataEntry
+SET user_input = ?
+WHERE sample_id = ?
+  AND field_id = ?;
+

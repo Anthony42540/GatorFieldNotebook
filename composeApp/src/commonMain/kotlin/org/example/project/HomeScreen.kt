@@ -6,6 +6,7 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -194,8 +195,22 @@ fun RecentSubmissionsSection(
                     modifier = Modifier.height(200.dp)
                 ) {
                     items(recentSamples) { sample ->
-                        database?.getSampleForm(sample.formId.toLong())
-                            ?.let { SampleCard(sample, it.formName) }
+                        val form = database?.getSampleForm(sample.formId.toLong())
+                        if (form != null) {
+                            SampleCard(
+                                sample = sample,
+                                collectionName = form.formName,
+                                // 1) Navigate to EditSampleScreen, passing this sample’s ID
+                                onEditSample = {
+                                    navController.navigate("EditExistingSampleScreen/${sample.sampleId}")
+                                },
+                                // 2) Delete from DB, then remove from the list so UI refreshes
+                                onDeleteSample = {
+                                    database.deleteSample(sample.sampleId.toLong())
+                                    recentSamples = recentSamples.filterNot { it.sampleId == sample.sampleId }
+                                }
+                            )
+                        }
                     }
                 }
                 Spacer(modifier = Modifier.height(2.dp))
@@ -221,7 +236,9 @@ fun RecentSubmissionsSection(
 @Composable
 private fun SampleCard(
     sample: SampleAndData,
-    collectionName: String
+    collectionName: String,
+    onDeleteSample: () -> Unit,
+    onEditSample: () -> Unit
 ) {
     Card(
         modifier = Modifier
@@ -263,6 +280,30 @@ private fun SampleCard(
                 style = MaterialTheme.typography.bodySmall,
                 color = Color.Gray
             )
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceEvenly
+            ) {
+                Button(
+                    onClick = { onEditSample() },
+                    colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF0021A5))
+                ) {
+                    Text(
+                        text = "Edit Sample",
+                        color = Color.White  // Ensure text is visible on blue background
+                    )
+                }
+
+                Button(
+                    onClick = { onDeleteSample() },
+                    colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF0021A5))
+                ) {
+                    Text(
+                        text = "Delete Sample",
+                        color = Color.White
+                    )
+                }
+            }
         }
     }
 }
