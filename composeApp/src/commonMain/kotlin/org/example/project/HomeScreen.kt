@@ -200,15 +200,6 @@ fun RecentSubmissionsSection(
                             SampleCard(
                                 sample = sample,
                                 collectionName = form.formName,
-                                // 1) Navigate to EditSampleScreen, passing this sample’s ID
-                                onEditSample = {
-                                    navController.navigate("EditExistingSampleScreen/${sample.sampleId}")
-                                },
-                                // 2) Delete from DB, then remove from the list so UI refreshes
-                                onDeleteSample = {
-                                    database.deleteSample(sample.sampleId.toLong())
-                                    recentSamples = recentSamples.filterNot { it.sampleId == sample.sampleId }
-                                }
                             )
                         }
                     }
@@ -236,9 +227,7 @@ fun RecentSubmissionsSection(
 @Composable
 private fun SampleCard(
     sample: SampleAndData,
-    collectionName: String,
-    onDeleteSample: () -> Unit,
-    onEditSample: () -> Unit
+    collectionName: String
 ) {
     Card(
         modifier = Modifier
@@ -280,30 +269,6 @@ private fun SampleCard(
                 style = MaterialTheme.typography.bodySmall,
                 color = Color.Gray
             )
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceEvenly
-            ) {
-                Button(
-                    onClick = { onEditSample() },
-                    colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF0021A5))
-                ) {
-                    Text(
-                        text = "Edit Sample",
-                        color = Color.White  // Ensure text is visible on blue background
-                    )
-                }
-
-                Button(
-                    onClick = { onDeleteSample() },
-                    colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF0021A5))
-                ) {
-                    Text(
-                        text = "Delete Sample",
-                        color = Color.White
-                    )
-                }
-            }
         }
     }
 }

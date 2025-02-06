@@ -302,8 +302,11 @@ fun EditField(
             "SHORT_STRING", "NUMBER" -> {
                 TextField(
                     value = localValue,
-                    onValueChange = {},
-                    readOnly = true,
+                    onValueChange = {
+                        localValue = it
+                        onValueChange(it)
+                    },
+                    readOnly = false,
                     label = { Text(field.fieldName) },
                     modifier = Modifier.fillMaxWidth(),
                     colors = OutlinedTextFieldDefaults.colors(
@@ -326,6 +329,7 @@ fun EditField(
                     modifier = Modifier
                         .fillMaxWidth()
                         .height(100.dp),
+                    readOnly = false,
                     // Same custom colors:
                     colors = OutlinedTextFieldDefaults.colors(
                         focusedBorderColor = Color(0xFF0021A5),
@@ -338,6 +342,7 @@ fun EditField(
 
             "DROPDOWN" -> {
                 var expanded by remember { mutableStateOf(false) }
+
                 TextField(
                     value = localValue,
                     onValueChange = {},
@@ -350,7 +355,37 @@ fun EditField(
                         focusedContainerColor = Color(0xFF0021A5).copy(0.1f),
                         unfocusedContainerColor = Color(0xFF0021A5).copy(0.1f)
                     ),
+                    interactionSource = remember { MutableInteractionSource() }
+                        .also { interactionSource ->
+                            // Toggle 'expanded' when user taps the text field
+                            LaunchedEffect(interactionSource) {
+                                interactionSource.interactions.collect { interaction ->
+                                    if (interaction is PressInteraction.Release) {
+                                        expanded = !expanded
+                                    }
+                                }
+                            }
+                        }
                 )
+
+                // Show menu when 'expanded' is true
+                DropdownMenu(
+                    expanded = expanded,
+                    onDismissRequest = { expanded = false },
+                    modifier = Modifier.fillMaxWidth()
+                ) {
+                    field.options?.forEach { option ->
+                        DropdownMenuItem(
+                            onClick = {
+                                // Update localValue with the user’s selection
+                                localValue = option
+                                onValueChange(option) // tell the parent composable
+                                expanded = false
+                            },
+                            text = { Text(text = option) }
+                        )
+                    }
+                }
             }
         }
     }
