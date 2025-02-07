@@ -6,6 +6,7 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -194,8 +195,13 @@ fun RecentSubmissionsSection(
                     modifier = Modifier.height(200.dp)
                 ) {
                     items(recentSamples) { sample ->
-                        database?.getSampleForm(sample.formId.toLong())
-                            ?.let { SampleCard(sample, it.formName) }
+                        val form = database?.getSampleForm(sample.formId.toLong())
+                        if (form != null) {
+                            SampleCard(
+                                sample = sample,
+                                collectionName = form.formName,
+                            )
+                        }
                     }
                 }
                 Spacer(modifier = Modifier.height(2.dp))

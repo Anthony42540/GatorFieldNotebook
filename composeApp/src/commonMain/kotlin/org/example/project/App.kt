@@ -137,6 +137,19 @@ fun AppNavigation() {
                     sampleId = sampleId
                 )
             }
+            composable(
+                route = "EditExistingSampleScreen/{sampleId}"
+            ) { backStackEntry ->
+                val sampleIdArg = backStackEntry.arguments
+                    ?.getString("sampleId")
+                    ?.toLongOrNull() ?: 0L
+                EditExistingSampleScreen(
+                    navController = navController,
+                    database = database,
+                    sampleId = sampleIdArg,
+                    viewModel = collectionViewModel
+                )
+            }
         }
     }
 }

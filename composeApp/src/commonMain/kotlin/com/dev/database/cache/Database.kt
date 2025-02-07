@@ -119,7 +119,43 @@ class Database(databaseDriverFactory: DatabaseDriverFactory) {
             dbQuery.clearAllSamples()
         }
     }
+
+    /************************** EDIT FUNCTIONS **************************/
+
+    internal fun updateSampleData(
+        sampleId: Long,
+        newDateCollectedUtc: String,
+        newLocation: String
+    ) {
+        dbQuery.updateSampleData(
+            newDateCollectedUtc,
+            newLocation,
+            sampleId
+        )
+    }
+
+    internal fun updateDataEntry(
+        sampleId: Long,
+        fieldId: Long,
+        newUserInput: String
+    ) {
+        dbQuery.updateDataEntry(
+            newUserInput,
+            sampleId,
+            fieldId
+        )
+    }
+
     /************************** DELETE FUNCTIONS **************************/
+    internal fun deleteSample(sampleId: Long) {
+        dbQuery.transaction {
+            // First delete all data entries associated with this sample
+            dbQuery.deleteDataEntryBySampleId(sampleId)
+            // Now delete the sample itself
+            dbQuery.deleteSample(sampleId)
+        }
+    }
+
 }
 
 private fun mapSampleForm(
@@ -220,3 +256,6 @@ fun listToJsonString(list: List<String>?): String? {
 fun jsonStringToList(json: String?): List<String>? {
     return json?.let { Json.decodeFromString(it) }
 }
+
+
+

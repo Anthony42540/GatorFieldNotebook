@@ -92,6 +92,40 @@ fun DetailedSampleScreen(
                 sample != null -> {
                     DetailedSampleContent(sample!!, database)
                 }
+
+
+            }
+            Row (
+                horizontalArrangement = Arrangement.SpaceBetween,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(16.dp)
+                ){
+                // EDIT SAMPLE
+                ActionButton(
+                    "Edit",
+                    onClick = {
+                        // Navigate to your EditExistingSampleScreen route
+                        // e.g. "editSample/$sampleId"
+                        navController.navigate("EditExistingSampleScreen/$sampleId")
+                    },
+                    buttonColor = Color(0xFF0021A5),
+                    textColor = Color.White
+                )
+
+                // DELETE SAMPLE
+                ActionButton(
+                    "Delete",
+                    onClick = {
+                        if (database != null && sample != null) {
+                            database.deleteSample(sampleId)
+                            // After deleting, navigate back
+                            navController.navigate("viewSampleCollection")
+                        }
+                    },
+                    buttonColor = Color(0xFF0021A5),
+                    textColor = Color.White
+                )
             }
         }
         Button(
@@ -117,8 +151,18 @@ fun DetailedSampleScreen(
                     .align(Alignment.BottomCenter)
                     .padding(16.dp)
             ) {
-                ActionButton("Back", onClick = { navController.navigate("viewSampleCollection") }, Color(0xFF0021A5), Color.White)
-                ActionButton("Print", onClick = { navController.navigate("print") }, Color(0xFF12BF7A), Color.White)
+                ActionButton(
+                    "Back",
+                    onClick = { navController.navigate("viewSampleCollection") },
+                    Color(0xFF0021A5),
+                    Color.White
+                )
+                ActionButton(
+                    "Print",
+                    onClick = { navController.navigate("print") },
+                    Color(0xFF12BF7A),
+                    Color.White
+                )
             }
         }
     }
