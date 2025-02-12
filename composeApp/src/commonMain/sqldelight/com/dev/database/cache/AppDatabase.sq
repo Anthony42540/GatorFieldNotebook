@@ -2,15 +2,16 @@
 -- table stores the forms that are created. Contains unique form ID and non unique name.
 CREATE TABLE SampleForm (
     form_id INTEGER PRIMARY KEY AUTOINCREMENT,
-    form_name TEXT NOT NULL
+    form_name TEXT NOT NULL,
+    form_active INTEGER NOT NULL
 );
 
 insertSampleForm:
-INSERT INTO SampleForm(form_name)
-VALUES(?);
+INSERT INTO SampleForm(form_name, form_active)
+VALUES(?,?);
 
 getAllSampleForms:
-SELECT * FROM SampleForm;
+SELECT * FROM SampleForm WHERE form_active = 1;
 
 getSampleForm:
 SELECT * FROM SampleForm WHERE form_id = ?;
