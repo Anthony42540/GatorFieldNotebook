@@ -35,17 +35,41 @@ import dev.gitlive.firebase.initialize
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 import org.example.project.RemoteDatabase.FirebaseDatabase
+import org.example.project.RemoteDatabase.SampleSynchronizer
 
 @Composable
 @Preview
 fun App() {
+    val database = remember {
+        try {
+            val db = DatabaseProvider.getInstance().database
+            println("Local database initialized successfully")
+            db
+        } catch (e: Exception) {
+            println("Failed to get local database: ${e.message}")
+            e.printStackTrace()
+            null
+        }
+    }
+
     LaunchedEffect(Unit) {
         try {
-            println("Initializing Firebase...")
-            FirebaseDatabase.addSample("Test", "TestCollection", 0.0, 0.0, 0.0, "2025-02-12", "12:00")
-            println("Firebase initialized successfully")
+            println("Initializing Firebase and starting synchronization...")
+
+            database?.let { db ->
+                val synchronizer = SampleSynchronizer(db)
+
+                // Perform initial sync
+                synchronizer.syncLocalToFirebase()
+                println("Successfully synchronized local to remote database")
+                synchronizer.syncFirebaseToLocal()
+                println("Successfully synchronized remote to local database")
+
+                println("Firebase and synchronization initialized successfully")
+            } ?: throw Exception("Database is null")
+
         } catch (e: Exception) {
-            println("Failed to initialize Firebase: ${e.message}")
+            println("Failed to initialize Firebase/sync: ${e.message}")
             e.printStackTrace()
         }
     }
