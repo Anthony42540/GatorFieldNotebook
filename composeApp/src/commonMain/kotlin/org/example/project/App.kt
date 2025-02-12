@@ -38,11 +38,13 @@ fun App() {
 }
 
 @Composable
+expect fun getScreenWidth(): Int
+
+@Composable
 fun ActionButton(text: String, onClick: () -> Unit, buttonColor: Color, textColor: Color) {
     Button(
         onClick = onClick,
         modifier = Modifier
-            .padding(horizontal = 2.dp)
             .size(width = 160.dp, height = 45.dp),
         colors = ButtonDefaults.buttonColors(
             containerColor = buttonColor
@@ -112,9 +114,6 @@ fun AppNavigation() {
             composable("viewSampleCollection") {
                 ViewSampleCollectionScreen(navController)
             }
-            composable("settings") {
-                SettingsScreen(navController)
-            }
             composable("newForm") {
                 NewFormScreen(navController, database, formViewModel, formValueState)
             }
@@ -127,9 +126,6 @@ fun AppNavigation() {
             composable("viewSampleCollection") {
                 ViewSampleCollectionScreen(navController, database)
             }
-            composable("settings") {
-                SettingsScreen(navController)
-            }
             composable(
                 route = "sampleDetail/{sampleId}",
                 arguments = listOf(navArgument("sampleId") { type = NavType.LongType })
@@ -139,6 +135,19 @@ fun AppNavigation() {
                     navController = navController,
                     database = database,
                     sampleId = sampleId
+                )
+            }
+            composable(
+                route = "EditExistingSampleScreen/{sampleId}"
+            ) { backStackEntry ->
+                val sampleIdArg = backStackEntry.arguments
+                    ?.getString("sampleId")
+                    ?.toLongOrNull() ?: 0L
+                EditExistingSampleScreen(
+                    navController = navController,
+                    database = database,
+                    sampleId = sampleIdArg,
+                    viewModel = collectionViewModel
                 )
             }
         }

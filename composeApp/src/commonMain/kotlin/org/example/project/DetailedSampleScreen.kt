@@ -48,28 +48,23 @@ fun DetailedSampleScreen(
         }
     }
 
-    fun back() {
-        navController.navigate("viewSampleCollection")
-    }
+    val fontSizeVal = if (getScreenWidth() <= 360) 20.sp else 25.sp
 
     Column(
         modifier = Modifier
-            .fillMaxSize()
-            .padding(16.dp),
+            .fillMaxSize(),
         verticalArrangement = Arrangement.Top,
         horizontalAlignment = Alignment.Start
     ) {
+        Header()
+
         Column(
             modifier = Modifier
                 .fillMaxWidth()
                 .wrapContentHeight(),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            Text(
-                text = "Sample Details",
-                color = Color(0xFF000000),
-                fontSize = 30.sp,
-            )
+            SectionTitle("Sample Details")
         }
         Column(
             modifier = Modifier
@@ -97,19 +92,53 @@ fun DetailedSampleScreen(
                 sample != null -> {
                     DetailedSampleContent(sample!!, database)
                 }
+
+
+            }
+            Row (
+                horizontalArrangement = Arrangement.SpaceBetween,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(16.dp)
+                ){
+                // EDIT SAMPLE
+                ActionButton(
+                    "Edit",
+                    onClick = {
+                        // Navigate to your EditExistingSampleScreen route
+                        // e.g. "editSample/$sampleId"
+                        navController.navigate("EditExistingSampleScreen/$sampleId")
+                    },
+                    buttonColor = Color(0xFF0021A5),
+                    textColor = Color.White
+                )
+
+                // DELETE SAMPLE
+                ActionButton(
+                    "Delete",
+                    onClick = {
+                        if (database != null && sample != null) {
+                            database.deleteSample(sampleId)
+                            // After deleting, navigate back
+                            navController.navigate("viewSampleCollection")
+                        }
+                    },
+                    buttonColor = Color(0xFF0021A5),
+                    textColor = Color.White
+                )
             }
         }
         Button(
             onClick = {}, //TODO: Add view all samples for specified collection screen
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(vertical = 4.dp)
+                .padding(8.dp)
                 .border(1.dp, Color.Black, RoundedCornerShape(24.dp)),
             colors = ButtonDefaults.buttonColors(
                 containerColor = Color.White
             ),
         ) {
-            Text("View all samples for this collection", color = Color.Black, fontSize = 25.sp, style = TextStyle(fontFamily = KhandFontFamily(), fontWeight = FontWeight.Medium))
+            Text("View all samples for this collection", color = Color.Black, fontSize = fontSizeVal, style = TextStyle(fontFamily = KhandFontFamily(), fontWeight = FontWeight.Medium))
         }
         Box(
             modifier = Modifier
@@ -120,8 +149,20 @@ fun DetailedSampleScreen(
                 modifier = Modifier
                     .fillMaxWidth()
                     .align(Alignment.BottomCenter)
+                    .padding(16.dp)
             ) {
-                ActionButton("Back", onClick = { back() }, Color(0xFF0021A5), Color.White)
+                ActionButton(
+                    "Back",
+                    onClick = { navController.navigate("viewSampleCollection") },
+                    Color(0xFF0021A5),
+                    Color.White
+                )
+                ActionButton(
+                    "Print",
+                    onClick = { navController.navigate("print") },
+                    Color(0xFF12BF7A),
+                    Color.White
+                )
             }
         }
     }
