@@ -28,10 +28,28 @@ import org.example.project.viewModels.FormViewModel
 import org.jetbrains.compose.ui.tooling.preview.Preview
 import org.koin.compose.KoinContext
 import org.koin.compose.viewmodel.koinViewModel
+import dev.gitlive.firebase.Firebase
+import dev.gitlive.firebase.firestore.FirebaseFirestore
+import dev.gitlive.firebase.firestore.firestore
+import dev.gitlive.firebase.initialize
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.map
+import org.example.project.RemoteDatabase.FirebaseDatabase
 
 @Composable
 @Preview
 fun App() {
+    LaunchedEffect(Unit) {
+        try {
+            println("Initializing Firebase...")
+            FirebaseDatabase.addSample("Test", "TestCollection", 0.0, 0.0, 0.0, "2025-02-12", "12:00")
+            println("Firebase initialized successfully")
+        } catch (e: Exception) {
+            println("Failed to initialize Firebase: ${e.message}")
+            e.printStackTrace()
+        }
+    }
+
     MaterialTheme {
         AppNavigation()
     }

@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "748177703561",
+    "project_id": "gator-field-notebook",
+    "storage_bucket": "gator-field-notebook.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:748177703561:android:f35797550c1c7bfbaa3c58",
+        "android_client_info": {
+          "package_name": "org.example.project"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyB7wXZkxDwA_gTkf4p0U7wzYmoOZTo4RI4"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
