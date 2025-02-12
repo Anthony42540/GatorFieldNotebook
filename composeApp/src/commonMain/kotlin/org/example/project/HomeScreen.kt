@@ -6,7 +6,6 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
-import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -228,12 +227,14 @@ fun RecentSubmissionsSection(
 @Composable
 private fun SampleCard(
     sample: SampleAndData,
-    collectionName: String
+    collectionName: String,
+    onSampleClick: (Long) -> Unit
 ) {
     Card(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(vertical = 4.dp),
+            .padding(vertical = 4.dp)
+            .clickable { onSampleClick(sample.sampleId.toLong()) },
         colors = CardDefaults.cardColors(
             containerColor = Color.White
         ),
@@ -281,7 +282,7 @@ private fun formatDate(dateString: String): String {
 
         "${localDateTime.month.name.take(3)} ${localDateTime.dayOfMonth}, ${localDateTime.year} " +
                 "${localDateTime.hour % 12}:${localDateTime.minute.toString().padStart(2, '0')} " +
-                "${if (localDateTime.hour >= 12) "PM" else "AM"}"
+                if (localDateTime.hour >= 12) "PM" else "AM"
     } catch (e: Exception) {
         dateString
     }
