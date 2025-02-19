@@ -349,7 +349,7 @@ fun DisplayField(
     var collectedData by remember { mutableStateOf("") }
     Column {
         when (ftToStr(field.fieldType)) {
-            "SHORT_STRING", "NUMBER" -> {
+            "SHORT_STRING" -> {
                 TextField(
                     value = collectedData,
                     onValueChange = {
@@ -363,7 +363,29 @@ fun DisplayField(
                         unfocusedBorderColor = Color(0xFF0021A5),
                         focusedContainerColor = Color(0xFF0021A5).copy(0.1f),
                         unfocusedContainerColor = Color(0xFF0021A5).copy(0.1f)
-                    ),
+                    )
+                )
+            }
+
+            "NUMBER" -> {
+                val patternForNumericalInput = remember { Regex("[-+]?[0-9]*\\.?[0-9]+(e[-+]?[0-9]*)?")}
+
+                TextField(
+                    value = collectedData,
+                    onValueChange = {
+                        if (it.isEmpty() || it.matches(patternForNumericalInput) || it == "-" || it == "+" || (it.endsWith("e") && it.count{ char -> char == 'e' } <= 1) || (it.endsWith(".") && it.count{ char -> char == '.' } <= 1)) {
+                            collectedData = it
+                        }
+                        onChange(collectedData)
+                    },
+                    label = { Text(field.fieldName) },
+                    modifier = Modifier.fillMaxWidth(),
+                    colors = OutlinedTextFieldDefaults.colors(
+                        focusedBorderColor = Color(0xFF0021A5),
+                        unfocusedBorderColor = Color(0xFF0021A5),
+                        focusedContainerColor = Color(0xFF0021A5).copy(0.1f),
+                        unfocusedContainerColor = Color(0xFF0021A5).copy(0.1f)
+                    )
                 )
             }
 
