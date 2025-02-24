@@ -62,6 +62,7 @@ fun NewFormScreen(
                 //insert new form
                 val formId = database.insertSampleForm(
                     formName = formValueState,
+                    formActive = 1
                 )
                 //insert fields for new form, also clears fields list
                 database.insertFieldsFromList(formId)

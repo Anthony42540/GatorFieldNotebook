@@ -6,7 +6,6 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
-import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -45,6 +44,7 @@ import dev.jordond.compass.geolocation.mobile
 import kotlinx.datetime.Instant
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.toLocalDateTime
+import androidx.compose.foundation.clickable
 
 suspend fun GetCurrentLocation(): GeolocatorResult {
     val geolocator: Geolocator = Geolocator.mobile()
@@ -195,13 +195,14 @@ fun RecentSubmissionsSection(
                     modifier = Modifier.height(200.dp)
                 ) {
                     items(recentSamples) { sample ->
-                        val form = database?.getSampleForm(sample.formId.toLong())
-                        if (form != null) {
-                            SampleCard(
-                                sample = sample,
-                                collectionName = form.formName,
-                            )
-                        }
+                        database?.getSampleForm(sample.formId.toLong())
+                            ?.let {
+                                SampleCard(sample,
+                                    it.formName,
+                                    onSampleClick = { sampleId ->
+                                        navController.navigate("sampleDetail/$sampleId")
+                                })
+                            }
                     }
                 }
                 Spacer(modifier = Modifier.height(2.dp))
@@ -214,7 +215,6 @@ fun RecentSubmissionsSection(
                         containerColor = Color.White
                     ),
                     modifier = Modifier.padding(0.dp),
-
                     contentPadding = PaddingValues(2.dp)
                 ) {
                     Text("View all submissions", color = Color.Black, fontSize = 23.sp, style = TextStyle(fontFamily = KhandFontFamily(), fontWeight = FontWeight.Medium))
@@ -227,12 +227,14 @@ fun RecentSubmissionsSection(
 @Composable
 private fun SampleCard(
     sample: SampleAndData,
-    collectionName: String
+    collectionName: String,
+    onSampleClick: (Long) -> Unit
 ) {
     Card(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(vertical = 4.dp),
+            .padding(vertical = 4.dp)
+            .clickable { onSampleClick(sample.sampleId.toLong()) },
         colors = CardDefaults.cardColors(
             containerColor = Color.White
         ),
@@ -280,7 +282,7 @@ private fun formatDate(dateString: String): String {
 
         "${localDateTime.month.name.take(3)} ${localDateTime.dayOfMonth}, ${localDateTime.year} " +
                 "${localDateTime.hour % 12}:${localDateTime.minute.toString().padStart(2, '0')} " +
-                "${if (localDateTime.hour >= 12) "PM" else "AM"}"
+                if (localDateTime.hour >= 12) "PM" else "AM"
     } catch (e: Exception) {
         dateString
     }

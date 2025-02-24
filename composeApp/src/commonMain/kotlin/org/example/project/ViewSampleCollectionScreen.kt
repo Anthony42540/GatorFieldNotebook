@@ -34,8 +34,6 @@ import kotlinx.datetime.Instant
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.toLocalDateTime
 
-data class Sample(val name: String, val id: String, val date: String)
-
 object GlobalState {
     var sampleId: Long? = null
 }
@@ -174,7 +172,7 @@ fun ViewSampleCollectionScreen(navController: NavController, database: Database?
     }
 }
 
-private suspend fun clearAllSamples(database: Database?) {
+private fun clearAllSamples(database: Database?) {
     if (database == null) return
 
     try {
@@ -184,7 +182,7 @@ private suspend fun clearAllSamples(database: Database?) {
     }
 }
 
-private suspend fun loadAllSamples(
+private fun loadAllSamples(
     database: Database?,
     onComplete: (List<SampleAndData>, String?) -> Unit
 ) {

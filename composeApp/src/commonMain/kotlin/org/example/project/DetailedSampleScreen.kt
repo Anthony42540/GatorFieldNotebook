@@ -120,25 +120,13 @@ fun DetailedSampleScreen(
                         if (database != null && sample != null) {
                             database.deleteSample(sampleId)
                             // After deleting, navigate back
-                            navController.navigate("viewSampleCollection")
+                            navController.popBackStack()
                         }
                     },
                     buttonColor = Color(0xFF0021A5),
                     textColor = Color.White
                 )
             }
-        }
-        Button(
-            onClick = {}, //TODO: Add view all samples for specified collection screen
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(8.dp)
-                .border(1.dp, Color.Black, RoundedCornerShape(24.dp)),
-            colors = ButtonDefaults.buttonColors(
-                containerColor = Color.White
-            ),
-        ) {
-            Text("View all samples for this collection", color = Color.Black, fontSize = fontSizeVal, style = TextStyle(fontFamily = KhandFontFamily(), fontWeight = FontWeight.Medium))
         }
         Box(
             modifier = Modifier
@@ -153,7 +141,7 @@ fun DetailedSampleScreen(
             ) {
                 ActionButton(
                     "Back",
-                    onClick = { navController.navigate("viewSampleCollection") },
+                    onClick = { navController.popBackStack() },
                     Color(0xFF0021A5),
                     Color.White
                 )
