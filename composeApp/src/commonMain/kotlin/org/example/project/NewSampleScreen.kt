@@ -368,12 +368,12 @@ fun DisplayField(
             }
 
             "NUMBER" -> {
-                val patternForNumericalInput = remember { Regex("[-+]?[0-9]*\\.?[0-9]+(e[-+]?[0-9]*)?")}
+                val patternForNumericalInput = remember { Regex("[-+]?[0-9]+\\.?[0-9]*(e[-+]?[0-9]+\\.?[0-9]*)?")}
 
                 TextField(
                     value = collectedData,
                     onValueChange = {
-                        if (it.isEmpty() || it.matches(patternForNumericalInput) || it == "-" || it == "+" || (it.endsWith("e") && it.count{ char -> char == 'e' } <= 1) || (it.endsWith(".") && it.count{ char -> char == '.' } <= 1)) {
+                        if (it.isEmpty() || it.matches(patternForNumericalInput) || it == "-" || it == "+" || (it.endsWith("e") && it.count{ char -> char == 'e' } <= 1) || (it.endsWith(".") && it.count{ char -> char == '.' } <= 2) && !it.contains("..") && it.lastIndexOf('.') < it.length - 1) {
                             collectedData = it
                         }
                         onChange(collectedData)

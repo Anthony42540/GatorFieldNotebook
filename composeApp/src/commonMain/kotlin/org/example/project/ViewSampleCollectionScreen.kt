@@ -229,14 +229,6 @@ private fun SampleRow(sample: SampleAndData, form: SampleForm, onSampleClick: (L
             modifier = Modifier.padding(8.dp),
             color = Color.Black
         )
-        Icon(
-            imageVector = Icons.Default.Edit,
-            contentDescription = "Edit sample",
-            modifier = Modifier
-                .size(32.dp)
-                .padding(8.dp),
-            tint = Color.Black
-        )
     }
 }
 
