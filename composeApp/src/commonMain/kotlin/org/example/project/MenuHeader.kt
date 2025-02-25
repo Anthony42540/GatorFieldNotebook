@@ -57,7 +57,9 @@ fun MenuHeader(
 
     ModalNavigationDrawer(
         drawerContent = {
-            ModalDrawerSheet {
+            ModalDrawerSheet (
+                drawerContainerColor = Color.White
+            ) {
                 Column(
                     modifier = Modifier.padding(horizontal = 16.dp)
                         .verticalScroll(rememberScrollState())
