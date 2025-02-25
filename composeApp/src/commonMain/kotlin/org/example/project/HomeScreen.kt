@@ -2,6 +2,7 @@ package org.example.project
 
 import KhandFontFamily
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -45,7 +46,10 @@ import kotlinx.datetime.Instant
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.toLocalDateTime
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.TopAppBar
+import androidx.compose.ui.draw.clip
 
 suspend fun GetCurrentLocation(): GeolocatorResult {
     val geolocator: Geolocator = Geolocator.mobile()
@@ -72,50 +76,34 @@ fun HomeScreen(navController: NavController, database: Database? = null) {
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
 
-        MenuHeader()
-
-        Column(
-            modifier = Modifier.fillMaxSize(),
-            verticalArrangement = Arrangement.Top,
-            horizontalAlignment = Alignment.CenterHorizontally
-        ) {
-            RecentSubmissionsSection(navController, database)
-
+        MenuHeader(content = {
             Column(
                 modifier = Modifier.fillMaxSize(),
-                verticalArrangement = Arrangement.Center,
+                verticalArrangement = Arrangement.Top,
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
-                Box(
-                    modifier = Modifier.fillMaxWidth()
+                RecentSubmissionsSection(navController, database)
+
+                Column(
+                    modifier = Modifier.fillMaxSize().padding(15.dp),
+                    verticalArrangement = Arrangement.Bottom,
+                    horizontalAlignment = Alignment.CenterHorizontally
                 ) {
-                    GoogleMaps(locationState?.coordinates?.latitude.toString(), locationState?.coordinates?.longitude.toString())
                     Box(
                         modifier = Modifier
-                            .align(Alignment.BottomCenter)
-                            .padding(20.dp)
+                            .size(380.dp)
+                            .clip(RoundedCornerShape(25.dp))
                     ) {
-                        Column(
-                            verticalArrangement = Arrangement.spacedBy(8.dp),
-                            horizontalAlignment = Alignment.CenterHorizontally
-                        ) {
-                            ActionButton(
-                                "New Sample",
-                                onClick = { navController.navigate("selectCollection") },
-                                Color(0xFF12BF7A),
-                                Color.White
-                            )
-                            ActionButton(
-                                "New Form",
-                                onClick = { navController.navigate("newForm") },
-                                Color(0xFF12BF7A),
-                                Color.White
-                            )
-                        }
+                        GoogleMaps(
+                            locationState?.coordinates?.latitude.toString(),
+                            locationState?.coordinates?.longitude.toString()
+                        )
                     }
                 }
             }
-        }
+        },
+            navController = navController
+        )
     }
 }
 
@@ -155,13 +143,13 @@ fun RecentSubmissionsSection(
     Column(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(vertical = 8.dp)
-            .padding(horizontal = 16.dp)
+            .padding(top = 64.dp)
+            .padding(horizontal = 10.dp)
     ) {
         Text(
             text = "Recent Submissions",
             style = TextStyle(fontFamily = KhandFontFamily(), fontWeight = FontWeight.Medium),
-            fontSize = 30.sp,
+            fontSize = 25.sp,
             modifier = Modifier.padding(bottom = 2.dp)
         )
 
@@ -184,41 +172,32 @@ fun RecentSubmissionsSection(
                 )
             }
             recentSamples.isEmpty() -> {
-                Text(
-                    text = "No submissions yet",
-                    style = TextStyle(fontFamily = KhandFontFamily(), fontWeight = FontWeight.Light),
-                    fontSize = 23.sp,
-                    modifier = Modifier.padding(vertical = 2.dp)
-                )
+                Box(
+                    modifier = Modifier.fillMaxWidth(),
+                    contentAlignment = Alignment.Center
+                ) {
+                    Text(
+                        text = "No submissions yet",
+                        style = TextStyle(fontFamily = KhandFontFamily(), fontWeight = FontWeight.Light),
+                        fontSize = 23.sp,
+                        modifier = Modifier.padding(vertical = 25.dp),
+                    )
+                }
             }
             else -> {
                 LazyColumn(
-                    modifier = Modifier.height(200.dp)
+                    modifier = Modifier.height(380.dp)
                 ) {
                     items(recentSamples) { sample ->
                         database?.getSampleForm(sample.formId.toLong())
-                            ?.let {
-                                SampleCard(sample,
-                                    it.formName,
-                                    onSampleClick = { sampleId ->
-                                        navController.navigate("sampleDetail/$sampleId")
-                                })
-                            }
+                        ?.let {
+                            SampleCard(sample,
+                                it.formName,
+                                onSampleClick = { sampleId ->
+                                    navController.navigate("sampleDetail/$sampleId")
+                            })
+                        }
                     }
-                }
-                Spacer(modifier = Modifier.height(2.dp))
-
-                Button(
-                    onClick = {
-                        navController.navigate("viewSampleCollection")
-                    },
-                    colors = ButtonDefaults.buttonColors(
-                        containerColor = Color.White
-                    ),
-                    modifier = Modifier.padding(0.dp),
-                    contentPadding = PaddingValues(2.dp)
-                ) {
-                    Text("View all submissions", color = Color.Black, fontSize = 23.sp, style = TextStyle(fontFamily = KhandFontFamily(), fontWeight = FontWeight.Medium))
                 }
             }
         }
