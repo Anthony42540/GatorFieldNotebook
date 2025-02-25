@@ -45,6 +45,7 @@ import kotlinx.datetime.Instant
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.toLocalDateTime
 import androidx.compose.foundation.clickable
+import androidx.compose.material3.TopAppBar
 
 suspend fun GetCurrentLocation(): GeolocatorResult {
     val geolocator: Geolocator = Geolocator.mobile()
@@ -71,7 +72,7 @@ fun HomeScreen(navController: NavController, database: Database? = null) {
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
 
-        Header()
+        MenuHeader()
 
         Column(
             modifier = Modifier.fillMaxSize(),
