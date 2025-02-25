@@ -19,6 +19,7 @@ import com.google.android.gms.maps.model.CameraPosition
 import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.MapColorScheme
 import com.google.maps.android.compose.GoogleMap
+import com.google.maps.android.compose.MapUiSettings
 import com.google.maps.android.compose.Marker
 import com.google.maps.android.compose.rememberCameraPositionState
 
@@ -52,7 +53,10 @@ actual fun GoogleMaps(lat: String, long: String) {
             cameraPositionState = cameraPositionState,
             googleMapOptionsFactory = {
                 GoogleMapOptions().mapColorScheme(MapColorScheme.FOLLOW_SYSTEM)
-            }
+            },
+            uiSettings = MapUiSettings(
+                scrollGesturesEnabled = false
+            )
         ) {
             if (!isLoading) {
                 Marker(
