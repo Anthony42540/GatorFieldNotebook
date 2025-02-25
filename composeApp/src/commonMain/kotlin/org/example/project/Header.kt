@@ -30,7 +30,7 @@ fun Header() {
             text = "Gator Field Notebook",
             style = TextStyle(fontFamily = KhandFontFamily(), fontWeight = FontWeight.Medium),
             color = Color.White,
-            fontSize = 45.sp
+            fontSize = 40.sp
         )
         HorizontalDivider()
     }
