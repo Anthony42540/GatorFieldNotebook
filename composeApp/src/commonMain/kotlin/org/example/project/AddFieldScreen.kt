@@ -145,7 +145,10 @@ fun AddFieldScreen(
             Spacer(modifier = Modifier.width(8.dp))
             Checkbox(
                 checked = isRequired,
-                onCheckedChange = { isRequired = it }
+                onCheckedChange = { isRequired = it },
+                colors = CheckboxDefaults.colors(
+                    checkedColor = Color(0xFF0021A5)
+                )
             )
         }
 
