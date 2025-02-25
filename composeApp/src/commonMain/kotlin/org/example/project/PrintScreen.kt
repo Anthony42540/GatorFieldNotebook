@@ -116,7 +116,7 @@ fun PrintScreen(navController: NavController) {
                         .align(Alignment.BottomCenter)
                         .padding(16.dp)
                 ) {
-                    ActionButton("Back", onClick = { navController.navigate("sampleDetail/"+GlobalState.sampleId) }, Color(0xFF0021A5), Color.White)
+                    ActionButton("Back", onClick = { navController.popBackStack() }, Color(0xFF0021A5), Color.White)
                     ActionButton("Print", onClick = {  }, Color(0xFF12BF7A), Color.White)
                 }
             }
