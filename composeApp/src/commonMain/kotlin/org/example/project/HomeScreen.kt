@@ -78,7 +78,9 @@ fun HomeScreen(navController: NavController, database: Database? = null) {
 
         MenuHeader(content = {
             Column(
-                modifier = Modifier.fillMaxSize(),
+                modifier = Modifier
+                    .fillMaxSize()
+                    .background(Color.White),
                 verticalArrangement = Arrangement.Top,
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
