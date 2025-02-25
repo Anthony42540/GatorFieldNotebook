@@ -11,6 +11,71 @@ An app streamlining environmental data collection. This repository contains all 
 ### Project Overview
 The Gator Field Notebook is a field notebook application that enhances field data collection by integrating GPS logging, customizable data fields, and Bluetooth printing for on-site label creation. The application also enables users to export collected data to Excel for analysis and reporting.
 
+## Getting Started
+
+### Prerequisites
+
+- Android Studio Arctic Fox (2021.3.1) or newer
+- JDK 11 or newer
+- Git
+- For iOS development: macOS with Xcode 13 or newer
+
+### Installation
+
+1. Clone the repository:
+   ```bash
+   git clone https://github.com/Anthony42540/GatorFieldNotebook.git
+   cd GatorFieldNotebook
+   ```
+
+2. Open the project in Android Studio:
+   - Launch Android Studio
+   - Select "Open an existing project"
+   - Navigate to the cloned repository and select it
+
+3. Install dependencies:
+   - Android Studio will automatically sync the Gradle files
+   - Wait for the sync to complete (this may take a few minutes)
+
+4. Set up Firebase:
+   - Create a new Firebase project at [firebase.google.com](https://firebase.google.com)
+   - Add Android and iOS apps to your Firebase project
+   - Download and add `google-services.json` to the `/android` directory
+   - For iOS, add `GoogleService-Info.plist` to the `/ios` directory
+
+### Running the Application
+
+#### Android
+
+1. Connect an Android device or start an emulator
+2. Select the 'android' configuration from the run configurations dropdown
+3. Click the Run button (or press Shift+F10)
+
+#### iOS (requires macOS)
+
+1. Open the iOS project in Xcode:
+   ```bash
+   cd iosApp
+   open iosApp.xcworkspace
+   ```
+2. Select your target device
+3. Click the Run button
+
+## Project Structure
+
+```
+GatorFieldNotebook/
+├── androidApp/          # Android-specific code
+├── iosApp/              # iOS-specific code
+├── shared/              # Shared code (KMP)
+│   ├── src/
+│   │   ├── commonMain/  # Common Kotlin code
+│   │   ├── androidMain/ # Android-specific implementations
+│   │   └── iosMain/     # iOS-specific implementations
+├── build.gradle.kts     # Project build configuration
+└── gradle/              # Gradle configuration
+```
+
 ### Architecture
 The Gator Field Notebook has distinct modules that work together to manage data collection, storage, processing, and output. The key architectural elements are as follows:
 
@@ -99,8 +164,9 @@ This is the "head" of each sample collected. It is associated with a form and co
 **Description:**  
 Stores individual data entries for each sample. It is linked to the sample it is from and the type of field that it is. In the future, if fields are to be reused for multiple forms, the SampleData table will have to store a list linking each dataEntry to its fields. This will save space in the database.
 
+
+
 ### Known Bugs
-- Upon saving a sample, the print screen sometimes pops up
 - There is no form field validation so leaving some fields empty might break the app
 - There is no scroll window implemented when fields overflow the screen, so for now sample fields are limited to one screen
 - There is no safeguard for submitting text with curly braces, but this should be implemented because it could mess up lists stored as json strings in the database
