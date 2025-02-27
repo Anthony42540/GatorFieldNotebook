@@ -1,0 +1,38 @@
+PODS:
+  - composeApp (1.0):
+    - Google-Maps-iOS-Utils (= 6.1.0)
+    - GoogleMaps (= 9.3.0)
+  - Google-Maps-iOS-Utils (6.1.0):
+    - GoogleMaps (~> 9.0)
+  - GoogleMaps (9.3.0):
+    - GoogleMaps/Maps (= 9.3.0)
+  - GoogleMaps/Maps (9.3.0)
+  - sqlite3 (3.49.0):
+    - sqlite3/common (= 3.49.0)
+  - sqlite3/common (3.49.0)
+
+DEPENDENCIES:
+  - composeApp (from `../composeApp`)
+  - Google-Maps-iOS-Utils (= 6.1.0)
+  - GoogleMaps (= 9.3.0)
+  - sqlite3 (= 3.49.0)
+
+SPEC REPOS:
+  trunk:
+    - Google-Maps-iOS-Utils
+    - GoogleMaps
+    - sqlite3
+
+EXTERNAL SOURCES:
+  composeApp:
+    :path: "../composeApp"
+
+SPEC CHECKSUMS:
+  composeApp: c61c88ae3353abc657b9ab576055e1ad860037d7
+  Google-Maps-iOS-Utils: 0a484b05ed21d88c9f9ebbacb007956edd508a96
+  GoogleMaps: b58e9627004f47043897eeae830c3ef023678f3b
+  sqlite3: 4922312598b67e1825c6a6c821296dcbf6783046
+
+PODFILE CHECKSUM: 30ac3acc4bab9b9f959c79646a87c7c71e95d0f3
+
+COCOAPODS: 1.16.2
