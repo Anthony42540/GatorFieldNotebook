@@ -153,8 +153,8 @@ fun MenuHeader(
                                 text = "Gator Field Notebook",
                                 style = TextStyle(fontFamily = KhandFontFamily(), fontWeight = FontWeight.Medium),
                                 color = Color.White,
-                                fontSize = 40.sp,
-                                modifier = Modifier.padding(horizontal = 20.dp)
+                                fontSize = 30.sp,
+                                modifier = Modifier.padding(horizontal = 40.dp)
                             )
                         }
                     },

@@ -15,8 +15,8 @@ import kotlinx.cinterop.ExperimentalForeignApi
 actual fun GoogleMaps(lat: String, long: String) {
     val mapView = remember { GMSMapView() }
     val cameraPosition = GMSCameraPosition.cameraWithLatitude(
-        latitude = 1.35,
-        longitude = 103.87,
+        latitude = 0.0,
+        longitude = 0.0,
         zoom = 14.0f
     )
     val cameraUpdate = GMSCameraUpdate.setCamera(cameraPosition)
