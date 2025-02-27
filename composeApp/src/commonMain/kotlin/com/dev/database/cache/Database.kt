@@ -60,8 +60,8 @@ class Database(databaseDriverFactory: DatabaseDriverFactory) {
 
 
     /************************** INSERT FUNCTIONS **************************/
-    internal fun insertSampleForm(formName: String): Long { //add new sample form and return unique sample ID
-        dbQuery.insertSampleForm(formName)
+    internal fun insertSampleForm(formName: String, formActive: Long): Long { //add new sample form and return unique sample ID
+        dbQuery.insertSampleForm(formName, formActive)
         return dbQuery.getLastRowID().executeAsOne()
     }
     internal fun insertField( //add new field to a sample form
@@ -163,11 +163,13 @@ class Database(databaseDriverFactory: DatabaseDriverFactory) {
 
 private fun mapSampleForm(
     form_id: Long,
-    form_name: String
+    form_name: String,
+    form_active: Long,
 ): SampleForm {
     return SampleForm(
         formId = form_id.toInt(),
-        formName = form_name
+        formName = form_name,
+        formActive = form_active.toInt()
     )
 }
 
@@ -234,7 +236,6 @@ fun ftToStr(fieldType: FieldType): String {
 }
 
 fun readableToFT(fieldType: String): FieldType {
-    val tmp : FieldType
     if (fieldType == "small text box") {
         return FieldType.SHORT_STRING
     }

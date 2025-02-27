@@ -34,8 +34,6 @@ import kotlinx.datetime.Instant
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.toLocalDateTime
 
-data class Sample(val name: String, val id: String, val date: String)
-
 object GlobalState {
     var sampleId: Long? = null
 }
@@ -174,7 +172,7 @@ fun ViewSampleCollectionScreen(navController: NavController, database: Database?
     }
 }
 
-private suspend fun clearAllSamples(database: Database?) {
+private fun clearAllSamples(database: Database?) {
     if (database == null) return
 
     try {
@@ -184,7 +182,7 @@ private suspend fun clearAllSamples(database: Database?) {
     }
 }
 
-private suspend fun loadAllSamples(
+private fun loadAllSamples(
     database: Database?,
     onComplete: (List<SampleAndData>, String?) -> Unit
 ) {
@@ -230,14 +228,6 @@ private fun SampleRow(sample: SampleAndData, form: SampleForm, onSampleClick: (L
             fontSize = 16.sp,
             modifier = Modifier.padding(8.dp),
             color = Color.Black
-        )
-        Icon(
-            imageVector = Icons.Default.Edit,
-            contentDescription = "Edit sample",
-            modifier = Modifier
-                .size(32.dp)
-                .padding(8.dp),
-            tint = Color.Black
         )
     }
 }
