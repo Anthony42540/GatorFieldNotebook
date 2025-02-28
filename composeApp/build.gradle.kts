@@ -11,6 +11,7 @@ plugins {
     alias(libs.plugins.compose.compiler)
     alias(libs.plugins.kotlinxSerialization)
     alias(libs.plugins.sqldelight)
+    alias(libs.plugins.googleServices)
 }
 
 kotlin {
@@ -60,6 +61,9 @@ kotlin {
             implementation(libs.koin.android)
             implementation(libs.koin.core)
             implementation(libs.koin.androidx.compose)
+
+
+
         }
         commonMain.dependencies {
             implementation(compose.runtime)
@@ -85,6 +89,7 @@ kotlin {
             api(libs.koin.core)
             implementation(libs.koin.compose)
             implementation(libs.koin.composeVM)
+            implementation(libs.gitlive.firebase.firestore)
         }
         desktopMain.dependencies {
             implementation(compose.desktop.currentOs)
@@ -136,6 +141,8 @@ dependencies {
     implementation(libs.androidx.appcompat)
     debugImplementation(compose.uiTooling)
     implementation(libs.kotlinx.coroutines.core.v181)
+    implementation(platform("com.google.firebase:firebase-bom:33.9.0"))
+    implementation("com.google.firebase:firebase-analytics")
 }
 
 compose.desktop {
