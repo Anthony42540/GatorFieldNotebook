@@ -1,9 +1,7 @@
 package org.example.project
 
 import KhandFontFamily
-import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.MaterialTheme
@@ -97,20 +95,6 @@ fun ActionButton(text: String, onClick: () -> Unit, buttonColor: Color, textColo
     }
 }
 
-@Composable
-fun NavigationImgButton(icon: @Composable () -> Unit, onClick: () -> Unit) {
-    Button(
-        onClick = onClick,
-        modifier = Modifier
-            .padding(horizontal = 2.dp)
-            .border(1.dp, Color.Black, RoundedCornerShape(24.dp)),
-        colors = ButtonDefaults.buttonColors(
-            containerColor = Color.White
-        )
-    ) {
-        icon()
-    }
-}
 @Composable
 fun AppNavigation() {
     KoinContext{

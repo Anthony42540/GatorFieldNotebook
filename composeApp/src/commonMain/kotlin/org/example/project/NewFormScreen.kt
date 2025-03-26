@@ -230,7 +230,7 @@ fun NewFormScreen(
         }
 
         Row(
-            horizontalArrangement = Arrangement.spacedBy(8.dp),
+            horizontalArrangement = Arrangement.SpaceEvenly,
             modifier = Modifier
                 .padding(8.dp)
                 .fillMaxWidth()

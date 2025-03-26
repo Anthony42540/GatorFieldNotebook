@@ -2,6 +2,7 @@ package org.example.project
 
 
 import KhandFontFamily
+import androidx.compose.animation.animateContentSize
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -20,10 +21,16 @@ import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Edit
+import androidx.compose.material.icons.filled.KeyboardArrowDown
+import androidx.compose.material.icons.filled.KeyboardArrowUp
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.Divider
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import com.dev.database.cache.Database
@@ -45,6 +52,8 @@ fun ViewSampleCollectionScreen(navController: NavController, database: Database?
     var isLoading by remember { mutableStateOf(true) }
     var error by remember { mutableStateOf<String?>(null) }
     val coroutineScope = rememberCoroutineScope()
+
+    var expandedGroups by remember { mutableStateOf(setOf<String>()) }
 
     LaunchedEffect(Unit) {
         loadAllSamples(database) { newSamples, errorMessage ->
@@ -138,21 +147,67 @@ fun ViewSampleCollectionScreen(navController: NavController, database: Database?
             Box (
                 modifier = Modifier.fillMaxSize()
             ) {
+                val groupedSamples = samples.groupBy { database?.getSampleForm(it.formId.toLong())?.formName ?: "Unknown" }
+
                 LazyColumn(
                     modifier = Modifier
                         .fillMaxSize()
                         .padding(bottom = 70.dp)
                 ) {
-                    items(samples) { sample ->
-                        if (database != null) {
-                            SampleRow(
-                                sample = sample,
-                                form = database.getSampleForm((sample.formId).toLong()),
-                                onSampleClick = { sampleId ->
-                                    GlobalState.sampleId = sampleId
-                                    navController.navigate("sampleDetail/$sampleId")
+                    groupedSamples.forEach { (formName, sampleList) ->
+                        item {
+                            Card(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .padding(horizontal = 12.dp, vertical = 8.dp)
+                                    .clickable {
+                                        expandedGroups = if (expandedGroups.contains(formName)) {
+                                            expandedGroups - formName
+                                        } else {
+                                            expandedGroups + formName
+                                        }
+                                    },
+                                colors = CardDefaults.cardColors(containerColor = Color(0xFFFFFFFF)),
+                                elevation = CardDefaults.cardElevation(defaultElevation = 4.dp),
+                                shape = RoundedCornerShape(12.dp)
+                            ) {
+                                Column(
+                                    modifier = Modifier
+                                        .fillMaxWidth()
+                                        .padding(16.dp)
+                                        .animateContentSize()
+                                ) {
+                                    Row(
+                                        verticalAlignment = Alignment.CenterVertically
+                                    ) {
+                                        Text(
+                                            text = "Collection: $formName",
+                                            fontSize = 18.sp,
+                                            fontWeight = FontWeight.SemiBold,
+                                            style = MaterialTheme.typography.bodyLarge
+                                        )
+                                        Icon(
+                                            imageVector = if (expandedGroups.contains(formName)) Icons.Default.KeyboardArrowUp else Icons.Default.KeyboardArrowDown,
+                                            contentDescription = "Expand/Collapse"
+                                        )
+                                    }
+
+                                    if (expandedGroups.contains(formName)) {
+                                        Divider(color = Color.Gray, thickness = 1.dp, modifier = Modifier.padding(vertical = 8.dp))
+                                        sampleList.forEach { sample ->
+                                            SampleRow(
+                                                sample = sample,
+                                                form = database!!.getSampleForm(sample.formId.toLong()),
+                                                onSampleClick = { sampleId ->
+                                                    GlobalState.sampleId = sampleId
+                                                    navController.navigate("sampleDetail/$sampleId")
+                                                }
+                                            )
+                                            Divider(color = Color.LightGray, thickness = 0.5.dp)
+                                        }
+                                    }
                                 }
-                            )
+                            }
                         }
                     }
                 }
@@ -210,7 +265,6 @@ private fun SampleRow(sample: SampleAndData, form: SampleForm, onSampleClick: (L
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(vertical = 4.dp, horizontal = 8.dp)
-                .border(1.dp, Color.Black, RoundedCornerShape(4.dp))
                 .clickable { onSampleClick(sample.sampleId.toLong()) },
             horizontalArrangement = Arrangement.SpaceBetween,
             verticalAlignment = Alignment.CenterVertically
