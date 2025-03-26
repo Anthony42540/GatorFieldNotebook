@@ -45,6 +45,7 @@ data class FieldNoID(
 data class SampleData(
     @SerialName("sample_id") val sampleId: Int,
     @SerialName("form_id") val formId: Int,
+    @SerialName("sample_collection_id") val sampleCollectionId: Int, // <-- NEW
     @SerialName("date_collected_utc") val dateCollectedUTC: String,
     @SerialName("location") val location: String,
 )
@@ -62,7 +63,8 @@ data class DataEntry(
 data class SampleAndData(
     @SerialName("sample_id") val sampleId: Int,
     @SerialName("form_id") val formId: Int,
+    @SerialName("sample_collection_id") val sampleCollectionId: Int,
     @SerialName("date_collected_utc") val dateCollectedUTC: String,
     @SerialName("location") val location: String,
-    @SerialName("data_entries") val dataEntries: Map<Long, String> //First value contains field id, second value contains user input
+    @SerialName("data_entries") val dataEntries: Map<Long, String>
 )
