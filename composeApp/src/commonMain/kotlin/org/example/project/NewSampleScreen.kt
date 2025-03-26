@@ -83,7 +83,7 @@ fun EditSampleScreen(
         isLoading = true.toString()
 
         coroutineScope.launch {
-            GetCurrentLocationAndroid().onSuccess { location ->
+            GetCurrentLocation().onSuccess { location ->
                 locationState.value = location
                 coordinates =
                     (locationState.value!!.coordinates.latitude.toString()) + ", " + (locationState.value!!.coordinates.longitude.toString())

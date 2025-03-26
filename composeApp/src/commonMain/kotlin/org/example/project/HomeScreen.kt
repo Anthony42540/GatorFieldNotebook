@@ -48,20 +48,9 @@ import androidx.compose.ui.draw.clip
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 
-suspend fun GetCurrentLocationAndroid(): GeolocatorResult {
+suspend fun GetCurrentLocation(): GeolocatorResult {
     val geolocator: Geolocator = Geolocator.mobile()
     return geolocator.current(Priority.HighAccuracy)
-}
-
-suspend fun GetCurrentLocationiOS() : GeolocatorResult {
-    var geolocatorResult : GeolocatorResult
-
-    withContext(Dispatchers.Default) {
-        val geolocator: Geolocator = Geolocator.mobile()
-        geolocatorResult = geolocator.current(priority = Priority.HighAccuracy)
-    }
-
-    return geolocatorResult
 }
 
 @Composable
@@ -69,19 +58,10 @@ fun HomeScreen(navController: NavController, database: Database? = null) {
     var locationState by remember { mutableStateOf<Location?>(null) }
 
     LaunchedEffect(Unit) {
-        if (getPlatform().name.contains("Android")){
-            GetCurrentLocationAndroid().onSuccess { location ->
-                locationState = location
-            }.onFailed { exception ->
-                locationState = null
-            }
-        }
-        else {
-            GetCurrentLocationiOS().onSuccess { location ->
-                locationState = location
-            }.onFailed { exception ->
-                locationState = null
-            }
+        GetCurrentLocation().onSuccess { location ->
+            locationState = location
+        }.onFailed { exception ->
+            locationState = null
         }
     }
 
