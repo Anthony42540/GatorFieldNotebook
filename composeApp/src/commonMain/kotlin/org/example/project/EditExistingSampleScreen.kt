@@ -237,18 +237,31 @@ fun EditExistingSampleScreen(
             }
 
             // Display each field with existing userInput
-            items(fields) { field ->
-                val currentValue = collectedData[field.fieldId] ?: ""
-                EditField(
-                    field = field,
-                    initialValue = currentValue,
-                    onValueChange = { newValue ->
-                        collectedData = collectedData.toMutableMap().apply {
-                            this[field.fieldId] = newValue
+            items(fields) {
+                    field ->
+                // Center each field horizontally
+                Box(
+                    modifier = Modifier.fillMaxWidth(),
+                    contentAlignment = Alignment.Center
+                ) {
+                    DisplayField(
+                        field = field,
+                        //maps user input to its field ID for submission (on save)
+                        onChange = { value ->
+                            collectedData = collectedData.toMutableMap().apply {
+                                this[field.fieldId] = value
+                            }
                         }
-                    }
-                )
+                    )
+                }
                 Spacer(modifier = Modifier.height(16.dp))
+                // Center the image upload screen horizontally
+                Box(
+                    modifier = Modifier.fillMaxWidth(),
+                    contentAlignment = Alignment.Center
+                ) {
+                    ImageUploadScreen(navController)
+                }
             }
         }
 

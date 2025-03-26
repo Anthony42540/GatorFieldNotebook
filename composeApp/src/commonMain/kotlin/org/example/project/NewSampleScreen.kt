@@ -319,6 +319,9 @@ fun EditSampleScreen(
                     )
                 }
                 Spacer(modifier = Modifier.height(16.dp))
+
+            }
+            item{
                 // Center the image upload screen horizontally
                 Box(
                     modifier = Modifier.fillMaxWidth(),
@@ -326,7 +329,9 @@ fun EditSampleScreen(
                 ) {
                     ImageUploadScreen(navController)
                 }
+
             }
+
         }
 
 
