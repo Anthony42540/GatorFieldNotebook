@@ -122,6 +122,7 @@ fun AppNavigation() {
         NavHost(navController, startDestination = "home") {
             composable("home") {
                 HomeScreen(navController, database)
+
             }
             composable("selectCollection") {
                 SelectCollectionScreen(

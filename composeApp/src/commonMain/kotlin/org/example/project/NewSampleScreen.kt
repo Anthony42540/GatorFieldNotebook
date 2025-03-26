@@ -279,7 +279,7 @@ fun EditSampleScreen(
                     modifier = Modifier
                         .fillMaxWidth()
                         .padding(vertical = 6.dp),
-                    horizontalArrangement = Arrangement.End,
+                    horizontalArrangement = Arrangement.Center,
                     verticalAlignment = Alignment.CenterVertically
                 ) {
                     Button(
@@ -301,20 +301,38 @@ fun EditSampleScreen(
                 }
             }
 
-            items(fields) { field ->
-                //displays each field for user input
-                DisplayField(
-                    field = field,
-                    //maps user input to its field ID for submission (on save)
-                    onChange = { value ->
-                        collectedData = collectedData.toMutableMap().apply {
-                            this[field.fieldId] = value
+            items(fields) {
+                    field ->
+                // Center each field horizontally
+                Box(
+                    modifier = Modifier.fillMaxWidth(),
+                    contentAlignment = Alignment.Center
+                ) {
+                    DisplayField(
+                        field = field,
+                        //maps user input to its field ID for submission (on save)
+                        onChange = { value ->
+                            collectedData = collectedData.toMutableMap().apply {
+                                this[field.fieldId] = value
+                            }
                         }
-                    }
-                )
+                    )
+                }
                 Spacer(modifier = Modifier.height(16.dp))
+                // Center the image upload screen horizontally
+                Box(
+                    modifier = Modifier.fillMaxWidth(),
+                    contentAlignment = Alignment.Center
+                ) {
+                    ImageUploadScreen(navController)
+                }
             }
         }
+
+
+
+
+
         Row(
             horizontalArrangement = Arrangement.SpaceBetween,
             modifier = Modifier
