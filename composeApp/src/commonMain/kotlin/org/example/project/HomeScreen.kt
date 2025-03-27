@@ -2,11 +2,9 @@ package org.example.project
 
 import KhandFontFamily
 import androidx.compose.foundation.background
-import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -14,8 +12,6 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import androidx.compose.material3.Button
-import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
@@ -49,6 +45,7 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.ui.draw.clip
+import androidx.compose.foundation.layout.Row
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 
@@ -137,7 +134,7 @@ fun RecentSubmissionsSection(
                 database.getSampleAndData(sampleId.toLong())
             }
         } catch (e: Exception) {
-            error = "Failed to load recent submissions: ${e.message}"
+            error = "Failed to load recent samples: ${e.message}"
         } finally {
             isLoading = false
         }
@@ -150,7 +147,7 @@ fun RecentSubmissionsSection(
             .padding(horizontal = 10.dp)
     ) {
         Text(
-            text = "Recent Submissions",
+            text = "Recent Samples",
             style = TextStyle(fontFamily = KhandFontFamily(), fontWeight = FontWeight.Medium),
             fontSize = 25.sp,
             modifier = Modifier.padding(bottom = 2.dp)
@@ -180,7 +177,7 @@ fun RecentSubmissionsSection(
                     contentAlignment = Alignment.Center
                 ) {
                     Text(
-                        text = "No submissions yet",
+                        text = "No samples yet",
                         style = TextStyle(fontFamily = KhandFontFamily(), fontWeight = FontWeight.Light),
                         fontSize = 23.sp,
                         modifier = Modifier.padding(vertical = 25.dp),
@@ -193,13 +190,13 @@ fun RecentSubmissionsSection(
                 ) {
                     items(recentSamples) { sample ->
                         database?.getSampleForm(sample.formId.toLong())
-                        ?.let {
-                            SampleCard(sample,
-                                it.formName,
-                                onSampleClick = { sampleId ->
-                                    navController.navigate("sampleDetail/$sampleId")
-                            })
-                        }
+                            ?.let {
+                                SampleCard(sample,
+                                    it.formName,
+                                    onSampleClick = { sampleId ->
+                                        navController.navigate("sampleDetail/$sampleId")
+                                    })
+                            }
                     }
                 }
             }
@@ -233,19 +230,29 @@ private fun SampleCard(
             // Debug print to see what's in dataEntries
             println("DataEntries: ${sample.dataEntries}")
 
-            Text(
-                text = "Collection: $collectionName",
-                style = MaterialTheme.typography.bodyLarge,
-                color = Color.Black
-            )
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween
+            ) {
+                Text(
+                    text = collectionName,
+                    style = MaterialTheme.typography.bodyLarge.copy(fontWeight = FontWeight.Bold),
+                    color = Color.Black
+                )
+                Text(
+                    text = "#${sample.sampleCollectionId}",
+                    style = MaterialTheme.typography.bodyLarge,
+                    color = Color.Black
+                )
+            }
 
             Spacer(modifier = Modifier.height(4.dp))
 
             val pair = formatDate(sample.dateCollectedUTC).split("T")
 
             Text(
-                text = "${pair[0]} at ${pair[1]}",
-                style = MaterialTheme.typography.bodyMedium,
+                text = "Date/Time: ${pair[0]} at ${pair[1]}",
+                style = MaterialTheme.typography.bodySmall,
                 color = Color.Gray
             )
 
