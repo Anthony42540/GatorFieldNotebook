@@ -51,6 +51,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.ui.draw.clip
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
+import androidx.compose.foundation.layout.Row
 
 suspend fun GetCurrentLocation(): GeolocatorResult {
     val geolocator: Geolocator = Geolocator.mobile()
@@ -233,19 +234,29 @@ private fun SampleCard(
             // Debug print to see what's in dataEntries
             println("DataEntries: ${sample.dataEntries}")
 
-            Text(
-                text = "Collection: $collectionName",
-                style = MaterialTheme.typography.bodyLarge,
-                color = Color.Black
-            )
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween
+            ) {
+                Text(
+                    text = collectionName,
+                    style = MaterialTheme.typography.bodyLarge.copy(fontWeight = FontWeight.Bold),
+                    color = Color.Black
+                )
+                Text(
+                    text = "#${sample.sampleCollectionId}",
+                    style = MaterialTheme.typography.bodyLarge,
+                    color = Color.Black
+                )
+            }
 
             Spacer(modifier = Modifier.height(4.dp))
 
             val pair = formatDate(sample.dateCollectedUTC).split("T")
 
             Text(
-                text = "${pair[0]} at ${pair[1]}",
-                style = MaterialTheme.typography.bodyMedium,
+                text = "Date/Time: ${pair[0]} at ${pair[1]}",
+                style = MaterialTheme.typography.bodySmall,
                 color = Color.Gray
             )
 
