@@ -69,11 +69,9 @@ fun MenuHeader(
                     NavigationDrawerItem(
                         label = {
                             Text(
-                                text = "new sample",
-                                style = TextStyle(
-                                    fontSize = 30.sp,
-                                    color = Color.Black
-                                )
+                                text = "Create new sample",
+                                style = TextStyle(fontFamily = KhandFontFamily(), fontSize = 30.sp,
+                                    color = Color.Black)
                             )
                         },
                         selected = false,
@@ -82,11 +80,11 @@ fun MenuHeader(
                     NavigationDrawerItem(
                         label = {
                             Text(
-                                text = "new form",
-                                style = TextStyle(
-                                    fontSize = 30.sp,
-                                    color = Color.Black
-                                )
+                                text = "Create new form",
+                                style = TextStyle(fontFamily = KhandFontFamily(), fontSize = 30.sp,
+                                    color = Color.Black)
+
+
                             )
                         },
                         selected = false,
@@ -95,11 +93,9 @@ fun MenuHeader(
                     NavigationDrawerItem(
                         label = {
                             Text(
-                                text = "all samples",
-                                style = TextStyle(
-                                    fontSize = 30.sp,
-                                    color = Color.Black
-                                )
+                                text = "View all samples",
+                                style = TextStyle(fontFamily = KhandFontFamily(), fontSize = 30.sp,
+                                    color = Color.Black)
                             )
                         },
                         selected = false,
@@ -108,11 +104,9 @@ fun MenuHeader(
                     NavigationDrawerItem(
                         label = {
                             Text(
-                                text = "all forms",
-                                style = TextStyle(
-                                    fontSize = 30.sp,
-                                    color = Color.Black
-                                )
+                                text = "View all forms",
+                                style = TextStyle(fontFamily = KhandFontFamily(), fontSize = 30.sp,
+                                    color = Color.Black)
                             )
                         },
                         selected = false,
