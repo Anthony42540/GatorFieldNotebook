@@ -161,9 +161,9 @@ private fun DetailedSampleContent(
     sample: SampleAndData,
     database: Database?
 ) {
-    var datePair = formatDetailedDate(sample.dateCollectedUTC).split("T")
-    var locationPair = sample.location.split("|")
-    var form = database?.getSampleForm(sample.formId.toLong())
+    val datePair = formatDetailedDate(sample.dateCollectedUTC).split("T")
+    val locationPair = sample.location.split("|")
+    val form = database?.getSampleForm(sample.formId.toLong())
 
     Card(
         modifier = Modifier
@@ -173,16 +173,25 @@ private fun DetailedSampleContent(
         elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
     ) {
         Column(modifier = Modifier.padding(16.dp)) {
+            // If the form is known, show the name:
             if (form != null) {
                 DetailRow("Sample from Collection", form.formName)
             }
+
+            // Show the local ID for this collection
+            DetailRow("Sample ID", sample.sampleCollectionId.toString())
+
+            // Then show date/time
             DetailRow("Date Collected", datePair[0])
             DetailRow("Time Collected", datePair[1])
+
+            // Coordinates and altitude
             DetailRow("Coordinates", locationPair[0])
             DetailRow("Altitude", locationPair[1])
 
             HorizontalDivider(modifier = Modifier.padding(vertical = 8.dp))
 
+            // Show all data entries for each field
             sample.dataEntries.forEach { (fieldId, value) ->
                 val field = database?.getFieldByID(fieldId)
                 if (field != null) {
