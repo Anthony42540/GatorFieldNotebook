@@ -48,9 +48,9 @@ import kotlinx.datetime.toLocalDateTime
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material3.TopAppBar
 import androidx.compose.ui.draw.clip
-import androidx.compose.foundation.layout.Row
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 
 suspend fun GetCurrentLocation(): GeolocatorResult {
     val geolocator: Geolocator = Geolocator.mobile()
@@ -137,7 +137,7 @@ fun RecentSubmissionsSection(
                 database.getSampleAndData(sampleId.toLong())
             }
         } catch (e: Exception) {
-            error = "Failed to load recent samples: ${e.message}"
+            error = "Failed to load recent submissions: ${e.message}"
         } finally {
             isLoading = false
         }
@@ -150,7 +150,7 @@ fun RecentSubmissionsSection(
             .padding(horizontal = 10.dp)
     ) {
         Text(
-            text = "Recent Samples",
+            text = "Recent Submissions",
             style = TextStyle(fontFamily = KhandFontFamily(), fontWeight = FontWeight.Medium),
             fontSize = 25.sp,
             modifier = Modifier.padding(bottom = 2.dp)
@@ -180,7 +180,7 @@ fun RecentSubmissionsSection(
                     contentAlignment = Alignment.Center
                 ) {
                     Text(
-                        text = "No samples yet",
+                        text = "No submissions yet",
                         style = TextStyle(fontFamily = KhandFontFamily(), fontWeight = FontWeight.Light),
                         fontSize = 23.sp,
                         modifier = Modifier.padding(vertical = 25.dp),
@@ -233,29 +233,19 @@ private fun SampleCard(
             // Debug print to see what's in dataEntries
             println("DataEntries: ${sample.dataEntries}")
 
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceBetween
-            ) {
-                Text(
-                    text = collectionName,
-                    style = MaterialTheme.typography.bodyLarge.copy(fontWeight = FontWeight.Bold),
-                    color = Color.Black
-                )
-                Text(
-                    text = "#${sample.sampleCollectionId}",
-                    style = MaterialTheme.typography.bodyLarge,
-                    color = Color.Black
-                )
-            }
+            Text(
+                text = "Collection: $collectionName",
+                style = MaterialTheme.typography.bodyLarge,
+                color = Color.Black
+            )
 
             Spacer(modifier = Modifier.height(4.dp))
 
             val pair = formatDate(sample.dateCollectedUTC).split("T")
 
             Text(
-                text = "Date/Time: ${pair[0]} at ${pair[1]}",
-                style = MaterialTheme.typography.bodySmall,
+                text = "${pair[0]} at ${pair[1]}",
+                style = MaterialTheme.typography.bodyMedium,
                 color = Color.Gray
             )
 
