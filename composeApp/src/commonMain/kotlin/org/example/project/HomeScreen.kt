@@ -45,6 +45,7 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.ui.draw.clip
+import androidx.compose.foundation.layout.Row
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 
@@ -133,7 +134,7 @@ fun RecentSubmissionsSection(
                 database.getSampleAndData(sampleId.toLong())
             }
         } catch (e: Exception) {
-            error = "Failed to load recent submissions: ${e.message}"
+            error = "Failed to load recent samples: ${e.message}"
         } finally {
             isLoading = false
         }
@@ -146,7 +147,7 @@ fun RecentSubmissionsSection(
             .padding(horizontal = 10.dp)
     ) {
         Text(
-            text = "Recent Submissions",
+            text = "Recent Samples",
             style = TextStyle(fontFamily = KhandFontFamily(), fontWeight = FontWeight.Medium),
             fontSize = 25.sp,
             modifier = Modifier.padding(bottom = 2.dp)
@@ -176,7 +177,7 @@ fun RecentSubmissionsSection(
                     contentAlignment = Alignment.Center
                 ) {
                     Text(
-                        text = "No submissions yet",
+                        text = "No samples yet",
                         style = TextStyle(fontFamily = KhandFontFamily(), fontWeight = FontWeight.Light),
                         fontSize = 23.sp,
                         modifier = Modifier.padding(vertical = 25.dp),
@@ -229,11 +230,21 @@ private fun SampleCard(
             // Debug print to see what's in dataEntries
             println("DataEntries: ${sample.dataEntries}")
 
-            Text(
-                text = "Collection: $collectionName",
-                style = MaterialTheme.typography.bodyLarge,
-                color = Color.Black
-            )
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween
+            ) {
+                Text(
+                    text = collectionName,
+                    style = MaterialTheme.typography.bodyLarge.copy(fontWeight = FontWeight.Bold),
+                    color = Color.Black
+                )
+                Text(
+                    text = "#${sample.sampleCollectionId}",
+                    style = MaterialTheme.typography.bodyLarge,
+                    color = Color.Black
+                )
+            }
 
             Spacer(modifier = Modifier.height(4.dp))
 

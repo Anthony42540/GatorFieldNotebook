@@ -45,23 +45,49 @@ UPDATE Field SET order_num = ? WHERE field_id = ?;
 CREATE TABLE SampleData (
     sample_id INTEGER PRIMARY KEY AUTOINCREMENT,
     form_id INTEGER NOT NULL,
+    sample_collection_id INTEGER NOT NULL,  -- <--- Added
     date_collected_utc TEXT NOT NULL,
     location TEXT NOT NULL,
     FOREIGN KEY (form_id) REFERENCES SampleForm(form_id) ON DELETE CASCADE
 );
 
 insertSampleData:
-INSERT INTO SampleData(form_id, date_collected_utc, location)
-VALUES(?,?,?);
+INSERT INTO SampleData(form_id, sample_collection_id, date_collected_utc, location)
+VALUES(?,?,?,?);
 
 getAllSampleData:
-SELECT * FROM SampleData;
+SELECT
+  sample_id,
+  form_id,
+  sample_collection_id,
+  date_collected_utc,
+  location
+FROM SampleData;
 
 getSampleDataByForm:
-SELECT * FROM SampleData WHERE form_id = ?;
+SELECT
+  sample_id,
+  form_id,
+  sample_collection_id,
+  date_collected_utc,
+  location
+FROM SampleData
+WHERE form_id = ?;
 
 getSampleData:
-SELECT * FROM SampleData WHERE sample_id = ?;
+SELECT
+  sample_id,
+  form_id,
+  sample_collection_id,
+  date_collected_utc,
+  location
+FROM SampleData
+WHERE sample_id = ?;
+
+getMaxCollectionIdByForm:
+SELECT CAST(MAX(sample_collection_id) AS INTEGER) AS max_local_id
+FROM SampleData
+WHERE form_id = ?;
 
 --data entries stored here. this is an INDIVIDUAL data entry.
 --sample ID links it to specific sample taken

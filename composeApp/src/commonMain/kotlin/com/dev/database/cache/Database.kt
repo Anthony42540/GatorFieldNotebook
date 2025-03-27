@@ -43,21 +43,34 @@ class Database(databaseDriverFactory: DatabaseDriverFactory) {
     internal fun getDataEntry(sampleId: Long): List<DataEntry> { //get list of all data entries for a sample type
         return dbQuery.getDataEntry(sampleId, ::mapDataEntry).executeAsList()
     }
-    internal fun getSampleAndData(sampleId: Long): SampleAndData { //uses getSampleData and getDataEntry to create data class object SampleAndData (easier to use in frontend)
+    internal fun getNextCollectionIdForForm(formId: Long): Long {
+        // 'row' is your data class instance (or null)
+        val row = dbQuery.getMaxCollectionIdByForm(formId).executeAsOneOrNull()
+
+        // Extract the numeric value from row.max_local_id, defaulting to 0 if null
+        val maxLocalId = row?.max_local_id ?: 0L
+
+        // Now you can safely do plus 1
+        return maxLocalId + 1L
+    }
+    internal fun getSampleAndData(sampleId: Long): SampleAndData {
         val sampleData = getSampleData(sampleId)
         val dataEntries = getDataEntry(sampleId)
-        //converts list of data entries into map<Long, String> (iterates through list)
-        val dataEntriesMap = dataEntries.associate{it.fieldId.toLong() to it.userInput}
+        val dataEntriesMap = dataEntries.associate { it.fieldId.toLong() to it.userInput }
+
         return SampleAndData(
             sampleId = sampleData.sampleId,
             formId = sampleData.formId,
+            // make sure to set it here:
+            sampleCollectionId = sampleData.sampleCollectionId,
+
             dateCollectedUTC = sampleData.dateCollectedUTC,
             location = sampleData.location,
             dataEntries = dataEntriesMap
         )
     }
-    /************************** GETTER FUNCTIONS **************************/
 
+    /************************** GETTER FUNCTIONS **************************/
 
     /************************** INSERT FUNCTIONS **************************/
     internal fun insertSampleForm(formName: String, formActive: Long): Long { //add new sample form and return unique sample ID
@@ -75,12 +88,23 @@ class Database(databaseDriverFactory: DatabaseDriverFactory) {
         dbQuery.insertField(formId, fieldName, orderNum, ftToStr(fieldType), if (isRequired) 1 else 0, listToJsonString(options))
         return dbQuery.getLastRowID().executeAsOne()
     }
-    internal fun insertSampleData( //add new sample collected
+    internal fun insertSampleData(
         formId: Long,
         dateCollectedUtc: String,
         location: String,
     ): Long {
-        dbQuery.insertSampleData(formId, dateCollectedUtc, location)
+        // Generate the next local ID for this form
+        val newLocalId = getNextCollectionIdForForm(formId)
+
+        // Insert row with the new local ID
+        dbQuery.insertSampleData(
+            formId,
+            newLocalId,
+            dateCollectedUtc,
+            location
+        )
+
+        // Return the primary key for the newly inserted row
         return dbQuery.getLastRowID().executeAsOne()
     }
 
@@ -198,12 +222,14 @@ private fun mapField(
 private fun mapSampleData(
     sample_id: Long,
     form_id: Long,
+    sample_collection_id: Long,
     date_collected_utc: String,
     location: String
 ): SampleData {
     return SampleData(
         sampleId = sample_id.toInt(),
         formId = form_id.toInt(),
+        sampleCollectionId = sample_collection_id.toInt(),  // pass it along
         dateCollectedUTC = date_collected_utc,
         location = location,
     )
