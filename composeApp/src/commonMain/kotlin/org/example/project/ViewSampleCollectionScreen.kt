@@ -259,32 +259,33 @@ private fun loadAllSamples(
 
 @Composable
 private fun SampleRow(sample: SampleAndData, form: SampleForm, onSampleClick: (Long) -> Unit) {
-        var pair = formatDate(sample.dateCollectedUTC).split("T")
+    val pair = formatDate(sample.dateCollectedUTC).split("T")
 
+    Column(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(vertical = 4.dp, horizontal = 8.dp)
+            .clickable { onSampleClick(sample.sampleId.toLong()) }
+    ) {
         Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(vertical = 4.dp, horizontal = 8.dp)
-                .clickable { onSampleClick(sample.sampleId.toLong()) },
+            modifier = Modifier.fillMaxWidth(),
             horizontalArrangement = Arrangement.SpaceBetween,
             verticalAlignment = Alignment.CenterVertically
         ) {
-
-        Text(
-            text = form.formName,
-            fontSize = 16.sp,
-            modifier = Modifier.padding(8.dp),
-            color = Color.Black
-        )
-
-        Text(
-            text = "${pair[0]}, ${pair[1]}",
-            fontSize = 16.sp,
-            modifier = Modifier.padding(8.dp),
-            color = Color.Black
-        )
+            Text(
+                text = form.formName,
+                fontSize = 16.sp,
+                color = Color.Black
+            )
+            Text(
+                text = "#${sample.sampleCollectionId}",
+                fontSize = 16.sp,
+                color = Color.Black
+            )
+        }
     }
 }
+
 
 private fun formatDate(dateString: String): String {
     return try {

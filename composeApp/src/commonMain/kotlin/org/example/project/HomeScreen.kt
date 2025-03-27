@@ -254,8 +254,8 @@ private fun SampleCard(
             val pair = formatDate(sample.dateCollectedUTC).split("T")
 
             Text(
-                text = "${pair[0]} at ${pair[1]}",
-                style = MaterialTheme.typography.bodyMedium,
+                text = "Date/Time: ${pair[0]} at ${pair[1]}",
+                style = MaterialTheme.typography.bodySmall,
                 color = Color.Gray
             )
 
