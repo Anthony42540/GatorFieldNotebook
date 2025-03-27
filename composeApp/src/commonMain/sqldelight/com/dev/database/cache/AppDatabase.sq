@@ -3,7 +3,7 @@
 CREATE TABLE SampleForm (
     form_id INTEGER PRIMARY KEY AUTOINCREMENT,
     form_name TEXT NOT NULL,
-    form_active INTEGER NOT NULL
+    form_active INTEGER NOT NULL DEFAULT 1
 );
 
 insertSampleForm:

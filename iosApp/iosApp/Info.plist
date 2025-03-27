@@ -46,5 +46,9 @@
 		<string>UIInterfaceOrientationLandscapeLeft</string>
 		<string>UIInterfaceOrientationLandscapeRight</string>
 	</array>
+	<key>NSLocationWhenInUseUsageDescription</key>
+    <string>This permission is needed for coordinate retrieval</string>
+    <key>NSLocationAlwaysAndWhenInUseUsageDescription</key>
+    <string>This permission is needed for coordinate retrieval</string>
 </dict>
 </plist>

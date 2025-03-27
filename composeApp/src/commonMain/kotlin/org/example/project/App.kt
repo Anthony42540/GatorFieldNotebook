@@ -1,9 +1,7 @@
 package org.example.project
 
 import KhandFontFamily
-import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.MaterialTheme
@@ -28,10 +26,52 @@ import org.example.project.viewModels.FormViewModel
 import org.jetbrains.compose.ui.tooling.preview.Preview
 import org.koin.compose.KoinContext
 import org.koin.compose.viewmodel.koinViewModel
+import dev.gitlive.firebase.Firebase
+import dev.gitlive.firebase.firestore.FirebaseFirestore
+import dev.gitlive.firebase.firestore.firestore
+import dev.gitlive.firebase.initialize
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.map
+import org.example.project.RemoteDatabase.FirebaseDatabase
+import org.example.project.RemoteDatabase.SampleSynchronizer
 
 @Composable
 @Preview
 fun App() {
+    val database = remember {
+        try {
+            val db = DatabaseProvider.getInstance().database
+            println("Local database initialized successfully")
+            db
+        } catch (e: Exception) {
+            println("Failed to get local database: ${e.message}")
+            e.printStackTrace()
+            null
+        }
+    }
+
+    LaunchedEffect(Unit) {
+        try {
+            println("Initializing Firebase and starting synchronization...")
+
+            database?.let { db ->
+                val synchronizer = SampleSynchronizer(db)
+
+                // Perform initial sync
+                synchronizer.syncLocalToFirebase()
+                println("Successfully synchronized local to remote database")
+                synchronizer.syncFirebaseToLocal()
+                println("Successfully synchronized remote to local database")
+
+                println("Firebase and synchronization initialized successfully")
+            } ?: throw Exception("Database is null")
+
+        } catch (e: Exception) {
+            println("Failed to initialize Firebase/sync: ${e.message}")
+            e.printStackTrace()
+        }
+    }
+
     MaterialTheme {
         AppNavigation()
     }
@@ -55,20 +95,6 @@ fun ActionButton(text: String, onClick: () -> Unit, buttonColor: Color, textColo
     }
 }
 
-@Composable
-fun NavigationImgButton(icon: @Composable () -> Unit, onClick: () -> Unit) {
-    Button(
-        onClick = onClick,
-        modifier = Modifier
-            .padding(horizontal = 2.dp)
-            .border(1.dp, Color.Black, RoundedCornerShape(24.dp)),
-        colors = ButtonDefaults.buttonColors(
-            containerColor = Color.White
-        )
-    ) {
-        icon()
-    }
-}
 @Composable
 fun AppNavigation() {
     KoinContext{

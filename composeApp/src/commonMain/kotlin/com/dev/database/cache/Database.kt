@@ -13,6 +13,7 @@ class Database(databaseDriverFactory: DatabaseDriverFactory) {
     private val database = AppDatabase(databaseDriverFactory.createDriver())
     private val dbQuery = database.appDatabaseQueries
 
+
     //list to track new fields when creating a new form
     var newFieldsList = mutableListOf<FieldNoID>()
     private var newFormName = ""
@@ -106,6 +107,8 @@ class Database(databaseDriverFactory: DatabaseDriverFactory) {
         // Return the primary key for the newly inserted row
         return dbQuery.getLastRowID().executeAsOne()
     }
+
+
     internal fun insertDataEntry(
         sampleId: Long,
         fieldId: Long,
