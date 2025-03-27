@@ -69,10 +69,12 @@ fun ImageUploadScreen (navController: NavController){
         onClick = {
             pickerLauncher.launch()
         },
-        modifier = Modifier.padding(16.dp)
+        colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF0021A5)),
+        modifier = Modifier
+            .padding(horizontal = 4.dp)
 
     ) {
-        Text("Upload Sample Images")
+        Text("Upload Image", fontSize = 25.sp, style = TextStyle(fontFamily = KhandFontFamily(), fontWeight = FontWeight.Medium))
     }
 
 
