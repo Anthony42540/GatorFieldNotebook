@@ -107,6 +107,8 @@ fun EditExistingSampleScreen(
                     newLocation = locationString
                 )
 
+                database.updateImageSampleId(0, sampleId)
+
                 // 2B) Update each changed DataEntry
                 collectedData.forEach { (fieldId, userInput) ->
                     database.updateDataEntry(
@@ -255,19 +257,30 @@ fun EditExistingSampleScreen(
                     )
                 }
                 Spacer(modifier = Modifier.height(16.dp))
+
+            }
+            item{
                 // Center the image upload screen horizontally
                 Box(
                     modifier = Modifier.fillMaxWidth(),
                     contentAlignment = Alignment.Center
                 ) {
                     database?.let { db ->
+                        // Use the SampleManager to get the current sample ID
+                        val currentSampleId = SampleManager.getSampleId()
+                        print("Current Sample Id: ")
+                        print(currentSampleId)
+
+
                         ImageUploadScreen(
                             navController = navController,
                             database = db,
-                            sampleId = GlobalState.sampleId?.toInt() ?: 0  // Provide a default if null
+                            sampleId = currentSampleId.toInt()
                         )
+
                     }
                 }
+
             }
         }
 
