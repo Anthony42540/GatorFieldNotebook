@@ -29,8 +29,10 @@ enum class ViewOption {
 }
 
 @Serializable
-enum class FilterOption {
-
+enum class FilterDateOption {
+    ON_DATE,
+    BEFORE_DATE,
+    AFTER_DATE,
 }
 
 // sampleForm

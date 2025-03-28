@@ -6,6 +6,9 @@ import androidx.compose.animation.animateContentSize
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.gestures.awaitEachGesture
+import androidx.compose.foundation.gestures.awaitFirstDown
+import androidx.compose.foundation.gestures.waitForUpOrCancellation
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.interaction.PressInteraction
 import androidx.compose.foundation.layout.*
@@ -22,6 +25,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.DateRange
 import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material.icons.filled.KeyboardArrowDown
 import androidx.compose.material.icons.filled.KeyboardArrowUp
@@ -32,23 +36,38 @@ import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Checkbox
 import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.DatePicker
+import androidx.compose.material3.DatePickerDialog
 import androidx.compose.material3.Divider
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.OutlinedTextFieldDefaults
+import androidx.compose.material3.TextButton
 import androidx.compose.material3.TextField
+import androidx.compose.material3.rememberDatePickerState
+import androidx.compose.ui.draw.shadow
+import androidx.compose.ui.input.pointer.PointerEventPass
+import androidx.compose.ui.input.pointer.pointerInput
+import androidx.compose.ui.layout.HorizontalAlignmentLine
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.window.Popup
 import com.dev.database.cache.Database
 import com.dev.database.cache.listToJsonString
 import com.dev.database.entity.Field
+import com.dev.database.entity.FilterDateOption
 import com.dev.database.entity.SampleAndData
 import com.dev.database.entity.SampleForm
 import com.dev.database.entity.SortOption
 import com.dev.database.entity.ViewOption
 import kotlinx.coroutines.launch
+import kotlinx.datetime.Clock
 import kotlinx.datetime.Instant
+import kotlinx.datetime.LocalDate
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.toLocalDateTime
 
@@ -59,15 +78,23 @@ object GlobalState {
 @Composable
 fun ViewSampleCollectionScreen(navController: NavController, database: Database? = null) {
     var showDeleteConfirmation by remember { mutableStateOf(false) }
-    var samples by remember { mutableStateOf<List<SampleAndData>>(emptyList()) }
-    val listOfForms = database?.getAllSampleForms()
+
+    var samples by remember { mutableStateOf<List<SampleAndData>>(emptyList()) } //List of all samples
+
+    val listOfForms = database?.getAllSampleForms() //List of all forms
+    var selectedForms by remember { mutableStateOf(listOfForms) } //List of selected forms (default is all)
+    var viewOption by remember { mutableStateOf(ViewOption.BY_COLLECTION) }
+    var selectedDate by remember { mutableStateOf(getCurrentTimeMillis()) }
+    var selectedDateFilter by remember { mutableStateOf(FilterDateOption.BEFORE_DATE) }
+
+    val filteredSamples =
+        samples.filter { sample ->
+            selectedForms!!.any { it.formId == sample.formId }
+        }
+
     var isLoading by remember { mutableStateOf(true) }
     var error by remember { mutableStateOf<String?>(null) }
     val coroutineScope = rememberCoroutineScope()
-
-    var selectedForms by remember { mutableStateOf(listOfForms) }
-    var sortOption by remember { mutableStateOf(SortOption.BY_COLLECTION) }
-    var viewOption by remember { mutableStateOf(ViewOption.BY_COLLECTION) }
 
     var expandedGroups by remember { mutableStateOf(setOf<String>()) }
     var expandedFilters by remember { mutableStateOf(false) }
@@ -191,27 +218,59 @@ fun ViewSampleCollectionScreen(navController: NavController, database: Database?
                         )
                     }
                     if (expandedFilters) {
+
+                        Divider(color = Color.Gray, thickness = 1.dp, modifier = Modifier.padding(vertical = 8.dp))
+
                         selectedForms?.let {
                             if (listOfForms != null) {
                                 MultiSelectForms(
                                     listOfForms,
                                     selectedForms!!,
-                                    onSelectionChange = {
-                                        selectedForms = it
+                                    onSelectionChange = { newSelection ->
+                                        selectedForms = newSelection
                                     }
                                 )
                             }
                         }
+                        DateFilter(
+                            selectedDate = selectedDate,
+                            onDateSelected = { dateMillis ->
+                                if (dateMillis != null) {
+                                    selectedDate = dateMillis
+                                }
+                            }
+                        )
                     }
                 }
             }
 
-            Divider(color = Color.LightGray, thickness = 1.dp, modifier = Modifier.padding(vertical = 8.dp, horizontal = 8.dp))
+            Divider(color = Color.LightGray, thickness = 1.dp, modifier = Modifier.padding(vertical = 8.dp, horizontal = 10.dp))
 
             Box (
                 modifier = Modifier.fillMaxSize()
             ) {
-                val groupedSamples = samples.groupBy { database?.getSampleForm(it.formId.toLong())?.formName ?: "Unknown" }
+                val groupedSamples = filteredSamples.groupBy { database?.getSampleForm(it.formId.toLong())?.formName ?: "Unknown" }
+
+                Row(
+                    horizontalArrangement = Arrangement.Center,
+                    modifier = Modifier.fillMaxWidth()
+                ) {
+                    if (filteredSamples.isEmpty() && samples.isNotEmpty()) {
+                        Text(
+                            text = "Select at least one collection to view samples",
+                            fontSize = 18.sp,
+                            fontWeight = FontWeight.SemiBold,
+                            style = MaterialTheme.typography.bodyLarge,
+                        )
+                    } else if (samples.isEmpty()) {
+                        Text(
+                            text = "No samples yet!",
+                            fontSize = 18.sp,
+                            fontWeight = FontWeight.SemiBold,
+                            style = MaterialTheme.typography.bodyLarge,
+                        )
+                    }
+                }
 
                 LazyColumn(
                     modifier = Modifier
@@ -375,6 +434,7 @@ fun MultiSelectForms(
     onSelectionChange: (List<SampleForm>) -> Unit
 ) {
     var expanded by remember { mutableStateOf(false) }
+    val allSelected = options.isNotEmpty() && selectedOptions.size == options.size
 
     Column(modifier = Modifier.fillMaxWidth()) {
         Card(
@@ -392,7 +452,8 @@ fun MultiSelectForms(
                     .animateContentSize()
             ) {
                 Row(
-                    verticalAlignment = Alignment.CenterVertically
+                    verticalAlignment = Alignment.CenterVertically,
+                    modifier = Modifier.padding(5.dp)
                 ) {
                     Text(
                         text = "Filter by Collection",
@@ -402,6 +463,9 @@ fun MultiSelectForms(
                     )
                 }
                 if (expanded) {
+
+                    Divider(color = Color.LightGray, thickness = 1.dp, modifier = Modifier.padding(vertical = 8.dp, horizontal = 10.dp))
+
                     Card(
                         modifier = Modifier.fillMaxWidth(),
                         colors = CardDefaults.cardColors(containerColor = Color(0xFFFFFFFF)),
@@ -409,6 +473,29 @@ fun MultiSelectForms(
                         LazyColumn(
                             modifier = Modifier.heightIn(max = 300.dp)
                         ) {
+                            item {
+                                Row(
+                                    modifier = Modifier
+                                        .fillMaxWidth()
+                                        .clickable {
+                                            val newSelection = if (allSelected) emptyList() else options
+                                            onSelectionChange(newSelection)
+                                        }
+                                        .padding(4.dp),
+                                    verticalAlignment = Alignment.CenterVertically
+                                ) {
+                                    Checkbox(
+                                        checked = allSelected,
+                                        onCheckedChange = {
+                                            val newSelection = if (allSelected) emptyList() else options
+                                            onSelectionChange(newSelection)
+                                        }
+                                    )
+                                    Spacer(modifier = Modifier.width(8.dp))
+                                    Text(text = if (allSelected) "Deselect All" else "Select All")
+                                }
+                            }
+
                             items(options) { option ->
                                 Row(
                                     modifier = Modifier
@@ -449,3 +536,104 @@ fun MultiSelectForms(
     }
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun DateFilter(
+    selectedDate: Long?,
+    onDateSelected: (Long?) -> Unit,
+) {
+    var expanded by remember { mutableStateOf(false) }
+    var showDatePicker by remember { mutableStateOf(false) }
+    val datePickerState = rememberDatePickerState()
+
+    Column(modifier = Modifier.fillMaxWidth()) {
+        Card(
+            modifier = Modifier
+                .fillMaxWidth()
+                .clickable {
+                    expanded = !expanded
+                },
+            colors = CardDefaults.cardColors(containerColor = Color(0xFFFFFFFF)),
+            shape = RoundedCornerShape(12.dp)
+        ) {
+            Column(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .animateContentSize()
+            ) {
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                    modifier = Modifier.padding(5.dp)
+                ) {
+                    Text(
+                        text = "Filter by Date",
+                        fontSize = 18.sp,
+                        fontWeight = FontWeight.SemiBold,
+                        style = MaterialTheme.typography.bodyLarge
+                    )
+                    if (expanded) {
+
+                        Divider(color = Color.LightGray, thickness = 1.dp, modifier = Modifier.padding(vertical = 8.dp, horizontal = 10.dp))
+
+                        Card(
+                            modifier = Modifier.fillMaxWidth(),
+                            colors = CardDefaults.cardColors(containerColor = Color(0xFFFFFFFF)),
+                        ) {
+                            LazyColumn(
+                                modifier = Modifier.heightIn(max = 300.dp)
+                            ) {
+                                item {
+                                    Row(
+                                        modifier = Modifier
+                                            .fillMaxWidth()
+                                            .clickable {
+                                                showDatePicker = !showDatePicker
+                                            }
+                                            .padding(4.dp),
+                                        verticalAlignment = Alignment.CenterVertically
+                                    ) {
+                                        Text(
+                                            text = selectedDate?.let { convertMillisToDate(it) }
+                                                ?: "Select a date",
+                                            fontSize = 16.sp,
+                                        )
+                                    }
+                                }
+                            }
+                        }
+
+                        if (showDatePicker) {
+                            DatePickerDialog(
+                                onDismissRequest = { showDatePicker = false },
+                                confirmButton = {
+                                    TextButton(onClick = {
+                                        onDateSelected(datePickerState.selectedDateMillis)
+                                        showDatePicker = false
+                                    }) {
+                                        Text("OK")
+                                    }
+                                },
+                                dismissButton = {
+                                    TextButton(onClick = { showDatePicker = false }) {
+                                        Text("Cancel")
+                                    }
+                                }
+                            ) {
+                                DatePicker(state = datePickerState)
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
+
+fun convertMillisToDate(millis: Long): String {
+    val localDateTime = Instant.fromEpochMilliseconds(millis).toLocalDateTime(TimeZone.currentSystemDefault())
+    return "${localDateTime.monthNumber}/${localDateTime.dayOfMonth}/${localDateTime.year}"
+}
+
+fun getCurrentTimeMillis(): Long {
+    return Clock.System.now().toEpochMilliseconds()
+}
