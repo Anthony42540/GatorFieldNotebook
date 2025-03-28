@@ -13,6 +13,26 @@ enum class FieldType {
     MULTI_SELECT
 }
 
+//options for sorting, default is collection
+@Serializable
+enum class SortOption {
+    BY_COLLECTION,
+    BY_DATE_NEWEST,
+    BY_DATE_OLDEST,
+}
+
+//options for which takes precedent TODO: might delete and turn into toggle button
+@Serializable
+enum class ViewOption {
+    BY_COLLECTION,
+    BY_DATE,
+}
+
+@Serializable
+enum class FilterOption {
+
+}
+
 // sampleForm
 @Serializable
 data class SampleForm(

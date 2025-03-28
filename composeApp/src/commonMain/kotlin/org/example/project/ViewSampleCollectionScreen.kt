@@ -6,6 +6,8 @@ import androidx.compose.animation.animateContentSize
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.interaction.MutableInteractionSource
+import androidx.compose.foundation.interaction.PressInteraction
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -28,14 +30,23 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.Checkbox
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Divider
+import androidx.compose.material3.DropdownMenu
+import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedTextFieldDefaults
+import androidx.compose.material3.TextField
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import com.dev.database.cache.Database
+import com.dev.database.cache.listToJsonString
+import com.dev.database.entity.Field
 import com.dev.database.entity.SampleAndData
 import com.dev.database.entity.SampleForm
+import com.dev.database.entity.SortOption
+import com.dev.database.entity.ViewOption
 import kotlinx.coroutines.launch
 import kotlinx.datetime.Instant
 import kotlinx.datetime.TimeZone
@@ -49,11 +60,18 @@ object GlobalState {
 fun ViewSampleCollectionScreen(navController: NavController, database: Database? = null) {
     var showDeleteConfirmation by remember { mutableStateOf(false) }
     var samples by remember { mutableStateOf<List<SampleAndData>>(emptyList()) }
+    val listOfForms = database?.getAllSampleForms()
     var isLoading by remember { mutableStateOf(true) }
     var error by remember { mutableStateOf<String?>(null) }
     val coroutineScope = rememberCoroutineScope()
 
+    var selectedForms by remember { mutableStateOf(listOfForms) }
+    var sortOption by remember { mutableStateOf(SortOption.BY_COLLECTION) }
+    var viewOption by remember { mutableStateOf(ViewOption.BY_COLLECTION) }
+
     var expandedGroups by remember { mutableStateOf(setOf<String>()) }
+    var expandedFilters by remember { mutableStateOf(false) }
+    var expandedSort by remember { mutableStateOf(false) }
 
     LaunchedEffect(Unit) {
         loadAllSamples(database) { newSamples, errorMessage ->
@@ -142,7 +160,53 @@ fun ViewSampleCollectionScreen(navController: NavController, database: Database?
             verticalArrangement = Arrangement.Top,
             horizontalAlignment = Alignment.Start
         ) {
+
             SectionTitle("Samples")
+
+            Card(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 12.dp, vertical = 4.dp)
+                    .clickable {
+                        expandedFilters = !expandedFilters
+                    },
+                colors = CardDefaults.cardColors(containerColor = Color(0xFFFFFFFF)),
+                elevation = CardDefaults.cardElevation(defaultElevation = 4.dp),
+                shape = RoundedCornerShape(12.dp)
+            ) {
+                Column(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(16.dp)
+                        .animateContentSize()
+                ) {
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Text(
+                            text = "Filters",
+                            fontSize = 18.sp,
+                            fontWeight = FontWeight.SemiBold,
+                            style = MaterialTheme.typography.bodyLarge
+                        )
+                    }
+                    if (expandedFilters) {
+                        selectedForms?.let {
+                            if (listOfForms != null) {
+                                MultiSelectForms(
+                                    listOfForms,
+                                    selectedForms!!,
+                                    onSelectionChange = {
+                                        selectedForms = it
+                                    }
+                                )
+                            }
+                        }
+                    }
+                }
+            }
+
+            Divider(color = Color.LightGray, thickness = 1.dp, modifier = Modifier.padding(vertical = 8.dp, horizontal = 8.dp))
 
             Box (
                 modifier = Modifier.fillMaxSize()
@@ -154,6 +218,7 @@ fun ViewSampleCollectionScreen(navController: NavController, database: Database?
                         .fillMaxSize()
                         .padding(bottom = 70.dp)
                 ) {
+
                     groupedSamples.forEach { (formName, sampleList) ->
                         item {
                             Card(
@@ -273,15 +338,17 @@ private fun SampleRow(sample: SampleAndData, form: SampleForm, onSampleClick: (L
             verticalAlignment = Alignment.CenterVertically
         ) {
             Text(
-                text = form.formName,
-                fontSize = 16.sp,
-                color = Color.Black
-            )
-            Text(
                 text = "#${sample.sampleCollectionId}",
                 fontSize = 16.sp,
                 color = Color.Black
             )
+
+            Text(
+                text = "${pair[0]} at ${pair[1]}",
+                fontSize = 16.sp,
+                color = Color.Black
+            )
+
         }
     }
 }
@@ -299,3 +366,86 @@ private fun formatDate(dateString: String): String {
         dateString
     }
 }
+
+
+@Composable
+fun MultiSelectForms(
+    options: List<SampleForm>,
+    selectedOptions: List<SampleForm>,
+    onSelectionChange: (List<SampleForm>) -> Unit
+) {
+    var expanded by remember { mutableStateOf(false) }
+
+    Column(modifier = Modifier.fillMaxWidth()) {
+        Card(
+            modifier = Modifier
+                .fillMaxWidth()
+                .clickable {
+                    expanded = !expanded
+                },
+            colors = CardDefaults.cardColors(containerColor = Color(0xFFFFFFFF)),
+            shape = RoundedCornerShape(12.dp)
+        ){
+            Column(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .animateContentSize()
+            ) {
+                Row(
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Text(
+                        text = "Filter by Collection",
+                        fontSize = 18.sp,
+                        fontWeight = FontWeight.SemiBold,
+                        style = MaterialTheme.typography.bodyLarge
+                    )
+                }
+                if (expanded) {
+                    Card(
+                        modifier = Modifier.fillMaxWidth(),
+                        colors = CardDefaults.cardColors(containerColor = Color(0xFFFFFFFF)),
+                    ) {
+                        LazyColumn(
+                            modifier = Modifier.heightIn(max = 300.dp)
+                        ) {
+                            items(options) { option ->
+                                Row(
+                                    modifier = Modifier
+                                        .fillMaxWidth()
+                                        .clickable {
+                                            val newSelection =
+                                                if (selectedOptions.contains(option)) {
+                                                    selectedOptions - option
+                                                } else {
+                                                    selectedOptions + option
+                                                }
+                                            onSelectionChange(newSelection)
+                                        }
+                                        .padding(4.dp),
+                                    verticalAlignment = Alignment.CenterVertically
+                                ) {
+                                    Checkbox(
+                                        checked = selectedOptions.contains(option),
+                                        onCheckedChange = {
+                                            val newSelection =
+                                                if (selectedOptions.contains(option)) {
+                                                    selectedOptions - option
+                                                } else {
+                                                    selectedOptions + option
+                                                }
+                                            onSelectionChange(newSelection)
+                                        }
+                                    )
+                                    Spacer(modifier = Modifier.width(8.dp))
+                                    Text(text = option.formName)
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
+
