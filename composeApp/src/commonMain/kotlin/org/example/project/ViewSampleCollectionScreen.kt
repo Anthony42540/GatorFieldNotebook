@@ -19,6 +19,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material.icons.filled.KeyboardArrowDown
 import androidx.compose.material.icons.filled.KeyboardArrowUp
 import androidx.compose.material3.AlertDialog
@@ -76,7 +77,7 @@ fun ViewSampleCollectionScreen(navController: NavController, database: Database?
     var selectedDateFilter by remember { mutableStateOf(FilterDateOption.BEFORE_DATE) }
 
     val filteredSamples = samples.filter { sample ->
-        val isFormMatch = selectedForms!!.any { it.formId == sample.formId }
+        val isFormMatch = selectedForms!!.any { it.formId.toInt() == sample.formId }
 
         //convert UTC string to millis
         val dateMillis = utcStringToMillis(sample.dateCollectedUTC)
