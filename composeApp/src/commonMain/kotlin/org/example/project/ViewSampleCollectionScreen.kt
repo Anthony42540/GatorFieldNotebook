@@ -19,13 +19,13 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material.icons.filled.KeyboardArrowDown
 import androidx.compose.material.icons.filled.KeyboardArrowUp
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
+import androidx.compose.material3.CardColors
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Checkbox
 import androidx.compose.material3.CircularProgressIndicator
@@ -39,11 +39,15 @@ import androidx.compose.material3.TextButton
 import androidx.compose.material3.rememberDatePickerState
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.window.Dialog
+import androidx.compose.ui.window.DialogProperties
 import com.dev.database.cache.Database
 import com.dev.database.entity.FilterDateOption
 import com.dev.database.entity.SampleAndData
 import com.dev.database.entity.SampleForm
 import com.dev.database.entity.ViewOption
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.datetime.Clock
 import kotlinx.datetime.Instant
@@ -55,8 +59,12 @@ object GlobalState {
     var sampleId: Long? = null
 }
 
+expect fun exportToCSV(form: String, database: Database? = null, groupedSamples: Map<String, List<SampleAndData>>): Boolean
+
 @Composable
 fun ViewSampleCollectionScreen(navController: NavController, database: Database? = null) {
+    var check by remember { mutableStateOf<Boolean?>(null) }
+    var formNameVar by remember { mutableStateOf<String?>(null) }
     var showDeleteConfirmation by remember { mutableStateOf(false) }
 
     var samples by remember { mutableStateOf<List<SampleAndData>>(emptyList()) } //List of all samples
@@ -306,6 +314,21 @@ fun ViewSampleCollectionScreen(navController: NavController, database: Database?
                                             imageVector = if (expandedGroups.contains(formName)) Icons.Default.KeyboardArrowUp else Icons.Default.KeyboardArrowDown,
                                             contentDescription = "Expand/Collapse"
                                         )
+
+                                        Row (
+                                            modifier = Modifier.fillMaxWidth(),
+                                            horizontalArrangement = Arrangement.End,
+                                            verticalAlignment = Alignment.CenterVertically
+                                        ) {
+                                            Button(
+                                                onClick = {
+                                                    formNameVar = formName
+                                                    check = exportToCSV(formName, database, groupedSamples) },
+                                                colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF0021A5))
+                                            ) {
+                                                Text("Export (CSV)")
+                                            }
+                                        }
                                     }
 
                                     if (expandedGroups.contains(formName)) {
@@ -324,6 +347,31 @@ fun ViewSampleCollectionScreen(navController: NavController, database: Database?
                                     }
                                 }
                             }
+                        }
+                    }
+                }
+
+                check?.let { success ->
+                    LaunchedEffect(check) {
+                        delay(2000)
+                        check = null
+                    }
+
+                    Dialog(onDismissRequest = { check = null }) {
+                        Card(
+                            modifier = Modifier
+                                .height(100.dp)
+                                .padding(20.dp),
+                            shape = RoundedCornerShape(16.dp),
+                            colors = CardDefaults.cardColors(containerColor = Color.White)
+                        ) {
+                            Text(
+                                text = if (success) "$formNameVar was successfully exported to your downloads folder." else "$formNameVar could not be exported to your downloads folder.",
+                                modifier = Modifier
+                                    .fillMaxSize()
+                                    .wrapContentSize(Alignment.Center),
+                                textAlign = TextAlign.Center,
+                            )
                         }
                     }
                 }

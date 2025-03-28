@@ -153,6 +153,10 @@ fun AppNavigation() {
             composable("viewSampleCollection") {
                 ViewSampleCollectionScreen(navController, database)
             }
+            composable("QandA_screen") {
+                QandAScreen(navController, database)
+            }
+
             composable(
                 route = "sampleDetail/{sampleId}",
                 arguments = listOf(navArgument("sampleId") { type = NavType.LongType })

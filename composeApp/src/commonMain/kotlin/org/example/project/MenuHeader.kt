@@ -112,6 +112,17 @@ fun MenuHeader(
                         selected = false,
                         onClick = { /* add form screen */ },
                     )
+                    NavigationDrawerItem(
+                        label = {
+                            Text(
+                                text = "Q/A",
+                                style = TextStyle(fontFamily = KhandFontFamily(), fontSize = 30.sp,
+                                    color = Color.Black)
+                            )
+                        },
+                        selected = false,
+                        onClick = { navController.navigate("QandA_screen") },
+                    )
                     Spacer(Modifier.height(12.dp))
                 }
             }
