@@ -7,5 +7,5 @@ actual fun exportToCSV(
     form: String,
     database: Database?,
     groupedSamples: Map<String, List<SampleAndData>>
-) {
+): Boolean {
 }

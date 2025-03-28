@@ -4,12 +4,13 @@ import android.os.Environment
 import com.dev.database.cache.Database
 import com.dev.database.entity.SampleAndData
 import java.io.File
+import java.lang.StringBuilder
 
 actual fun exportToCSV(
     form: String,
     database: Database?,
     groupedSamples: Map<String, List<SampleAndData>>
-) {
+): Boolean {
     val csvBuilder = StringBuilder()
 
     val standardHeaders = listOf("SampleCollectionId", "FormId", "SampleId", "Location", "DateCollectedUTC")
@@ -55,8 +56,9 @@ actual fun exportToCSV(
 
     try {
         file.writeText(csvBuilder.toString())
-
+        return true
     } catch (e: Exception) {
         println("Error writing to file: ${e.message}")
+        return false
     }
 }
