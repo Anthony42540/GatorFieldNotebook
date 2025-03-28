@@ -25,7 +25,6 @@ import com.dev.database.entity.Field
 import dev.jordond.compass.Location
 import kotlinx.coroutines.launch
 import kotlinx.datetime.*
-import org.example.project.RemoteDatabase.FirebaseDatabase
 import org.example.project.viewModels.CollectionViewModel
 
 @Composable
@@ -541,6 +540,7 @@ fun DisplayField(
                                         selectedList = selectedList + type
                                     }
                                     collectedData = listToJsonString(selectedList).toString()
+                                    collectedData = collectedData.replace("[", "").replace("]","").replace("\"", "").replace(",",", ")
                                     onChange(collectedData)
                                     expanded = false
                                 },

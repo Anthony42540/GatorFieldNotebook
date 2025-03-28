@@ -2,7 +2,6 @@ package org.example.project
 
 
 import KhandFontFamily
-import MessageBarState
 import androidx.compose.animation.animateContentSize
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -25,29 +24,35 @@ import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
+import androidx.compose.material3.CardColors
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Divider
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.window.Dialog
+import androidx.compose.ui.window.DialogProperties
 import com.dev.database.cache.Database
 import com.dev.database.entity.SampleAndData
 import com.dev.database.entity.SampleForm
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.datetime.Instant
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.toLocalDateTime
-import rememberMessageBarState
 
 object GlobalState {
     var sampleId: Long? = null
 }
 
-expect fun exportToCSV(form: String, database: Database? = null, groupedSamples: Map<String, List<SampleAndData>>)
+expect fun exportToCSV(form: String, database: Database? = null, groupedSamples: Map<String, List<SampleAndData>>): Boolean
 
 @Composable
-fun ViewSampleCollectionScreen(navController: NavController, database: Database? = null, messageBarState: MessageBarState = rememberMessageBarState()) {
+fun ViewSampleCollectionScreen(navController: NavController, database: Database? = null) {
+    var check by remember { mutableStateOf<Boolean?>(null) }
+    var formNameVar by remember { mutableStateOf<String?>(null) }
     var showDeleteConfirmation by remember { mutableStateOf(false) }
     var samples by remember { mutableStateOf<List<SampleAndData>>(emptyList()) }
     var isLoading by remember { mutableStateOf(true) }
@@ -198,7 +203,9 @@ fun ViewSampleCollectionScreen(navController: NavController, database: Database?
                                             verticalAlignment = Alignment.CenterVertically
                                         ) {
                                             Button(
-                                                onClick = { exportToCSV(formName, database, groupedSamples) },
+                                                onClick = {
+                                                    formNameVar = formName
+                                                    check = exportToCSV(formName, database, groupedSamples) },
                                                 colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF0021A5))
                                             ) {
                                                 Text("Export (CSV)")
@@ -222,6 +229,31 @@ fun ViewSampleCollectionScreen(navController: NavController, database: Database?
                                     }
                                 }
                             }
+                        }
+                    }
+                }
+
+                check?.let { success ->
+                    LaunchedEffect(check) {
+                        delay(2000)
+                        check = null
+                    }
+
+                    Dialog(onDismissRequest = { check = null }) {
+                        Card(
+                            modifier = Modifier
+                                .height(100.dp)
+                                .padding(20.dp),
+                            shape = RoundedCornerShape(16.dp),
+                            colors = CardDefaults.cardColors(containerColor = Color.White)
+                        ) {
+                            Text(
+                                text = if (success) "$formNameVar was successfully exported to your downloads folder." else "$formNameVar could not be exported to your downloads folder.",
+                                modifier = Modifier
+                                    .fillMaxSize()
+                                    .wrapContentSize(Alignment.Center),
+                                textAlign = TextAlign.Center,
+                            )
                         }
                     }
                 }
