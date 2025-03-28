@@ -191,7 +191,7 @@ private fun mapSampleForm(
     form_active: Long,
 ): SampleForm {
     return SampleForm(
-        formId = form_id.toInt(),
+        formId = form_id.toLong(),
         formName = form_name,
         formActive = form_active.toInt()
     )

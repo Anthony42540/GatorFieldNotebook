@@ -529,7 +529,8 @@ fun DisplayField(
                         onDismissRequest = { expanded = false },
                         modifier = Modifier
                             .fillMaxWidth()
-                            .padding(16.dp)
+                            .background(Color(0xFFFFFFFF))
+                            .border(1.dp, Color(0xFF0021A5))
                     ) {
                         field.options?.forEach { type ->
                             DropdownMenuItem(

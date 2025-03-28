@@ -2,13 +2,12 @@ package org.example.project
 
 
 import KhandFontFamily
+import MessageBarState
 import androidx.compose.animation.animateContentSize
 import androidx.compose.foundation.background
-import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
@@ -20,7 +19,6 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material.icons.filled.KeyboardArrowDown
 import androidx.compose.material.icons.filled.KeyboardArrowUp
 import androidx.compose.material3.AlertDialog
@@ -40,13 +38,16 @@ import kotlinx.coroutines.launch
 import kotlinx.datetime.Instant
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.toLocalDateTime
+import rememberMessageBarState
 
 object GlobalState {
     var sampleId: Long? = null
 }
 
+expect fun exportToCSV(form: String, database: Database? = null, groupedSamples: Map<String, List<SampleAndData>>)
+
 @Composable
-fun ViewSampleCollectionScreen(navController: NavController, database: Database? = null) {
+fun ViewSampleCollectionScreen(navController: NavController, database: Database? = null, messageBarState: MessageBarState = rememberMessageBarState()) {
     var showDeleteConfirmation by remember { mutableStateOf(false) }
     var samples by remember { mutableStateOf<List<SampleAndData>>(emptyList()) }
     var isLoading by remember { mutableStateOf(true) }
@@ -190,6 +191,19 @@ fun ViewSampleCollectionScreen(navController: NavController, database: Database?
                                             imageVector = if (expandedGroups.contains(formName)) Icons.Default.KeyboardArrowUp else Icons.Default.KeyboardArrowDown,
                                             contentDescription = "Expand/Collapse"
                                         )
+
+                                        Row (
+                                            modifier = Modifier.fillMaxWidth(),
+                                            horizontalArrangement = Arrangement.End,
+                                            verticalAlignment = Alignment.CenterVertically
+                                        ) {
+                                            Button(
+                                                onClick = { exportToCSV(formName, database, groupedSamples) },
+                                                colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF0021A5))
+                                            ) {
+                                                Text("Export (CSV)")
+                                            }
+                                        }
                                     }
 
                                     if (expandedGroups.contains(formName)) {

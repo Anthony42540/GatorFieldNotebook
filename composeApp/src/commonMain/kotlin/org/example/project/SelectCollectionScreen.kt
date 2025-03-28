@@ -43,7 +43,7 @@ fun SelectCollectionScreen(
     val coroutineScope = rememberCoroutineScope()
 
     // Available forms for selection
-    var availableForms by remember { mutableStateOf(emptyMap<Int, String>()) }
+    var availableForms by remember { mutableStateOf(emptyMap<Long, String>()) }
 
     // Load available forms when screen is first displayed
     LaunchedEffect(Unit) {
