@@ -96,10 +96,35 @@ fun EditSampleScreen(
         }
     }
 
+    fun getRequiredFields(): List<String> {
+        val requiredFieldNames = fields.filter { it.isRequired }
+            .map { it.fieldName }
+        return requiredFieldNames
+    }
+
+    fun checkRequiredFields(): Boolean {
+        val requiredFieldIDs = fields.filter{ it.isRequired }
+            .map { it.fieldId }
+
+        val requiredFieldsFilled = requiredFieldIDs.all { fieldID ->
+            collectedData.contains(fieldID) && !collectedData[fieldID].isNullOrEmpty()
+        }
+
+        return requiredFieldsFilled
+    }
+
     fun saveSample() {
         if (database == null) {
             errorMessage = "Database not initialized"
             println("Save failed: Database not initialized")
+            return
+        }
+        if (!checkRequiredFields()) {
+            var requiredFields = getRequiredFields()
+            requiredFields = requiredFields.map { it.replace("[","").replace("]","") }
+            val fieldNameStr = requiredFields.joinToString(", ")
+            errorMessage = "These fields are required and cannot be empty: $fieldNameStr"
+            println("Save failed: These fields are required and cannot be empty: $fieldNameStr")
             return
         }
 

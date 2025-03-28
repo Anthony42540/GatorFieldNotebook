@@ -6,6 +6,8 @@ import androidx.compose.foundation.border
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.interaction.PressInteraction
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.*
@@ -117,129 +119,136 @@ fun NewFormScreen(
     val fontSizeVal = if (getScreenWidth() <= 360) 20.sp else 25.sp
 
     Box(modifier = Modifier.fillMaxSize()) {
-        Column(
+        LazyColumn(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(16.dp)
-                .padding(bottom = 70.dp)
-                .verticalScroll(state = scrollState),
+                .padding(bottom = 70.dp),
             verticalArrangement = Arrangement.Top,
             horizontalAlignment = Alignment.Start
         ) {
-            Column(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(16.dp)
-                    .wrapContentHeight(),
-                horizontalAlignment = Alignment.CenterHorizontally
-            ) {
+            item {
                 Text(
                     style = TextStyle(fontFamily = KhandFontFamily(), fontWeight = FontWeight.Medium),
                     text = "Add New Form",
+                    color = Color(0x000000).copy(alpha = 1.0f),
                     fontSize = 40.sp,
+                    modifier = Modifier.fillMaxWidth().wrapContentWidth(Alignment.CenterHorizontally)
                 )
             }
             // Error message display
             errorMessage?.let { error ->
-                Text(
-                    text = error,
-                    color = Color.Red,
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(horizontal = 16.dp, vertical = 8.dp)
-                )
+                item {
+                    Text(
+                        text = error,
+                        color = Color.Red,
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(horizontal = 16.dp, vertical = 8.dp)
+                    )
+                }
             }
             // Form name
-            TextField(
-                value = formValueState,
-                onValueChange = { viewModel.updateFormName(it)
-                    println("Form name is $formValueState") },
-                label = { Text("Form Name") },
-                colors = OutlinedTextFieldDefaults.colors(
-                    focusedBorderColor = Color(0xFF0021A5),
-                    unfocusedBorderColor = Color(0xFF0021A5),
-                    focusedContainerColor = Color(0xFF0021A5).copy(0.1f),
-                    unfocusedContainerColor = Color(0xFF0021A5).copy(0.1f)
-                ),
-                modifier = Modifier.fillMaxWidth()
-            )
+            item {
+                TextField(
+                    value = formValueState,
+                    onValueChange = { viewModel.updateFormName(it)
+                        println("Form name is $formValueState") },
+                    label = { Text("Form Name") },
+                    colors = OutlinedTextFieldDefaults.colors(
+                        focusedBorderColor = Color(0xFF0021A5),
+                        unfocusedBorderColor = Color(0xFF0021A5),
+                        focusedContainerColor = Color(0xFF0021A5).copy(0.1f),
+                        unfocusedContainerColor = Color(0xFF0021A5).copy(0.1f)
+                    ),
+                    modifier = Modifier.fillMaxWidth()
+                )
+            }
 
             // Date/Time
-            Spacer(modifier = Modifier.height(16.dp))
-            TextField(
-                value = "date",
-                onValueChange = {},
-                modifier = Modifier.fillMaxWidth(),
-                label = { Text("Date") },
-                colors = OutlinedTextFieldDefaults.colors(
-                    focusedBorderColor = Color(0xFF0021A5),
-                    unfocusedBorderColor = Color(0xFF0021A5),
-                    focusedContainerColor = Color(0xFF0021A5).copy(0.1f),
-                    unfocusedContainerColor = Color(0xFF0021A5).copy(0.1f)
-                ),
-                readOnly = true
-            )
-            TextField(
-                value = "time",
-                onValueChange = {},
-                modifier = Modifier.fillMaxWidth(),
-                label = { Text("Time") },
-                colors = OutlinedTextFieldDefaults.colors(
-                    focusedBorderColor = Color(0xFF0021A5),
-                    unfocusedBorderColor = Color(0xFF0021A5),
-                    focusedContainerColor = Color(0xFF0021A5).copy(0.1f),
-                    unfocusedContainerColor = Color(0xFF0021A5).copy(0.1f)
-                ),
-                readOnly = true
-            )
+            item {
+                Spacer(modifier = Modifier.height(16.dp))
+                TextField(
+                    value = "date",
+                    onValueChange = {},
+                    modifier = Modifier.fillMaxWidth(),
+                    label = { Text("Date") },
+                    colors = OutlinedTextFieldDefaults.colors(
+                        focusedBorderColor = Color(0xFF0021A5),
+                        unfocusedBorderColor = Color(0xFF0021A5),
+                        focusedContainerColor = Color(0xFF0021A5).copy(0.1f),
+                        unfocusedContainerColor = Color(0xFF0021A5).copy(0.1f)
+                    ),
+                    readOnly = true
+                )
+            }
+            item {
+                TextField(
+                    value = "time",
+                    onValueChange = {},
+                    modifier = Modifier.fillMaxWidth(),
+                    label = { Text("Time") },
+                    colors = OutlinedTextFieldDefaults.colors(
+                        focusedBorderColor = Color(0xFF0021A5),
+                        unfocusedBorderColor = Color(0xFF0021A5),
+                        focusedContainerColor = Color(0xFF0021A5).copy(0.1f),
+                        unfocusedContainerColor = Color(0xFF0021A5).copy(0.1f)
+                    ),
+                    readOnly = true
+                )
+            }
 
             // Location
-            Spacer(modifier = Modifier.height(16.dp))
-            TextField(
-                value = "coordinates",
-                onValueChange = {},
-                modifier = Modifier.fillMaxWidth(),
-                label = { Text("Coordinates") },
-                colors = OutlinedTextFieldDefaults.colors(
-                    focusedBorderColor = Color(0xFF0021A5),
-                    unfocusedBorderColor = Color(0xFF0021A5),
-                    focusedContainerColor = Color(0xFF0021A5).copy(0.1f),
-                    unfocusedContainerColor = Color(0xFF0021A5).copy(0.1f)
-                ),
-                readOnly = true
-            )
-            TextField(
-                value = "altitude",
-                onValueChange = {},
-                modifier = Modifier.fillMaxWidth(),
-                label = { Text("Altitude") },
-                colors = OutlinedTextFieldDefaults.colors(
-                    focusedBorderColor = Color(0xFF0021A5),
-                    unfocusedBorderColor = Color(0xFF0021A5),
-                    focusedContainerColor = Color(0xFF0021A5).copy(0.1f),
-                    unfocusedContainerColor = Color(0xFF0021A5).copy(0.1f)
-                ),
-                readOnly = true
-            )
-            Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(vertical = 6.dp),
-                horizontalArrangement = Arrangement.End,
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                Button(
-                    onClick = {},
-                    colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF0021A5)),
+            item {
+                Spacer(modifier = Modifier.height(16.dp))
+                TextField(
+                    value = "coordinates",
+                    onValueChange = {},
+                    modifier = Modifier.fillMaxWidth(),
+                    label = { Text("Coordinates") },
+                    colors = OutlinedTextFieldDefaults.colors(
+                        focusedBorderColor = Color(0xFF0021A5),
+                        unfocusedBorderColor = Color(0xFF0021A5),
+                        focusedContainerColor = Color(0xFF0021A5).copy(0.1f),
+                        unfocusedContainerColor = Color(0xFF0021A5).copy(0.1f)
+                    ),
+                    readOnly = true
+                )
+                TextField(
+                    value = "altitude",
+                    onValueChange = {},
+                    modifier = Modifier.fillMaxWidth(),
+                    label = { Text("Altitude") },
+                    colors = OutlinedTextFieldDefaults.colors(
+                        focusedBorderColor = Color(0xFF0021A5),
+                        unfocusedBorderColor = Color(0xFF0021A5),
+                        focusedContainerColor = Color(0xFF0021A5).copy(0.1f),
+                        unfocusedContainerColor = Color(0xFF0021A5).copy(0.1f)
+                    ),
+                    readOnly = true
+                )
+            }
+            item {
+                Row(
                     modifier = Modifier
-                        .padding(horizontal = 4.dp),
+                        .fillMaxWidth()
+                        .padding(vertical = 6.dp),
+                    horizontalArrangement = Arrangement.Center,
+                    verticalAlignment = Alignment.CenterVertically
                 ) {
-                    Text("Refresh Location", color = Color.White, fontSize = fontSizeVal, style = TextStyle(fontFamily = KhandFontFamily(), fontWeight = FontWeight.Medium))
+                    Button(
+                        onClick = {},
+                        colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF0021A5)),
+                        modifier = Modifier
+                            .padding(horizontal = 4.dp),
+                    ) {
+                        Text("Refresh Location", color = Color.White, fontSize = fontSizeVal, style = TextStyle(fontFamily = KhandFontFamily(), fontWeight = FontWeight.Medium))
+                    }
                 }
             }
 
             //displays the added fields
-            database?.newFieldsList?.forEach { field ->
+            items(database?.newFieldsList?.toList() ?: listOf()) { field ->
                 FieldDisplay(field)
                 Spacer(modifier = Modifier.height(16.dp))
             }
