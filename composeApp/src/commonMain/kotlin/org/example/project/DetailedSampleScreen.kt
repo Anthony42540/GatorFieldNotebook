@@ -16,8 +16,10 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import com.dev.database.cache.Database
+import com.dev.database.cache.SampleImages
 import com.dev.database.entity.SampleAndData
 import com.dev.database.entity.SampleForm
+import com.dev.database.entity.SampleImage
 import kotlinx.coroutines.launch
 import kotlinx.datetime.Instant
 import kotlinx.datetime.TimeZone
@@ -32,6 +34,8 @@ fun DetailedSampleScreen(
     var sample by remember { mutableStateOf<SampleAndData?>(null) }
     var isLoading by remember { mutableStateOf(true) }
     var error by remember { mutableStateOf<String?>(null) }
+    var imageCount by remember { mutableStateOf(0) }
+    var images by remember { mutableStateOf<List<SampleImage>>(emptyList()) }
 
     LaunchedEffect(sampleId) {
         try {
@@ -40,7 +44,21 @@ fun DetailedSampleScreen(
                 return@LaunchedEffect
             }
 
+            print("Sample ID for detailed sample: ")
+            print(sampleId)
             sample = database.getSampleAndData(sampleId)
+            images = database.getSampleImages(sampleId)
+          //  database.getImageById()
+
+
+            // Get image count for this sample
+            imageCount = database.getSampleImagesForSample(sampleId).size
+            print("Image size:")
+            print(images.size)
+
+
+
+
             isLoading = false
         } catch (e: Exception) {
             error = "Failed to load sample: ${e.message}"
@@ -91,16 +109,35 @@ fun DetailedSampleScreen(
 
                 sample != null -> {
                     DetailedSampleContent(sample!!, database)
+
+                    // Add Image Button with count
+
+                        Spacer(modifier = Modifier.height(16.dp))
+                        Button(
+                            onClick = {
+                                navController.navigate("sampleImages/$sampleId")
+                            },
+                            colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF0021A5)),
+                            modifier = Modifier.fillMaxWidth()
+                        ) {
+                            Text(
+                                text = "View Images ($imageCount)",
+                                style = TextStyle(fontFamily = KhandFontFamily(), fontWeight = FontWeight.Medium),
+                                fontSize = 18.sp
+                            )
+
+                    }
                 }
-
-
             }
+
+            Spacer(modifier = Modifier.height(16.dp))
+
             Row (
                 horizontalArrangement = Arrangement.SpaceBetween,
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(16.dp)
-                ){
+            ){
                 // EDIT SAMPLE
                 ActionButton(
                     "Edit",
