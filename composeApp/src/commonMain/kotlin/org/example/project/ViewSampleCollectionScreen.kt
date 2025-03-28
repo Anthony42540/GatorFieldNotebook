@@ -4,13 +4,7 @@ package org.example.project
 import KhandFontFamily
 import androidx.compose.animation.animateContentSize
 import androidx.compose.foundation.background
-import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.gestures.awaitEachGesture
-import androidx.compose.foundation.gestures.awaitFirstDown
-import androidx.compose.foundation.gestures.waitForUpOrCancellation
-import androidx.compose.foundation.interaction.MutableInteractionSource
-import androidx.compose.foundation.interaction.PressInteraction
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -25,7 +19,6 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.DateRange
 import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material.icons.filled.KeyboardArrowDown
 import androidx.compose.material.icons.filled.KeyboardArrowUp
@@ -39,36 +32,23 @@ import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.DatePicker
 import androidx.compose.material3.DatePickerDialog
 import androidx.compose.material3.Divider
-import androidx.compose.material3.DropdownMenu
-import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.OutlinedTextField
-import androidx.compose.material3.OutlinedTextFieldDefaults
+import androidx.compose.material3.RadioButton
 import androidx.compose.material3.TextButton
-import androidx.compose.material3.TextField
 import androidx.compose.material3.rememberDatePickerState
-import androidx.compose.ui.draw.shadow
-import androidx.compose.ui.input.pointer.PointerEventPass
-import androidx.compose.ui.input.pointer.pointerInput
-import androidx.compose.ui.layout.HorizontalAlignmentLine
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.window.Popup
 import com.dev.database.cache.Database
-import com.dev.database.cache.listToJsonString
-import com.dev.database.entity.Field
 import com.dev.database.entity.FilterDateOption
 import com.dev.database.entity.SampleAndData
 import com.dev.database.entity.SampleForm
-import com.dev.database.entity.SortOption
 import com.dev.database.entity.ViewOption
 import kotlinx.coroutines.launch
 import kotlinx.datetime.Clock
 import kotlinx.datetime.Instant
-import kotlinx.datetime.LocalDate
 import kotlinx.datetime.TimeZone
+import kotlinx.datetime.atStartOfDayIn
 import kotlinx.datetime.toLocalDateTime
 
 object GlobalState {
@@ -87,10 +67,16 @@ fun ViewSampleCollectionScreen(navController: NavController, database: Database?
     var selectedDate by remember { mutableStateOf(getCurrentTimeMillis()) }
     var selectedDateFilter by remember { mutableStateOf(FilterDateOption.BEFORE_DATE) }
 
-    val filteredSamples =
-        samples.filter { sample ->
-            selectedForms!!.any { it.formId == sample.formId }
-        }
+    val filteredSamples = samples.filter { sample ->
+        val isFormMatch = selectedForms!!.any { it.formId == sample.formId }
+
+        //convert UTC string to millis
+        val dateMillis = utcStringToMillis(sample.dateCollectedUTC)
+        //check if date matches selected date (need to remove time from long)
+        val dateValue = isDateMatch(dateMillis, selectedDate, selectedDateFilter)
+
+        isFormMatch && dateValue
+    }
 
     var isLoading by remember { mutableStateOf(true) }
     var error by remember { mutableStateOf<String?>(null) }
@@ -148,7 +134,6 @@ fun ViewSampleCollectionScreen(navController: NavController, database: Database?
                             coroutineScope.launch {
                                 clearAllSamples(database)
                                 showDeleteConfirmation = false
-                                // Refresh the screen after deletion
                                 loadAllSamples(database) { newSamples, errorMessage ->
                                     samples = newSamples
                                     error = errorMessage
@@ -189,6 +174,8 @@ fun ViewSampleCollectionScreen(navController: NavController, database: Database?
         ) {
 
             SectionTitle("Samples")
+
+            Spacer(modifier = Modifier.height(8.dp))
 
             Card(
                 modifier = Modifier
@@ -234,10 +221,14 @@ fun ViewSampleCollectionScreen(navController: NavController, database: Database?
                         }
                         DateFilter(
                             selectedDate = selectedDate,
+                            selectedDateFilter = selectedDateFilter,
                             onDateSelected = { dateMillis ->
                                 if (dateMillis != null) {
                                     selectedDate = dateMillis
                                 }
+                            },
+                            onFilterDateChanged = { dateFilter ->
+                                selectedDateFilter = dateFilter
                             }
                         )
                     }
@@ -540,7 +531,9 @@ fun MultiSelectForms(
 @Composable
 fun DateFilter(
     selectedDate: Long?,
+    selectedDateFilter: FilterDateOption,
     onDateSelected: (Long?) -> Unit,
+    onFilterDateChanged: (FilterDateOption) -> Unit,
 ) {
     var expanded by remember { mutableStateOf(false) }
     var showDatePicker by remember { mutableStateOf(false) }
@@ -571,56 +564,130 @@ fun DateFilter(
                         fontWeight = FontWeight.SemiBold,
                         style = MaterialTheme.typography.bodyLarge
                     )
-                    if (expanded) {
+                }
+                if (expanded) {
 
-                        Divider(color = Color.LightGray, thickness = 1.dp, modifier = Modifier.padding(vertical = 8.dp, horizontal = 10.dp))
+                    Divider(color = Color.LightGray, thickness = 1.dp, modifier = Modifier.padding(vertical = 8.dp, horizontal = 10.dp))
 
-                        Card(
-                            modifier = Modifier.fillMaxWidth(),
-                            colors = CardDefaults.cardColors(containerColor = Color(0xFFFFFFFF)),
+                    Card(
+                        modifier = Modifier.fillMaxWidth(),
+                        colors = CardDefaults.cardColors(containerColor = Color(0xFFFFFFFF)),
+                    ) {
+                        LazyColumn(
+                            modifier = Modifier.heightIn(max = 300.dp)
                         ) {
-                            LazyColumn(
-                                modifier = Modifier.heightIn(max = 300.dp)
-                            ) {
-                                item {
+                            item {
+                                Row(
+                                    modifier = Modifier
+                                        .fillMaxWidth()
+                                        .clickable {
+                                            showDatePicker = !showDatePicker
+                                        }
+                                        .padding(8.dp),
+                                    verticalAlignment = Alignment.CenterVertically,
+                                    horizontalArrangement = Arrangement.SpaceBetween
+                                ) {
+                                    Text(
+                                        text = selectedDate?.let { convertMillisToDate(it) }
+                                            ?: "Select a date",
+                                        fontSize = 16.sp,
+                                    )
+                                    Icon(
+                                        imageVector = Icons.Default.Edit,
+                                        contentDescription = "Edit date"
+                                    )
+                                }
+                            }
+                            item {
+                                Column(modifier = Modifier.padding(8.dp)) {
                                     Row(
                                         modifier = Modifier
                                             .fillMaxWidth()
                                             .clickable {
-                                                showDatePicker = !showDatePicker
+                                                onFilterDateChanged(FilterDateOption.BEFORE_DATE)
                                             }
                                             .padding(4.dp),
                                         verticalAlignment = Alignment.CenterVertically
                                     ) {
+                                        RadioButton(
+                                            selected = selectedDateFilter == FilterDateOption.BEFORE_DATE,
+                                            onClick = {
+                                                onFilterDateChanged(FilterDateOption.BEFORE_DATE)
+                                            }
+                                        )
                                         Text(
-                                            text = selectedDate?.let { convertMillisToDate(it) }
-                                                ?: "Select a date",
-                                            fontSize = 16.sp,
+                                            text = "On or Before Date",
+                                            modifier = Modifier.padding(start = 8.dp)
+                                        )
+                                    }
+                                    Row(
+                                        modifier = Modifier
+                                            .fillMaxWidth()
+                                            .clickable {
+                                                onFilterDateChanged(FilterDateOption.ON_DATE)
+                                            }
+                                            .padding(4.dp),
+                                        verticalAlignment = Alignment.CenterVertically
+                                    ) {
+                                        RadioButton(
+                                            selected = selectedDateFilter == FilterDateOption.ON_DATE,
+                                            onClick = {
+                                                onFilterDateChanged(FilterDateOption.ON_DATE)
+                                            }
+                                        )
+                                        Text(
+                                            text = "On Date",
+                                            modifier = Modifier.padding(start = 8.dp)
+                                        )
+                                    }
+                                    Row(
+                                        modifier = Modifier
+                                            .fillMaxWidth()
+                                            .clickable {
+                                                onFilterDateChanged(FilterDateOption.AFTER_DATE)
+                                            }
+                                            .padding(4.dp),
+                                        verticalAlignment = Alignment.CenterVertically
+                                    ) {
+                                        RadioButton(
+                                            selected = selectedDateFilter == FilterDateOption.AFTER_DATE,
+                                            onClick = {
+                                                onFilterDateChanged(FilterDateOption.AFTER_DATE)
+                                            }
+                                        )
+                                        Text(
+                                            text = "On or After Date",
+                                            modifier = Modifier.padding(start = 8.dp)
                                         )
                                     }
                                 }
                             }
                         }
+                    }
 
-                        if (showDatePicker) {
-                            DatePickerDialog(
-                                onDismissRequest = { showDatePicker = false },
-                                confirmButton = {
-                                    TextButton(onClick = {
-                                        onDateSelected(datePickerState.selectedDateMillis)
-                                        showDatePicker = false
-                                    }) {
-                                        Text("OK")
-                                    }
-                                },
-                                dismissButton = {
-                                    TextButton(onClick = { showDatePicker = false }) {
-                                        Text("Cancel")
-                                    }
+                    if (showDatePicker) {
+                        DatePickerDialog(
+                            onDismissRequest = { showDatePicker = false },
+                            confirmButton = {
+                                TextButton(onClick = {
+                                    onDateSelected(datePickerState.selectedDateMillis?.let { millis ->
+                                        val localDate = Instant.fromEpochMilliseconds(millis)
+                                            .toLocalDateTime(TimeZone.UTC)
+                                            .date
+                                        localDate.atStartOfDayIn(TimeZone.currentSystemDefault()).toEpochMilliseconds()
+                                    })
+                                    showDatePicker = false
+                                }) {
+                                    Text("OK")
                                 }
-                            ) {
-                                DatePicker(state = datePickerState)
+                            },
+                            dismissButton = {
+                                TextButton(onClick = { showDatePicker = false }) {
+                                    Text("Cancel")
+                                }
                             }
+                        ) {
+                            DatePicker(state = datePickerState)
                         }
                     }
                 }
@@ -630,10 +697,28 @@ fun DateFilter(
 }
 
 fun convertMillisToDate(millis: Long): String {
-    val localDateTime = Instant.fromEpochMilliseconds(millis).toLocalDateTime(TimeZone.currentSystemDefault())
+    val localDateTime = Instant.fromEpochMilliseconds(millis)
+        .toLocalDateTime(TimeZone.currentSystemDefault())
+
     return "${localDateTime.monthNumber}/${localDateTime.dayOfMonth}/${localDateTime.year}"
 }
 
 fun getCurrentTimeMillis(): Long {
     return Clock.System.now().toEpochMilliseconds()
+}
+
+fun utcStringToMillis(utcString: String): Long {
+    val instant = Instant.parse(utcString + "Z")
+    return instant.toEpochMilliseconds()
+}
+
+fun isDateMatch(dateMillis: Long, selectedDate: Long, selectedDateFilter: FilterDateOption): Boolean {
+    val date = Instant.fromEpochMilliseconds(dateMillis).toLocalDateTime(TimeZone.currentSystemDefault()).date
+    val selected = Instant.fromEpochMilliseconds(selectedDate).toLocalDateTime(TimeZone.currentSystemDefault()).date
+
+    return when (selectedDateFilter) {
+        FilterDateOption.BEFORE_DATE -> date <= selected
+        FilterDateOption.ON_DATE -> date == selected
+        FilterDateOption.AFTER_DATE -> date >= selected
+    }
 }

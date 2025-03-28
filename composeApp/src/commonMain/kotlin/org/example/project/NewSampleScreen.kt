@@ -303,7 +303,6 @@ fun EditSampleScreen(
 
             items(fields) {
                     field ->
-                // Center each field horizontally
                 Box(
                     modifier = Modifier.fillMaxWidth(),
                     contentAlignment = Alignment.Center
@@ -322,7 +321,6 @@ fun EditSampleScreen(
 
             }
             item{
-                // Center the image upload screen horizontally
                 Box(
                     modifier = Modifier.fillMaxWidth(),
                     contentAlignment = Alignment.Center
