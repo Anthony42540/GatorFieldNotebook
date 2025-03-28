@@ -257,7 +257,7 @@ fun ViewSampleCollectionScreen(navController: NavController, database: Database?
                 ) {
                     if (filteredSamples.isEmpty() && samples.isNotEmpty()) {
                         Text(
-                            text = "Select at least one collection or modify your date range.",
+                            text = "Select at least one form or modify your date range.",
                             fontSize = 18.sp,
                             fontWeight = FontWeight.SemiBold,
                             style = MaterialTheme.typography.bodyLarge,
@@ -306,7 +306,7 @@ fun ViewSampleCollectionScreen(navController: NavController, database: Database?
                                         verticalAlignment = Alignment.CenterVertically
                                     ) {
                                         Text(
-                                            text = "Collection: $formName",
+                                            text = "Form: $formName",
                                             fontSize = 18.sp,
                                             fontWeight = FontWeight.SemiBold,
                                             style = MaterialTheme.typography.bodyLarge
@@ -497,7 +497,7 @@ fun MultiSelectForms(
                     modifier = Modifier.padding(5.dp)
                 ) {
                     Text(
-                        text = "Filter by Collection",
+                        text = "Filter by Form",
                         fontSize = 18.sp,
                         fontWeight = FontWeight.SemiBold,
                         style = MaterialTheme.typography.bodyLarge
