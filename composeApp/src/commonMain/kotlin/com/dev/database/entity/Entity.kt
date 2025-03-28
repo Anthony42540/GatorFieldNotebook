@@ -16,7 +16,7 @@ enum class FieldType {
 // sampleForm
 @Serializable
 data class SampleForm(
-    @SerialName("form_id") val formId: Int,
+    @SerialName("form_id") val formId: Long,
     @SerialName("form_name") val formName: String,
     @SerialName("form_active") val formActive: Int
 )

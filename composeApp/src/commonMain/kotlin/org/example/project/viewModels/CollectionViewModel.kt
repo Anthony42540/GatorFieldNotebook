@@ -9,8 +9,8 @@ class CollectionViewModel : ViewModel() {
     private val _collectionID = MutableStateFlow(0)
     val collectionID: StateFlow<Int> = _collectionID
 
-    fun updateCollectionID(newID: Int) {
-        _collectionID.value = newID
+    fun updateCollectionID(newID: Long) {
+        _collectionID.value = newID.toInt()
     }
 
     fun clearCollectionID() {
