@@ -64,6 +64,25 @@ fun AddFieldScreen(
         }
     }
 
+    fun duplicateFieldName(): Boolean {
+        if (database != null) {
+            return database.newFieldsList.any { it.fieldName == fieldName }
+        }
+
+        return false
+    }
+
+    fun duplicateOptionsMultiSelectAndDropDown(): Boolean {
+        if (database != null) {
+            errorMessage = "Option already exists"
+            println("Save failed: Option already exists")
+            return options.contains(newOption)
+        }
+
+        errorMessage = null
+        return false
+    }
+
     fun saveField() {
         if (database == null) {
             errorMessage = "Database not initialized"
@@ -73,6 +92,16 @@ fun AddFieldScreen(
         if (fieldName.isBlank()) {
             errorMessage = "Field Name is required"
             println("Save failed: Field name is blank")
+            return
+        }
+        if (duplicateFieldName()) {
+            errorMessage = "Field name already exists"
+            println("Save failed: Field name already exists")
+            return
+        }
+        if (options.isEmpty() && (fieldType == "dropdown" || fieldType == "multi-select")) {
+            errorMessage = "No options are specified"
+            println("Save failed: No options are specified")
             return
         }
         coroutineScope.launch {
@@ -122,6 +151,16 @@ fun AddFieldScreen(
                 text = "Add New Field",
                 color = Color(0x000000).copy(alpha = 1.0f),
                 fontSize = 40.sp,
+            )
+        }
+
+        errorMessage?.let { error ->
+            Text(
+                text = error,
+                color = Color.Red,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 16.dp, vertical = 8.dp)
             )
         }
 
@@ -223,8 +262,14 @@ fun AddFieldScreen(
 
             Button(
                 onClick = {
-                    options = options + newOption
-                    newOption = ""
+                    if (newOption.isBlank()) {
+                        errorMessage = "Option cannot be empty"
+                        println("Save failed: Option cannot be empty")
+                    } else if (!duplicateOptionsMultiSelectAndDropDown()) {
+                        options = options + newOption
+                        newOption = ""
+                        errorMessage = null
+                    }
                 },
                 modifier = Modifier
                     .align(Alignment.End)

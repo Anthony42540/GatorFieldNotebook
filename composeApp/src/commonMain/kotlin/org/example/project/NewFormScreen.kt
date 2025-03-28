@@ -43,6 +43,15 @@ fun NewFormScreen(
         println("Database is ${if (database == null) "null" else "not null"}")
     }
 
+    fun isFormNameDuplicate(formName: String): Boolean {
+        // Query your database to check if a form with the same name exists
+        if (database != null) {
+            return database.getAllSampleForms().any { it.formName == formName }
+        }
+
+        return false
+    }
+
     fun saveForm() {
         if (database == null) {
             errorMessage = "Database not initialized"
@@ -54,6 +63,13 @@ fun NewFormScreen(
             println("Save failed: Form name is blank")
             return
         }
+
+        if (isFormNameDuplicate(formValueState)) {
+            errorMessage = "Form name already exists"
+            println("Save failed: Form name already exists")
+            return
+        }
+
         coroutineScope.launch {
             try {
                 isSaving = true
