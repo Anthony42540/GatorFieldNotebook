@@ -7,7 +7,6 @@ import androidx.compose.foundation.border
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.interaction.PressInteraction
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Text
@@ -19,6 +18,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import com.dev.database.entity.FieldNoID
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
@@ -132,158 +132,164 @@ fun AddFieldScreen(
         }
     }
 
-    Column(
+    LazyColumn(
         modifier = Modifier
             .fillMaxSize()
             .padding(16.dp),
         verticalArrangement = Arrangement.Top,
         horizontalAlignment = Alignment.Start
     ) {
-        Column(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(16.dp)
-                .wrapContentHeight(),
-            horizontalAlignment = Alignment.CenterHorizontally
-        ) {
+        item {
             Text(
                 style = TextStyle(fontFamily = KhandFontFamily(), fontWeight = FontWeight.Medium),
                 text = "Add New Field",
                 color = Color(0x000000).copy(alpha = 1.0f),
                 fontSize = 40.sp,
+                modifier = Modifier.fillMaxWidth().wrapContentWidth(Alignment.CenterHorizontally)
             )
         }
 
         errorMessage?.let { error ->
-            Text(
-                text = error,
-                color = Color.Red,
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(horizontal = 16.dp, vertical = 8.dp)
-            )
-        }
-
-        TextField(
-            value = fieldName,
-            onValueChange = { fieldName = it },
-            colors = OutlinedTextFieldDefaults.colors(
-                focusedBorderColor = Color(0xFF0021A5),
-                unfocusedBorderColor = Color(0xFF0021A5),
-                focusedContainerColor = Color(0xFF0021A5).copy(0.1f),
-                unfocusedContainerColor = Color(0xFF0021A5).copy(0.1f)
-            ),
-            label = { Text("Field Name") },
-            modifier = Modifier.fillMaxWidth()
-        )
-
-        Spacer(modifier = Modifier.height(16.dp))
-
-        Row(verticalAlignment = Alignment.CenterVertically) {
-            Text("Required")
-            Spacer(modifier = Modifier.width(8.dp))
-            Checkbox(
-                checked = isRequired,
-                onCheckedChange = { isRequired = it },
-                colors = CheckboxDefaults.colors(
-                    checkedColor = Color(0xFF0021A5)
+            item {
+                Text(
+                    text = error,
+                    color = Color.Red,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(horizontal = 16.dp, vertical = 8.dp)
                 )
-            )
-        }
-
-        Spacer(modifier = Modifier.height(16.dp))
-
-        TextField(
-            value = fieldType ?: "",
-            onValueChange = {},
-            readOnly = true,
-            label = { Text("Field Type") },
-            modifier = Modifier.fillMaxWidth(),
-            colors = OutlinedTextFieldDefaults.colors(
-                focusedBorderColor = Color(0xFF0021A5),
-                unfocusedBorderColor = Color(0xFF0021A5),
-                focusedContainerColor = Color(0xFF0021A5).copy(0.1f),
-                unfocusedContainerColor = Color(0xFF0021A5).copy(0.1f)
-            ),
-            interactionSource = remember { MutableInteractionSource() }
-                .also { interactionSource ->
-                    LaunchedEffect(interactionSource) {
-                        interactionSource.interactions.collect {
-                            if (it is PressInteraction.Release) {
-                                expanded = !expanded
-                            }
-                        }
-                    }
-                }
-        )
-        Row(
-            verticalAlignment = Alignment.CenterVertically,
-            modifier = Modifier
-            .fillMaxWidth()
-            .padding(16.dp)
-        ) {
-            DropdownMenu(
-                expanded = expanded,
-                onDismissRequest = { expanded = false },
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .background(Color(0xFFFFFFFF))
-                    .border(1.dp, Color(0xFF0021A5))
-            ) {
-                fieldTypes.forEach { type ->
-                    DropdownMenuItem(
-                        onClick = {
-                            fieldType = type
-                            expanded = false
-                        },
-                        text = {
-                            Text(text = type)
-                        }
-                    )
-                }
             }
         }
 
-        Spacer(modifier = Modifier.height(16.dp))
-
-        if (fieldType == "dropdown" || fieldType == "multi-select") {
+        item {
             TextField(
-                value = newOption,
-                onValueChange = { newOption = it },
+                value = fieldName,
+                onValueChange = { fieldName = it },
                 colors = OutlinedTextFieldDefaults.colors(
                     focusedBorderColor = Color(0xFF0021A5),
                     unfocusedBorderColor = Color(0xFF0021A5),
                     focusedContainerColor = Color(0xFF0021A5).copy(0.1f),
                     unfocusedContainerColor = Color(0xFF0021A5).copy(0.1f)
                 ),
-                label = { Text("Add $fieldType option") },
+                label = { Text("Field Name") },
                 modifier = Modifier.fillMaxWidth()
             )
+        }
 
-            Button(
-                onClick = {
-                    if (newOption.isBlank()) {
-                        errorMessage = "Option cannot be empty"
-                        println("Save failed: Option cannot be empty")
-                    } else if (!duplicateOptionsMultiSelectAndDropDown()) {
-                        options = options + newOption
-                        newOption = ""
-                        errorMessage = null
-                    }
-                },
-                modifier = Modifier
-                    .align(Alignment.End)
-                    .padding(4.dp)
-                    .size(width = 160.dp, height = 45.dp),
-                colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF0021A5)),
-                contentPadding = PaddingValues(0.dp)
-            ) {
-                Text("Add Option", color = Color.White, fontSize = 25.sp, style = TextStyle(fontFamily = KhandFontFamily(), fontWeight = FontWeight.Medium))
-            }
-
+        item {
             Spacer(modifier = Modifier.height(16.dp))
 
-            options.forEach { option ->
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                Text("Required")
+                Spacer(modifier = Modifier.width(8.dp))
+                Checkbox(
+                    checked = isRequired,
+                    onCheckedChange = { isRequired = it },
+                    colors = CheckboxDefaults.colors(
+                        checkedColor = Color(0xFF0021A5)
+                    )
+                )
+            }
+        }
+
+        item {
+            Spacer(modifier = Modifier.height(16.dp))
+
+            TextField(
+                value = fieldType ?: "",
+                onValueChange = {},
+                readOnly = true,
+                label = { Text("Field Type") },
+                modifier = Modifier.fillMaxWidth(),
+                colors = OutlinedTextFieldDefaults.colors(
+                    focusedBorderColor = Color(0xFF0021A5),
+                    unfocusedBorderColor = Color(0xFF0021A5),
+                    focusedContainerColor = Color(0xFF0021A5).copy(0.1f),
+                    unfocusedContainerColor = Color(0xFF0021A5).copy(0.1f)
+                ),
+                interactionSource = remember { MutableInteractionSource() }
+                    .also { interactionSource ->
+                        LaunchedEffect(interactionSource) {
+                            interactionSource.interactions.collect {
+                                if (it is PressInteraction.Release) {
+                                    expanded = !expanded
+                                }
+                            }
+                        }
+                    }
+            )
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(16.dp)
+            ) {
+                DropdownMenu(
+                    expanded = expanded,
+                    onDismissRequest = { expanded = false },
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .background(Color(0xFFFFFFFF))
+                        .border(1.dp, Color(0xFF0021A5))
+                ) {
+                    fieldTypes.forEach { type ->
+                        DropdownMenuItem(
+                            onClick = {
+                                fieldType = type
+                                expanded = false
+                            },
+                            text = {
+                                Text(text = type)
+                            }
+                        )
+                    }
+                }
+            }
+        }
+
+        item {
+            Spacer(modifier = Modifier.height(16.dp))
+
+            if (fieldType == "dropdown" || fieldType == "multi-select") {
+                TextField(
+                    value = newOption,
+                    onValueChange = { newOption = it },
+                    colors = OutlinedTextFieldDefaults.colors(
+                        focusedBorderColor = Color(0xFF0021A5),
+                        unfocusedBorderColor = Color(0xFF0021A5),
+                        focusedContainerColor = Color(0xFF0021A5).copy(0.1f),
+                        unfocusedContainerColor = Color(0xFF0021A5).copy(0.1f)
+                    ),
+                    label = { Text("Add $fieldType option") },
+                    modifier = Modifier.fillMaxWidth()
+                )
+
+                Button(
+                    onClick = {
+                        if (newOption.isBlank()) {
+                            errorMessage = "Option cannot be empty"
+                            println("Save failed: Option cannot be empty")
+                        } else if (!duplicateOptionsMultiSelectAndDropDown()) {
+                            options = options + newOption
+                            newOption = ""
+                            errorMessage = null
+                        }
+                    },
+                    modifier = Modifier
+                        .padding(4.dp)
+                        .size(width = 160.dp, height = 45.dp),
+                    colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF0021A5)),
+                    contentPadding = PaddingValues(0.dp)
+                ) {
+                    Text("Add Option", color = Color.White, fontSize = 25.sp, style = TextStyle(fontFamily = KhandFontFamily(), fontWeight = FontWeight.Medium))
+                }
+
+                Spacer(modifier = Modifier.height(16.dp))
+            }
+        }
+
+        options.forEach { option ->
+            item {
                 Row(
                     verticalAlignment = Alignment.CenterVertically,
                     modifier = Modifier
@@ -314,29 +320,32 @@ fun AddFieldScreen(
             }
         }
 
-        Spacer(modifier = Modifier.height(16.dp))
+        item {
+            Spacer(modifier = Modifier.height(16.dp))
 
-        Box(
-            modifier = Modifier
-                .fillMaxSize()
-        ) {
-            Row(
-                horizontalArrangement = Arrangement.SpaceBetween,
+            Box(
                 modifier = Modifier
-                    .fillMaxWidth()
-                    .align(Alignment.BottomCenter)
+                    .fillMaxSize()
             ) {
-                ActionButton("Cancel", onClick = { cancel() }, Color(0xFF0021A5), Color.White)
-                Button(
+                Row(
+                    horizontalArrangement = Arrangement.SpaceBetween,
                     modifier = Modifier
-                        .padding(horizontal = 2.dp)
-                        .size(width = 160.dp, height = 45.dp),
-                    onClick = { saveField() },
-                    enabled = !isSaving && fieldName.isNotBlank(),
-                    colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF0021A5)),
-                    contentPadding = PaddingValues(0.dp)
+                        .fillMaxWidth()
+                        .align(Alignment.BottomCenter)
+                        .padding(16.dp)
                 ) {
-                    Text(text = "Save", color = Color.White, fontSize = 25.sp, style = TextStyle(fontFamily = KhandFontFamily(), fontWeight = FontWeight.Medium))
+                    ActionButton("Cancel", onClick = { cancel() }, Color(0xFF0021A5), Color.White)
+                    Button(
+                        modifier = Modifier
+                            .padding(horizontal = 2.dp)
+                            .size(width = 160.dp, height = 45.dp),
+                        onClick = { saveField() },
+                        enabled = !isSaving && fieldName.isNotBlank(),
+                        colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF0021A5)),
+                        contentPadding = PaddingValues(0.dp)
+                    ) {
+                        Text(text = "Save", color = Color.White, fontSize = 25.sp, style = TextStyle(fontFamily = KhandFontFamily(), fontWeight = FontWeight.Medium))
+                    }
                 }
             }
         }
