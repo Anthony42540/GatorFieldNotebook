@@ -111,7 +111,7 @@ fun DetailedSampleScreen(
                     DetailedSampleContent(sample!!, database)
 
                     // Add Image Button with count
-                    if (imageCount > 0) {
+
                         Spacer(modifier = Modifier.height(16.dp))
                         Button(
                             onClick = {
@@ -125,22 +125,7 @@ fun DetailedSampleScreen(
                                 style = TextStyle(fontFamily = KhandFontFamily(), fontWeight = FontWeight.Medium),
                                 fontSize = 18.sp
                             )
-                        }
-                    } else {
-                        Spacer(modifier = Modifier.height(16.dp))
-                        Button(
-                            onClick = {
-                                navController.navigate("uploadImage/$sampleId")
-                            },
-                            colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF12BF7A)),
-                            modifier = Modifier.fillMaxWidth()
-                        ) {
-                            Text(
-                                text = "Add Images",
-                                style = TextStyle(fontFamily = KhandFontFamily(), fontWeight = FontWeight.Medium),
-                                fontSize = 18.sp
-                            )
-                        }
+
                     }
                 }
             }

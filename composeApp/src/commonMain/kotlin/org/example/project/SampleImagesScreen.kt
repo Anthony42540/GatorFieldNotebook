@@ -104,44 +104,56 @@ fun SampleImagesScreen(navController: NavController, database: Database?, sample
                 modifier = Modifier.fillMaxWidth(),
                 verticalArrangement = Arrangement.spacedBy(16.dp) // Add spacing between items
             ) {
-                for(item in images){
-                    print("Image ")
-                    print(count)
-                    count += 1
+                if(images.size == 0){
+                    Text(
+                        text = "No images uploaded",
+                        fontSize = 30.sp,
+                        color = Color.Red,
+                        lineHeight = 24.sp,
+                        modifier = Modifier.padding(bottom = 8.dp)
+                    )
+                } else{
+                    for(item in images){
+                        print("Image ")
+                        print(count)
+                        count += 1
 
-                    // Wrap each image in a Card for better visibility
-                    Card(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(vertical = 4.dp),
-                        elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
-                    ) {
-                        Box(
+                        // Wrap each image in a Card for better visibility
+                        Card(
                             modifier = Modifier
                                 .fillMaxWidth()
-                                .padding(4.dp)
+                                .padding(vertical = 4.dp),
+                            elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
                         ) {
-                            AsyncImage(
-                                model = item.imageData,
+                            Box(
                                 modifier = Modifier
                                     .fillMaxWidth()
-                                    .height(300.dp),
-                                contentScale = ContentScale.Crop,
-                                contentDescription = "Sample image ${count}"
-                            )
-
-                            // Optional: Add an image number indicator
-                            Text(
-                                text = "Image ${count}",
-                                color = Color.White,
-                                modifier = Modifier
-                                    .align(Alignment.BottomEnd)
-                                    .background(Color.Black)
                                     .padding(4.dp)
-                            )
+                            ) {
+                                AsyncImage(
+                                    model = item.imageData,
+                                    modifier = Modifier
+                                        .fillMaxWidth()
+                                        .height(300.dp),
+                                    contentScale = ContentScale.Crop,
+                                    contentDescription = "Sample image ${count}"
+                                )
+
+                                // Optional: Add an image number indicator
+                                Text(
+                                    text = "Image ${count}",
+                                    color = Color.White,
+                                    modifier = Modifier
+                                        .align(Alignment.BottomEnd)
+                                        .background(Color.Black)
+                                        .padding(4.dp)
+                                )
+                            }
                         }
                     }
+
                 }
+
             }
 
             Spacer(modifier = Modifier.height(16.dp))
