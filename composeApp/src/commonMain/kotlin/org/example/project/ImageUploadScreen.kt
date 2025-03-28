@@ -36,19 +36,26 @@ import com.dev.database.cache.Database
 import com.dev.database.entity.SampleAndData
 import com.dev.database.entity.SampleForm
 import com.mohamedrejeb.calf.core.LocalPlatformContext
+import com.mohamedrejeb.calf.io.getName
 import com.mohamedrejeb.calf.io.readByteArray
 import com.mohamedrejeb.calf.picker.FilePickerFileType
 import com.mohamedrejeb.calf.picker.FilePickerSelectionMode
 import com.mohamedrejeb.calf.picker.rememberFilePickerLauncher
 import kotlinx.coroutines.launch
+import kotlinx.datetime.Clock
 import kotlinx.datetime.Instant
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.toLocalDateTime
 
+
+
 @Composable
-fun ImageUploadScreen (navController: NavController){
+fun ImageUploadScreen(navController: NavController, database: Database, sampleId: Int) {
     val scope = rememberCoroutineScope()
     val context = LocalPlatformContext.current
+
+
+    var uploadStatus by remember { mutableStateOf("") }
 
     val pickerLauncher = rememberFilePickerLauncher(
         type = FilePickerFileType.Image,
@@ -56,26 +63,70 @@ fun ImageUploadScreen (navController: NavController){
         onResult = { files ->
             scope.launch {
                 files.firstOrNull()?.let { file ->
-                    // Do something with the selected file
-                    // You can get the ByteArray of the file
-                    file.readByteArray(context)
+                    try {
+
+                        // Read the file as a ByteArray
+                        val imageData = file.readByteArray(context)
+
+                        // Get the file name and type
+                        // Get the file name and type
+                        val imageName = file.getName(context) ?: "image"
+                        val imageType = when {
+                            imageName.toString().lowercase().endsWith("jpg") ||
+                                    imageName.toString().lowercase().endsWith("jpeg") -> "image/jpeg"
+                            imageName.toString().lowercase().endsWith("png") -> "image/png"
+                            imageName.toString().lowercase().endsWith("gif") -> "image/gif"
+                            else -> "image/unknown"
+                        }
+
+
+
+                        // Get the current timestamp
+                        val timestamp = Clock.System.now().toEpochMilliseconds().toString()
+
+                        // Insert the image into the database
+                        database.insertSampleImage(
+                            sampleId = sampleId.toLong(),
+                            imageData = imageData,
+                            imageName = imageName,
+                            imageType = imageType,
+                            timestamp = timestamp
+                        )
+                        print("Sample ID for the image: ")
+                        print(print(sampleId))
+
+                        uploadStatus = "Image uploaded successfully"
+
+                    } catch (e: Exception) {
+                        uploadStatus = "Error uploading image: ${e.message}"
+                        println("Didnt upload image")
+                    }
                 }
             }
         }
     )
 
-
-    Button(
-        onClick = {
-            pickerLauncher.launch()
-        },
-        colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF0021A5)),
-        modifier = Modifier
-            .padding(horizontal = 4.dp)
-
+    print("entered image upload screen")
+    Column(
+        modifier = Modifier.padding(16.dp),
+        verticalArrangement = Arrangement.Center
     ) {
-        Text("Upload Image", fontSize = 25.sp, style = TextStyle(fontFamily = KhandFontFamily(), fontWeight = FontWeight.Medium))
+        Button(
+            onClick = {
+                pickerLauncher.launch()
+            },
+            colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF0021A5)),
+            modifier = Modifier.padding(horizontal = 4.dp)
+        ) {
+            Text("Upload Image", fontSize = 25.sp, style = TextStyle(fontFamily = KhandFontFamily(), fontWeight = FontWeight.Medium))
+        }
+
+        if (uploadStatus.isNotEmpty()) {
+            Text(
+                text = uploadStatus,
+                color = if (uploadStatus.startsWith("Error")) Color.Red else Color.Green,
+                modifier = Modifier.padding(top = 8.dp)
+            )
+        }
     }
-
-
 }

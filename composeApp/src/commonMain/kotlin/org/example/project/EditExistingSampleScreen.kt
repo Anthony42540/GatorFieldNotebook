@@ -260,7 +260,13 @@ fun EditExistingSampleScreen(
                     modifier = Modifier.fillMaxWidth(),
                     contentAlignment = Alignment.Center
                 ) {
-                    ImageUploadScreen(navController)
+                    database?.let { db ->
+                        ImageUploadScreen(
+                            navController = navController,
+                            database = db,
+                            sampleId = GlobalState.sampleId?.toInt() ?: 0  // Provide a default if null
+                        )
+                    }
                 }
             }
         }

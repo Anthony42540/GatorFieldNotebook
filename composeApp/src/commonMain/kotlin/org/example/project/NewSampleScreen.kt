@@ -25,6 +25,7 @@ import com.dev.database.entity.Field
 import dev.jordond.compass.Location
 import kotlinx.coroutines.launch
 import kotlinx.datetime.*
+import org.example.project.GlobalState.sampleId
 import org.example.project.RemoteDatabase.FirebaseDatabase
 import org.example.project.viewModels.CollectionViewModel
 
@@ -327,7 +328,13 @@ fun EditSampleScreen(
                     modifier = Modifier.fillMaxWidth(),
                     contentAlignment = Alignment.Center
                 ) {
-                    ImageUploadScreen(navController)
+                    database?.let { db ->
+                        ImageUploadScreen(
+                            navController = navController,
+                            database = db,
+                            sampleId = sampleId?.toInt() ?: 0  // Provide a default if null
+                        )
+                    }
                 }
 
             }

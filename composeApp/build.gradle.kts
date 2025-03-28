@@ -91,6 +91,7 @@ kotlin {
         }
         commonMain.dependencies {
             implementation("com.github.skydoves:landscapist-coil3:2.4.0")
+
             implementation(compose.runtime)
             implementation(compose.foundation)
             implementation(compose.material3)
@@ -119,6 +120,7 @@ kotlin {
             implementation("com.mohamedrejeb.calf:calf-file-picker-coil:0.5.1")
             implementation("io.coil-kt.coil3:coil-compose:3.1.0")
             implementation("com.stevdza-san:messagebarkmp:1.0.6")
+
 
 
 
@@ -171,6 +173,7 @@ dependencies {
     implementation(libs.androidx.runtime.android)
     implementation(libs.androidx.material3.android)
     implementation(libs.androidx.appcompat)
+
     debugImplementation(compose.uiTooling)
     implementation(libs.kotlinx.coroutines.core.v181)
     implementation(platform("com.google.firebase:firebase-bom:33.9.0"))

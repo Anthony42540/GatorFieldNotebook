@@ -1,4 +1,36 @@
 
+-- New table for storing images related to samples
+CREATE TABLE SampleImages (
+    image_id INTEGER PRIMARY KEY AUTOINCREMENT,
+    sample_id INTEGER NOT NULL,
+    image_data BLOB NOT NULL,         -- To store the actual image bytes
+    image_name TEXT,                   -- Optional name for the image
+    image_type TEXT,                   -- Store the MIME type (e.g., "image/jpeg")
+    timestamp TEXT NOT NULL,           -- When the image was added
+    FOREIGN KEY (sample_id) REFERENCES SampleData(sample_id) ON DELETE CASCADE
+);
+
+-- Insert a new image
+insertSampleImage:
+INSERT INTO SampleImages(sample_id, image_data, image_name, image_type, timestamp)
+VALUES(?, ?, ?, ?, ?);
+
+-- Get all images for a sample
+getSampleImages:
+SELECT * FROM SampleImages WHERE sample_id = ? ORDER BY timestamp DESC;
+
+-- Get a specific image
+getImageById:
+SELECT * FROM SampleImages WHERE image_id = ?;
+
+-- Delete an image
+deleteSampleImage:
+DELETE FROM SampleImages WHERE image_id = ?;
+
+-- Delete all images for a sample
+deleteAllSampleImages:
+DELETE FROM SampleImages WHERE sample_id = ?;
+
 -- table stores the forms that are created. Contains unique form ID and non unique name.
 CREATE TABLE SampleForm (
     form_id INTEGER PRIMARY KEY AUTOINCREMENT,
