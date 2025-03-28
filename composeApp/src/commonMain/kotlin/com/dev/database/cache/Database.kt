@@ -89,6 +89,9 @@
             dbQuery.insertField(formId, fieldName, orderNum, ftToStr(fieldType), if (isRequired) 1 else 0, listToJsonString(options))
             return dbQuery.getLastRowID().executeAsOne()
         }
+        internal fun updateImageSampleId(oldSampleId: Long, newSampleId: Long) {
+            dbQuery.updateImageSampleId(newSampleId, oldSampleId)
+        }
         internal fun insertSampleData(
             formId: Long,
             dateCollectedUtc: String,

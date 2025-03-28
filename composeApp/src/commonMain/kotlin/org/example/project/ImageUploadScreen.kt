@@ -30,8 +30,10 @@ import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Divider
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
+import coil3.compose.AsyncImage
 import com.dev.database.cache.Database
 import com.dev.database.entity.SampleAndData
 import com.dev.database.entity.SampleForm
@@ -54,6 +56,8 @@ fun ImageUploadScreen(navController: NavController, database: Database, sampleId
     val scope = rememberCoroutineScope()
     val context = LocalPlatformContext.current
 
+    var imageData by remember { mutableStateOf(ByteArray(0))}
+
 
     var uploadStatus by remember { mutableStateOf("") }
 
@@ -66,7 +70,7 @@ fun ImageUploadScreen(navController: NavController, database: Database, sampleId
                     try {
 
                         // Read the file as a ByteArray
-                        val imageData = file.readByteArray(context)
+                        imageData = file.readByteArray(context)
 
                         // Get the file name and type
                         // Get the file name and type
@@ -93,9 +97,9 @@ fun ImageUploadScreen(navController: NavController, database: Database, sampleId
                             timestamp = timestamp
                         )
                         print("Sample ID for the image: ")
-                        print(print(sampleId))
+                        print(sampleId)
 
-                        uploadStatus = "Image uploaded successfully"
+                        uploadStatus = "Image uploaded  successfully"
 
                     } catch (e: Exception) {
                         uploadStatus = "Error uploading image: ${e.message}"
@@ -120,6 +124,8 @@ fun ImageUploadScreen(navController: NavController, database: Database, sampleId
         ) {
             Text("Upload Image", fontSize = 25.sp, style = TextStyle(fontFamily = KhandFontFamily(), fontWeight = FontWeight.Medium))
         }
+
+
 
         if (uploadStatus.isNotEmpty()) {
             Text(

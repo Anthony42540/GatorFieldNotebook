@@ -27,6 +27,9 @@ SELECT * FROM SampleImages WHERE image_id = ?;
 deleteSampleImage:
 DELETE FROM SampleImages WHERE image_id = ?;
 
+updateImageSampleId:
+UPDATE SampleImages SET sample_id = ? WHERE sample_id = ?;
+
 -- Delete all images for a sample
 deleteAllSampleImages:
 DELETE FROM SampleImages WHERE sample_id = ?;
