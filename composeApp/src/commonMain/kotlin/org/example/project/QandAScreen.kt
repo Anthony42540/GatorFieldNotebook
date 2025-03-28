@@ -86,7 +86,7 @@ fun QandAScreen(navController: NavController, database: Database? = null) {
 
             SectionTitle("Q: What is a form?")
             Text(
-                text = "A form is a group of related samples that belong together, typically gathered during a specific research project or field expedition. Collections help you organize your data logically and make it easier to find related samples later.",
+                text = "A form is a group of related samples that share the same fields, typically gathered during a specific research project or field expedition. All samples are associated with one form, and a form can have multiple samples.",
                 fontSize = 16.sp,
                 color = Color.Black,
                 lineHeight = 24.sp,

@@ -7,6 +7,7 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
@@ -18,6 +19,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material.icons.filled.KeyboardArrowDown
 import androidx.compose.material.icons.filled.KeyboardArrowUp
 import androidx.compose.material3.AlertDialog
@@ -26,22 +28,33 @@ import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardColors
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.Checkbox
 import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.DatePicker
+import androidx.compose.material3.DatePickerDialog
 import androidx.compose.material3.Divider
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.RadioButton
+import androidx.compose.material3.TextButton
+import androidx.compose.material3.rememberDatePickerState
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
 import com.dev.database.cache.Database
+import com.dev.database.entity.FilterDateOption
 import com.dev.database.entity.SampleAndData
 import com.dev.database.entity.SampleForm
+import com.dev.database.entity.ViewOption
 import kotlinx.coroutines.delay
 import com.dev.database.entity.SampleImage
 import kotlinx.coroutines.launch
+import kotlinx.datetime.Clock
 import kotlinx.datetime.Instant
 import kotlinx.datetime.TimeZone
+import kotlinx.datetime.atStartOfDayIn
 import kotlinx.datetime.toLocalDateTime
 
 object GlobalState {
@@ -55,12 +68,33 @@ fun ViewSampleCollectionScreen(navController: NavController, database: Database?
     var check by remember { mutableStateOf<Boolean?>(null) }
     var formNameVar by remember { mutableStateOf<String?>(null) }
     var showDeleteConfirmation by remember { mutableStateOf(false) }
-    var samples by remember { mutableStateOf<List<SampleAndData>>(emptyList()) }
+
+    var samples by remember { mutableStateOf<List<SampleAndData>>(emptyList()) } //List of all samples
+
+    val listOfForms = database?.getAllSampleForms() //List of all forms
+    var selectedForms by remember { mutableStateOf(listOfForms) } //List of selected forms (default is all)
+    var viewOption by remember { mutableStateOf(ViewOption.BY_COLLECTION) }
+    var selectedDate by remember { mutableStateOf(getCurrentTimeMillis()) }
+    var selectedDateFilter by remember { mutableStateOf(FilterDateOption.BEFORE_DATE) }
+
+    val filteredSamples = samples.filter { sample ->
+        val isFormMatch = selectedForms!!.any { it.formId.toInt() == sample.formId }
+
+        //convert UTC string to millis
+        val dateMillis = utcStringToMillis(sample.dateCollectedUTC)
+        //check if date matches selected date (need to remove time from long)
+        val dateValue = isDateMatch(dateMillis, selectedDate, selectedDateFilter)
+
+        isFormMatch && dateValue
+    }
+
     var isLoading by remember { mutableStateOf(true) }
     var error by remember { mutableStateOf<String?>(null) }
     val coroutineScope = rememberCoroutineScope()
 
     var expandedGroups by remember { mutableStateOf(setOf<String>()) }
+    var expandedFilters by remember { mutableStateOf(false) }
+    var expandedSort by remember { mutableStateOf(false) }
 
     LaunchedEffect(Unit) {
         loadAllSamples(database) { newSamples, errorMessage ->
@@ -110,7 +144,6 @@ fun ViewSampleCollectionScreen(navController: NavController, database: Database?
                             coroutineScope.launch {
                                 clearAllSamples(database)
                                 showDeleteConfirmation = false
-                                // Refresh the screen after deletion
                                 loadAllSamples(database) { newSamples, errorMessage ->
                                     samples = newSamples
                                     error = errorMessage
@@ -149,18 +182,104 @@ fun ViewSampleCollectionScreen(navController: NavController, database: Database?
             verticalArrangement = Arrangement.Top,
             horizontalAlignment = Alignment.Start
         ) {
+
             SectionTitle("Samples")
+
+            Spacer(modifier = Modifier.height(8.dp))
+
+            Card(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 12.dp, vertical = 4.dp)
+                    .clickable {
+                        expandedFilters = !expandedFilters
+                    },
+                colors = CardDefaults.cardColors(containerColor = Color(0xFFFFFFFF)),
+                elevation = CardDefaults.cardElevation(defaultElevation = 4.dp),
+                shape = RoundedCornerShape(12.dp)
+            ) {
+                Column(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(16.dp)
+                        .animateContentSize()
+                ) {
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Text(
+                            text = "Filters",
+                            fontSize = 18.sp,
+                            fontWeight = FontWeight.SemiBold,
+                            style = MaterialTheme.typography.bodyLarge
+                        )
+                    }
+                    if (expandedFilters) {
+
+                        Divider(color = Color.Gray, thickness = 1.dp, modifier = Modifier.padding(vertical = 8.dp))
+
+                        selectedForms?.let {
+                            if (listOfForms != null) {
+                                MultiSelectForms(
+                                    listOfForms,
+                                    selectedForms!!,
+                                    onSelectionChange = { newSelection ->
+                                        selectedForms = newSelection
+                                    }
+                                )
+                            }
+                        }
+                        DateFilter(
+                            selectedDate = selectedDate,
+                            selectedDateFilter = selectedDateFilter,
+                            onDateSelected = { dateMillis ->
+                                if (dateMillis != null) {
+                                    selectedDate = dateMillis
+                                }
+                            },
+                            onFilterDateChanged = { dateFilter ->
+                                selectedDateFilter = dateFilter
+                            }
+                        )
+                    }
+                }
+            }
+
+            Divider(color = Color.LightGray, thickness = 1.dp, modifier = Modifier.padding(vertical = 8.dp, horizontal = 10.dp))
 
             Box (
                 modifier = Modifier.fillMaxSize()
             ) {
-                val groupedSamples = samples.groupBy { database?.getSampleForm(it.formId.toLong())?.formName ?: "Unknown" }
+                val groupedSamples = filteredSamples.groupBy { database?.getSampleForm(it.formId.toLong())?.formName ?: "Unknown" }
+
+                Row(
+                    horizontalArrangement = Arrangement.Center,
+                    modifier = Modifier.fillMaxWidth()
+                ) {
+                    if (filteredSamples.isEmpty() && samples.isNotEmpty()) {
+                        Text(
+                            text = "Select at least one form or modify your date range.",
+                            fontSize = 18.sp,
+                            fontWeight = FontWeight.SemiBold,
+                            style = MaterialTheme.typography.bodyLarge,
+                            modifier = Modifier.padding(10.dp),
+                        )
+                    } else if (samples.isEmpty()) {
+                        Text(
+                            text = "No samples yet!",
+                            fontSize = 18.sp,
+                            fontWeight = FontWeight.SemiBold,
+                            style = MaterialTheme.typography.bodyLarge,
+                        )
+                    }
+                }
 
                 LazyColumn(
                     modifier = Modifier
                         .fillMaxSize()
                         .padding(bottom = 70.dp)
                 ) {
+
                     groupedSamples.forEach { (formName, sampleList) ->
                         item {
                             Card(
@@ -188,7 +307,7 @@ fun ViewSampleCollectionScreen(navController: NavController, database: Database?
                                         verticalAlignment = Alignment.CenterVertically
                                     ) {
                                         Text(
-                                            text = "Collection: $formName",
+                                            text = "Form: $formName",
                                             fontSize = 18.sp,
                                             fontWeight = FontWeight.SemiBold,
                                             style = MaterialTheme.typography.bodyLarge
@@ -320,15 +439,17 @@ private fun SampleRow(sample: SampleAndData, form: SampleForm, onSampleClick: (L
             verticalAlignment = Alignment.CenterVertically
         ) {
             Text(
-                text = form.formName,
-                fontSize = 16.sp,
-                color = Color.Black
-            )
-            Text(
                 text = "#${sample.sampleCollectionId}",
                 fontSize = 16.sp,
                 color = Color.Black
             )
+
+            Text(
+                text = "${pair[0]} at ${pair[1]}",
+                fontSize = 16.sp,
+                color = Color.Black
+            )
+
         }
     }
 }
@@ -344,5 +465,311 @@ private fun formatDate(dateString: String): String {
                 "${localDateTime.year}"
     } catch (e: Exception) {
         dateString
+    }
+}
+
+
+@Composable
+fun MultiSelectForms(
+    options: List<SampleForm>,
+    selectedOptions: List<SampleForm>,
+    onSelectionChange: (List<SampleForm>) -> Unit
+) {
+    var expanded by remember { mutableStateOf(false) }
+    val allSelected = options.isNotEmpty() && selectedOptions.size == options.size
+
+    Column(modifier = Modifier.fillMaxWidth()) {
+        Card(
+            modifier = Modifier
+                .fillMaxWidth()
+                .clickable {
+                    expanded = !expanded
+                },
+            colors = CardDefaults.cardColors(containerColor = Color(0xFFFFFFFF)),
+            shape = RoundedCornerShape(12.dp)
+        ){
+            Column(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .animateContentSize()
+            ) {
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                    modifier = Modifier.padding(5.dp)
+                ) {
+                    Text(
+                        text = "Filter by Form",
+                        fontSize = 18.sp,
+                        fontWeight = FontWeight.SemiBold,
+                        style = MaterialTheme.typography.bodyLarge
+                    )
+                }
+                if (expanded) {
+
+                    Divider(color = Color.LightGray, thickness = 1.dp, modifier = Modifier.padding(vertical = 8.dp, horizontal = 10.dp))
+
+                    Card(
+                        modifier = Modifier.fillMaxWidth(),
+                        colors = CardDefaults.cardColors(containerColor = Color(0xFFFFFFFF)),
+                    ) {
+                        LazyColumn(
+                            modifier = Modifier.heightIn(max = 300.dp)
+                        ) {
+                            item {
+                                Row(
+                                    modifier = Modifier
+                                        .fillMaxWidth()
+                                        .clickable {
+                                            val newSelection = if (allSelected) emptyList() else options
+                                            onSelectionChange(newSelection)
+                                        }
+                                        .padding(4.dp),
+                                    verticalAlignment = Alignment.CenterVertically
+                                ) {
+                                    Checkbox(
+                                        checked = allSelected,
+                                        onCheckedChange = {
+                                            val newSelection = if (allSelected) emptyList() else options
+                                            onSelectionChange(newSelection)
+                                        }
+                                    )
+                                    Spacer(modifier = Modifier.width(8.dp))
+                                    Text(text = if (allSelected) "Deselect All" else "Select All")
+                                }
+                            }
+
+                            items(options) { option ->
+                                Row(
+                                    modifier = Modifier
+                                        .fillMaxWidth()
+                                        .clickable {
+                                            val newSelection =
+                                                if (selectedOptions.contains(option)) {
+                                                    selectedOptions - option
+                                                } else {
+                                                    selectedOptions + option
+                                                }
+                                            onSelectionChange(newSelection)
+                                        }
+                                        .padding(4.dp),
+                                    verticalAlignment = Alignment.CenterVertically
+                                ) {
+                                    Checkbox(
+                                        checked = selectedOptions.contains(option),
+                                        onCheckedChange = {
+                                            val newSelection =
+                                                if (selectedOptions.contains(option)) {
+                                                    selectedOptions - option
+                                                } else {
+                                                    selectedOptions + option
+                                                }
+                                            onSelectionChange(newSelection)
+                                        }
+                                    )
+                                    Spacer(modifier = Modifier.width(8.dp))
+                                    Text(text = option.formName)
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun DateFilter(
+    selectedDate: Long?,
+    selectedDateFilter: FilterDateOption,
+    onDateSelected: (Long?) -> Unit,
+    onFilterDateChanged: (FilterDateOption) -> Unit,
+) {
+    var expanded by remember { mutableStateOf(false) }
+    var showDatePicker by remember { mutableStateOf(false) }
+    val datePickerState = rememberDatePickerState()
+
+    Column(modifier = Modifier.fillMaxWidth()) {
+        Card(
+            modifier = Modifier
+                .fillMaxWidth()
+                .clickable {
+                    expanded = !expanded
+                },
+            colors = CardDefaults.cardColors(containerColor = Color(0xFFFFFFFF)),
+            shape = RoundedCornerShape(12.dp)
+        ) {
+            Column(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .animateContentSize()
+            ) {
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                    modifier = Modifier.padding(5.dp)
+                ) {
+                    Text(
+                        text = "Filter by Date",
+                        fontSize = 18.sp,
+                        fontWeight = FontWeight.SemiBold,
+                        style = MaterialTheme.typography.bodyLarge
+                    )
+                }
+                if (expanded) {
+
+                    Divider(color = Color.LightGray, thickness = 1.dp, modifier = Modifier.padding(vertical = 8.dp, horizontal = 10.dp))
+
+                    Card(
+                        modifier = Modifier.fillMaxWidth(),
+                        colors = CardDefaults.cardColors(containerColor = Color(0xFFFFFFFF)),
+                    ) {
+                        LazyColumn(
+                            modifier = Modifier.heightIn(max = 300.dp)
+                        ) {
+                            item {
+                                Row(
+                                    modifier = Modifier
+                                        .fillMaxWidth()
+                                        .clickable {
+                                            showDatePicker = !showDatePicker
+                                        }
+                                        .padding(8.dp),
+                                    verticalAlignment = Alignment.CenterVertically,
+                                    horizontalArrangement = Arrangement.SpaceBetween
+                                ) {
+                                    Text(
+                                        text = selectedDate?.let { convertMillisToDate(it) }
+                                            ?: "Select a date",
+                                        fontSize = 16.sp,
+                                    )
+                                    Icon(
+                                        imageVector = Icons.Default.Edit,
+                                        contentDescription = "Edit date"
+                                    )
+                                }
+                            }
+                            item {
+                                Column(modifier = Modifier.padding(8.dp)) {
+                                    Row(
+                                        modifier = Modifier
+                                            .fillMaxWidth()
+                                            .clickable {
+                                                onFilterDateChanged(FilterDateOption.BEFORE_DATE)
+                                            }
+                                            .padding(4.dp),
+                                        verticalAlignment = Alignment.CenterVertically
+                                    ) {
+                                        RadioButton(
+                                            selected = selectedDateFilter == FilterDateOption.BEFORE_DATE,
+                                            onClick = {
+                                                onFilterDateChanged(FilterDateOption.BEFORE_DATE)
+                                            }
+                                        )
+                                        Text(
+                                            text = "On or Before Date",
+                                            modifier = Modifier.padding(start = 8.dp)
+                                        )
+                                    }
+                                    Row(
+                                        modifier = Modifier
+                                            .fillMaxWidth()
+                                            .clickable {
+                                                onFilterDateChanged(FilterDateOption.ON_DATE)
+                                            }
+                                            .padding(4.dp),
+                                        verticalAlignment = Alignment.CenterVertically
+                                    ) {
+                                        RadioButton(
+                                            selected = selectedDateFilter == FilterDateOption.ON_DATE,
+                                            onClick = {
+                                                onFilterDateChanged(FilterDateOption.ON_DATE)
+                                            }
+                                        )
+                                        Text(
+                                            text = "On Date",
+                                            modifier = Modifier.padding(start = 8.dp)
+                                        )
+                                    }
+                                    Row(
+                                        modifier = Modifier
+                                            .fillMaxWidth()
+                                            .clickable {
+                                                onFilterDateChanged(FilterDateOption.AFTER_DATE)
+                                            }
+                                            .padding(4.dp),
+                                        verticalAlignment = Alignment.CenterVertically
+                                    ) {
+                                        RadioButton(
+                                            selected = selectedDateFilter == FilterDateOption.AFTER_DATE,
+                                            onClick = {
+                                                onFilterDateChanged(FilterDateOption.AFTER_DATE)
+                                            }
+                                        )
+                                        Text(
+                                            text = "On or After Date",
+                                            modifier = Modifier.padding(start = 8.dp)
+                                        )
+                                    }
+                                }
+                            }
+                        }
+                    }
+
+                    if (showDatePicker) {
+                        DatePickerDialog(
+                            onDismissRequest = { showDatePicker = false },
+                            confirmButton = {
+                                TextButton(onClick = {
+                                    onDateSelected(datePickerState.selectedDateMillis?.let { millis ->
+                                        val localDate = Instant.fromEpochMilliseconds(millis)
+                                            .toLocalDateTime(TimeZone.UTC)
+                                            .date
+                                        localDate.atStartOfDayIn(TimeZone.currentSystemDefault()).toEpochMilliseconds()
+                                    })
+                                    showDatePicker = false
+                                }) {
+                                    Text("OK")
+                                }
+                            },
+                            dismissButton = {
+                                TextButton(onClick = { showDatePicker = false }) {
+                                    Text("Cancel")
+                                }
+                            }
+                        ) {
+                            DatePicker(state = datePickerState)
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
+
+fun convertMillisToDate(millis: Long): String {
+    val localDateTime = Instant.fromEpochMilliseconds(millis)
+        .toLocalDateTime(TimeZone.currentSystemDefault())
+
+    return "${localDateTime.monthNumber}/${localDateTime.dayOfMonth}/${localDateTime.year}"
+}
+
+fun getCurrentTimeMillis(): Long {
+    return Clock.System.now().toEpochMilliseconds()
+}
+
+fun utcStringToMillis(utcString: String): Long {
+    val instant = Instant.parse(utcString + "Z")
+    return instant.toEpochMilliseconds()
+}
+
+fun isDateMatch(dateMillis: Long, selectedDate: Long, selectedDateFilter: FilterDateOption): Boolean {
+    val date = Instant.fromEpochMilliseconds(dateMillis).toLocalDateTime(TimeZone.currentSystemDefault()).date
+    val selected = Instant.fromEpochMilliseconds(selectedDate).toLocalDateTime(TimeZone.currentSystemDefault()).date
+
+    return when (selectedDateFilter) {
+        FilterDateOption.BEFORE_DATE -> date <= selected
+        FilterDateOption.ON_DATE -> date == selected
+        FilterDateOption.AFTER_DATE -> date >= selected
     }
 }
