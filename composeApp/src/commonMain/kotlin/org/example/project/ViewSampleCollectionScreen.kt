@@ -248,10 +248,11 @@ fun ViewSampleCollectionScreen(navController: NavController, database: Database?
                 ) {
                     if (filteredSamples.isEmpty() && samples.isNotEmpty()) {
                         Text(
-                            text = "Select at least one collection to view samples",
+                            text = "Select at least one collection or modify your date range.",
                             fontSize = 18.sp,
                             fontWeight = FontWeight.SemiBold,
                             style = MaterialTheme.typography.bodyLarge,
+                            modifier = Modifier.padding(10.dp),
                         )
                     } else if (samples.isEmpty()) {
                         Text(
