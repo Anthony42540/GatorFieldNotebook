@@ -41,6 +41,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.RadioButton
 import androidx.compose.material3.RadioButtonDefaults
 import androidx.compose.material3.TextButton
+import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.material3.rememberDatePickerState
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
@@ -771,7 +772,8 @@ fun DateFilter(
                                     todayDateBorderColor = Color(0xFF0021A5),
                                     todayContentColor = Color(0xFF0021A5),
                                     selectedYearContainerColor = Color(0xFF0021A5),
-                                    currentYearContentColor = Color(0xFF0021A5)
+                                    currentYearContentColor = Color(0xFF0021A5),
+                                    dateTextFieldColors = TextFieldDefaults.colors(unfocusedContainerColor = Color.White, focusedContainerColor = Color.White, focusedIndicatorColor = Color(0xFF0021A5), unfocusedIndicatorColor = Color(0xFF0021A5), focusedLabelColor = Color.Black, unfocusedLabelColor = Color.Black)
                                 )
                             )
                         }
