@@ -90,3 +90,41 @@ data class SampleAndData(
     @SerialName("location") val location: String,
     @SerialName("data_entries") val dataEntries: Map<Long, String>
 )
+
+// Images that a user uploads
+@Serializable
+data class SampleImage(
+    @SerialName("image_id") val imageId: Int,
+    @SerialName("sample_id") val sampleId: Int,
+    @SerialName("image_data") val imageData: ByteArray,
+    @SerialName("image_name") val imageName: String?,
+    @SerialName("image_type") val imageType: String?,
+    @SerialName("timestamp") val timestamp: String
+) {
+    // Override equals and hashCode because ByteArray needs special handling
+    override fun equals(other: Any?): Boolean {
+        if (this === other) return true
+        if (other == null || this::class != other::class) return false
+
+        other as SampleImage
+
+        if (imageId != other.imageId) return false
+        if (sampleId != other.sampleId) return false
+        if (!imageData.contentEquals(other.imageData)) return false
+        if (imageName != other.imageName) return false
+        if (imageType != other.imageType) return false
+        if (timestamp != other.timestamp) return false
+
+        return true
+    }
+
+    override fun hashCode(): Int {
+        var result = imageId
+        result = 31 * result + sampleId
+        result = 31 * result + imageData.contentHashCode()
+        result = 31 * result + (imageName?.hashCode() ?: 0)
+        result = 31 * result + (imageType?.hashCode() ?: 0)
+        result = 31 * result + timestamp.hashCode()
+        return result
+    }
+}

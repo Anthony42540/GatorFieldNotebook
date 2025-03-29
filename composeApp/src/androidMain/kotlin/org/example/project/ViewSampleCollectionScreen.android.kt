@@ -13,7 +13,7 @@ actual fun exportToCSV(
 ): Boolean {
     val csvBuilder = StringBuilder()
 
-    val standardHeaders = listOf("SampleCollectionId", "FormId", "SampleId", "Location", "DateCollectedUTC")
+    val standardHeaders = listOf("SampleCollectionId", "FormId", "GlobalId", "Location", "DateCollectedUTC")
 
     val dataEntryKeys = groupedSamples[form]
         ?.flatMap { it.dataEntries.keys }
@@ -34,7 +34,7 @@ actual fun exportToCSV(
             sampleList.forEach { sample ->
                 csvBuilder.append("${sample.sampleCollectionId ?: "N/A"}, ")
                 csvBuilder.append("${sample.formId ?: "N/A"}, ")
-                csvBuilder.append("${sample.sampleId ?: "N/A"}, ")
+                csvBuilder.append("${sample.sampleId ?: "N/A"}, ")  // Maybe rename this to GlobalId
 
                 val rLocation = sample.location.replace(",", "")
 

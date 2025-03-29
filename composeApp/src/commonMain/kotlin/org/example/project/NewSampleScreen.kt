@@ -25,7 +25,22 @@ import com.dev.database.entity.Field
 import dev.jordond.compass.Location
 import kotlinx.coroutines.launch
 import kotlinx.datetime.*
+import org.example.project.GlobalState.sampleId
+import org.example.project.RemoteDatabase.FirebaseDatabase
 import org.example.project.viewModels.CollectionViewModel
+
+// Add this at the top level of your file or in a Constants.kt file
+object SampleManager {
+    private var _currentSampleId: Long = 0
+
+    fun setSampleId(id: Long) {
+        _currentSampleId = id
+    }
+
+    fun getSampleId(): Long {
+        return _currentSampleId
+    }
+}
 
 @Composable
 fun EditSampleScreen(
@@ -143,6 +158,13 @@ fun EditSampleScreen(
                     dateCollectedUtc = "${date}T$time",
                     location = locationString
                 )
+                database.updateImageSampleId(0, sampleId)
+
+                // Store the ID in SampleManager
+                SampleManager.setSampleId(sampleId)
+
+                // For backward compatibility with existing code
+                GlobalState.sampleId = sampleId
 
                 collectedData.forEach { (fieldId, userInput) ->
                     database.insertDataEntry(
@@ -151,7 +173,7 @@ fun EditSampleScreen(
                         userInput = userInput
                     )
                 }
-                println("Sample saved successfully")
+                println("Sample saved successfully with ID: $sampleId")
 
                 viewModel.clearCollectionID()
                 navController.navigate("home")
@@ -349,7 +371,20 @@ fun EditSampleScreen(
                     modifier = Modifier.fillMaxWidth(),
                     contentAlignment = Alignment.Center
                 ) {
-                    ImageUploadScreen(navController)
+                    database?.let { db ->
+                        // Use the SampleManager to get the current sample ID
+                        val currentSampleId = SampleManager.getSampleId()
+                        print("Current Sample Id: ")
+                        print(currentSampleId)
+
+
+                        ImageUploadScreen(
+                            navController = navController,
+                            database = db,
+                            sampleId = currentSampleId.toInt()
+                        )
+
+                    }
                 }
 
             }

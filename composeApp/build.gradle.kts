@@ -88,6 +88,7 @@ kotlin {
         }
         commonMain.dependencies {
             implementation("com.github.skydoves:landscapist-coil3:2.4.0")
+
             implementation(compose.runtime)
             implementation(compose.foundation)
             implementation(compose.material3)
@@ -115,6 +116,8 @@ kotlin {
             implementation("com.mohamedrejeb.calf:calf-file-picker:0.7.1")
             implementation("com.mohamedrejeb.calf:calf-file-picker-coil:0.5.1")
             implementation("io.coil-kt.coil3:coil-compose:3.1.0")
+            implementation("com.stevdza-san:messagebarkmp:1.0.6")
+
         }
         desktopMain.dependencies {
             implementation(compose.desktop.currentOs)

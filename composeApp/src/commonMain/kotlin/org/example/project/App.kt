@@ -168,6 +168,20 @@ fun AppNavigation() {
                     sampleId = sampleId
                 )
             }
+
+            composable(
+                route = "sampleImages/{sampleId}",
+                arguments = listOf(navArgument("sampleId") { type = NavType.LongType })
+            ) { backStackEntry ->
+                val sampleId = backStackEntry.arguments?.getLong("sampleId") ?: return@composable
+                SampleImagesScreen(
+                    navController = navController,
+                    database = database,
+                    sampleId = sampleId
+                )
+            }
+
+
             composable(
                 route = "EditExistingSampleScreen/{sampleId}"
             ) { backStackEntry ->
