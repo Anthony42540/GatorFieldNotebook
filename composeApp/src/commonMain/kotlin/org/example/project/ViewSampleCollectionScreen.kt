@@ -29,13 +29,17 @@ import androidx.compose.material3.Card
 import androidx.compose.material3.CardColors
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Checkbox
+import androidx.compose.material3.CheckboxDefaults
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.DatePicker
+import androidx.compose.material3.DatePickerColors
+import androidx.compose.material3.DatePickerDefaults
 import androidx.compose.material3.DatePickerDialog
 import androidx.compose.material3.Divider
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.RadioButton
+import androidx.compose.material3.RadioButtonDefaults
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.rememberDatePickerState
 import androidx.compose.ui.text.TextStyle
@@ -531,7 +535,10 @@ fun MultiSelectForms(
                                         onCheckedChange = {
                                             val newSelection = if (allSelected) emptyList() else options
                                             onSelectionChange(newSelection)
-                                        }
+                                        },
+                                        colors = CheckboxDefaults.colors(
+                                            checkedColor = Color(0xFF0021A5)
+                                        )
                                     )
                                     Spacer(modifier = Modifier.width(8.dp))
                                     Text(text = if (allSelected) "Deselect All" else "Select All")
@@ -564,7 +571,10 @@ fun MultiSelectForms(
                                                     selectedOptions + option
                                                 }
                                             onSelectionChange(newSelection)
-                                        }
+                                        },
+                                        colors = CheckboxDefaults.colors(
+                                            checkedColor = Color(0xFF0021A5)
+                                        )
                                     )
                                     Spacer(modifier = Modifier.width(8.dp))
                                     Text(text = option.formName)
@@ -664,7 +674,10 @@ fun DateFilter(
                                             selected = selectedDateFilter == FilterDateOption.BEFORE_DATE,
                                             onClick = {
                                                 onFilterDateChanged(FilterDateOption.BEFORE_DATE)
-                                            }
+                                            },
+                                            colors = RadioButtonDefaults.colors(
+                                                selectedColor = Color(0xFF0021A5)
+                                            )
                                         )
                                         Text(
                                             text = "On or Before Date",
@@ -684,7 +697,10 @@ fun DateFilter(
                                             selected = selectedDateFilter == FilterDateOption.ON_DATE,
                                             onClick = {
                                                 onFilterDateChanged(FilterDateOption.ON_DATE)
-                                            }
+                                            },
+                                            colors = RadioButtonDefaults.colors(
+                                                selectedColor = Color(0xFF0021A5)
+                                            )
                                         )
                                         Text(
                                             text = "On Date",
@@ -704,7 +720,10 @@ fun DateFilter(
                                             selected = selectedDateFilter == FilterDateOption.AFTER_DATE,
                                             onClick = {
                                                 onFilterDateChanged(FilterDateOption.AFTER_DATE)
-                                            }
+                                            },
+                                            colors = RadioButtonDefaults.colors(
+                                                selectedColor = Color(0xFF0021A5)
+                                            )
                                         )
                                         Text(
                                             text = "On or After Date",
@@ -720,7 +739,9 @@ fun DateFilter(
                         DatePickerDialog(
                             onDismissRequest = { showDatePicker = false },
                             confirmButton = {
-                                TextButton(onClick = {
+                                TextButton(
+                                    colors = ButtonDefaults.buttonColors(contentColor = Color(0xFF0021A5), containerColor = Color.White),
+                                    onClick = {
                                     onDateSelected(datePickerState.selectedDateMillis?.let { millis ->
                                         val localDate = Instant.fromEpochMilliseconds(millis)
                                             .toLocalDateTime(TimeZone.UTC)
@@ -733,12 +754,26 @@ fun DateFilter(
                                 }
                             },
                             dismissButton = {
-                                TextButton(onClick = { showDatePicker = false }) {
+                                TextButton(
+                                    onClick = { showDatePicker = false },
+                                    colors = ButtonDefaults.buttonColors(contentColor = Color(0xFF0021A5), containerColor = Color.White),
+                                ) {
                                     Text("Cancel")
                                 }
-                            }
+                            },
+                            colors = DatePickerDefaults.colors(containerColor = Color.White)
                         ) {
-                            DatePicker(state = datePickerState)
+                            DatePicker(
+                                state = datePickerState,
+                                colors = DatePickerDefaults.colors(
+                                    containerColor = Color.White,
+                                    selectedDayContainerColor = Color(0xFF0021A5),
+                                    todayDateBorderColor = Color(0xFF0021A5),
+                                    todayContentColor = Color(0xFF0021A5),
+                                    selectedYearContainerColor = Color(0xFF0021A5),
+                                    currentYearContentColor = Color(0xFF0021A5)
+                                )
+                            )
                         }
                     }
                 }
