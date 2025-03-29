@@ -1,5 +1,7 @@
 # Gator Field Notebook
-An app streamlining environmental data collection. This repository contains all source code and documentation.
+An app streamlining environmental data collection. This repository contains all source code and documentation.  
+  
+![GatorFieldIcon.png](composeApp%2Fsrc%2FcommonMain%2FcomposeResources%2Fdrawable%2FGatorFieldIcon.png)  
 
 ## Table of Contents ## 
 - [Project Overview](https://github.com/Anthony42540/GatorFieldNotebook#project-overview)
