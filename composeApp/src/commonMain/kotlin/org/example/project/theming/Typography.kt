@@ -1,13 +1,13 @@
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
-import org.jetbrains.compose.resources.Font
 import gatorfieldnotebook.composeapp.generated.resources.Res
 import gatorfieldnotebook.composeapp.generated.resources.khand_bold
 import gatorfieldnotebook.composeapp.generated.resources.khand_light
 import gatorfieldnotebook.composeapp.generated.resources.khand_medium
 import gatorfieldnotebook.composeapp.generated.resources.khand_regular
 import gatorfieldnotebook.composeapp.generated.resources.khand_semibold
+import org.jetbrains.compose.resources.Font
 
 @Composable
 fun KhandFontFamily() = FontFamily(

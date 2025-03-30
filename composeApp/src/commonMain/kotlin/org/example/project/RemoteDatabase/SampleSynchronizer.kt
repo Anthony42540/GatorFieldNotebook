@@ -3,8 +3,6 @@ package org.example.project.RemoteDatabase
 import com.dev.database.cache.Database
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.flow.collect
-import kotlinx.coroutines.launch
 
 
 // class to handle the synchronization  between local (SQLDelight) and remote (Firestore) databases
