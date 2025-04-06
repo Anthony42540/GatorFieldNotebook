@@ -118,6 +118,19 @@ fun MenuHeader(
                         selected = false,
                         onClick = { navController.navigate("QandA_screen") },
                     )
+                    NavigationDrawerItem(
+                        label = {
+                            Text(
+                                text = "printer",
+                                style = TextStyle(
+                                    fontSize = 30.sp,
+                                    color = Color.Black
+                                )
+                            )
+                        },
+                        selected = false,
+                        onClick = { navController.navigate("print") }
+                    )
                     Spacer(Modifier.height(12.dp))
                 }
             }

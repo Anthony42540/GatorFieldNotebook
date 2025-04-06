@@ -1,11 +1,16 @@
 [versions]
+activityKtx = "1.10.1"
+activityKtxVersion = "1.8.2"
 agp = "8.7.2"
 android-compileSdk = "35"
 android-minSdk = "24"
 android-targetSdk = "34"
 androidx-activityCompose = "1.9.2"
 androidx-lifecycle = "2.8.2"
+androidxFragmentKtx = "1.5.7"
+blueline = "1.0.0"
 compose-plugin = "1.6.11"
+fragmentKtx = "1.8.6"
 kotlin = "2.0.20"
 kotlinx-coroutines = "1.9.0"
 coroutinesVersion = "1.7.3"
@@ -17,8 +22,10 @@ ktor = "2.3.7"
 lifecycleViewmodel = "2.8.2"
 mapcomposeMp = "0.9.3"
 navigationCompose = "2.8.0-alpha10"
+navigationFragmentKtx = "2.8.9"
 sqlDelight = "2.0.2"
 foundationAndroid = "1.7.4"
+swiperefreshlayout = "1.1.0"
 uiGraphicsAndroid = "1.7.4"
 foundationLayoutAndroid = "1.7.4"
 uiAndroid = "1.7.4"
@@ -36,13 +43,23 @@ appcompat = "1.7.0"
 firebase-bom = "33.9.0"
 gitlive = "2.1.0"
 googleServices = "4.4.2"
-composeMaterialCore = "1.4.1"
+constraintlayout = "2.2.1"
 
 [libraries]
+androidx-activity-ktx = { module = "androidx.activity:activity-ktx", version.ref = "activityKtx" }
+androidx-activity-ktx-v182 = { module = "androidx.activity:activity-ktx", version.ref = "activityKtxVersion" }
+androidx-fragment = { module = "androidx.fragment:fragment", version.ref = "androidxFragmentKtx" }
+androidx-fragment-ktx = { module = "androidx.fragment:fragment-ktx", version.ref = "fragmentKtx" }
+androidx-fragment-ktx-v157 = { module = "androidx.fragment:fragment-ktx", version.ref = "androidxFragmentKtx" }
+androidx-navigation-fragment-ktx = { module = "androidx.navigation:navigation-fragment-ktx", version.ref = "navigationFragmentKtx" }
+androidx-navigation-ui-ktx = { module = "androidx.navigation:navigation-ui-ktx", version.ref = "navigationFragmentKtx" }
+androidx-swiperefreshlayout = { module = "androidx.swiperefreshlayout:swiperefreshlayout", version.ref = "swiperefreshlayout" }
+blueline = { module = "com.dilivva:blueline", version.ref = "blueline" }
 kotlinx-coroutines-core-v181 = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-core", version.ref = "kotlinxCoroutinesCore" }
 lifecycle-viewmodel-compose = { module = "org.jetbrains.androidx.lifecycle:lifecycle-viewmodel-compose", version.ref = "androidx-lifecycle" }
 maps-compose = { module = "com.google.maps.android:maps-compose", version.ref = "mapsCompose" }
 maps-compose-utils = { module = "com.google.maps.android:maps-compose-utils", version.ref = "mapsCompose"}
+navigation-fragment-ktx = { module = "androidx.navigation:navigation-fragment-ktx" }
 play-services-maps = { module = "com.google.android.gms:play-services-maps", version.ref = "playServicesMaps"}
 androidx-activity-compose = { module = "androidx.activity:activity-compose", version.ref = "androidx-activityCompose" }
 androidx-lifecycle-runtime-compose = { group = "org.jetbrains.androidx.lifecycle", name = "lifecycle-runtime-compose", version.ref = "androidx-lifecycle" }
@@ -79,10 +96,9 @@ androidx-media3-database = { group = "androidx.media3", name = "media3-database"
 androidx-appcompat = { group = "androidx.appcompat", name = "appcompat", version.ref = "appcompat" }
 androidx-lifecycle-viewmodel = { module = "org.jetbrains.androidx.lifecycle:lifecycle-viewmodel", version.ref = "lifecycleViewmodel" }
 gitlive-firebase-firestore = { group = "dev.gitlive", name = "firebase-firestore", version.ref = "gitlive"}
-
+androidx-constraintlayout = { group = "androidx.constraintlayout", name = "constraintlayout", version.ref = "constraintlayout" }
 
 [plugins]
-
 androidApplication = { id = "com.android.application", version.ref = "agp" }
 androidLibrary = { id = "com.android.library", version.ref = "agp" }
 jetbrainsCompose = { id = "org.jetbrains.compose", version.ref = "compose-plugin" }

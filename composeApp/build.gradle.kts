@@ -84,6 +84,18 @@ kotlin {
             implementation(libs.koin.android)
             implementation(libs.koin.core)
             implementation(libs.koin.androidx.compose)
+
+            // esc-pos printer library
+            implementation("com.github.DantSu:ESCPOS-ThermalPrinter-Android:3.3.0")
+
+            // printooth permissions
+            implementation(libs.androidx.activity.ktx)
+            implementation("com.github.mazenrashed:Printooth:1.3.1")
+            implementation(libs.androidx.swiperefreshlayout)
+
+
+            // blueline permissions
+            implementation(libs.blueline)
         }
         commonMain.dependencies {
             implementation("com.github.skydoves:landscapist-coil3:2.4.0")
@@ -166,6 +178,8 @@ dependencies {
     implementation(libs.androidx.runtime.android)
     implementation(libs.androidx.material3.android)
     implementation(libs.androidx.appcompat)
+    implementation(libs.androidx.constraintlayout)
+    implementation(libs.androidx.activity.ktx)
     debugImplementation(compose.uiTooling)
     implementation(libs.kotlinx.coroutines.core.v181)
     implementation(platform("com.google.firebase:firebase-bom:33.9.0"))
