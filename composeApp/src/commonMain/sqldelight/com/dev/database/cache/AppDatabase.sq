@@ -10,6 +10,20 @@ CREATE TABLE SampleImages (
     FOREIGN KEY (sample_id) REFERENCES SampleData(sample_id) ON DELETE CASCADE
 );
 
+CREATE TABLE Settings (
+    key TEXT PRIMARY KEY,
+    value TEXT NOT NULL
+);
+
+-- Insert or replace a setting
+insertOrReplaceSetting:
+INSERT OR REPLACE INTO Settings (key, value)
+VALUES(?, ?);
+
+getSettingByKey:
+SELECT value FROM Settings
+WHERE key = ?;
+
 -- Insert a new image
 insertSampleImage:
 INSERT INTO SampleImages(sample_id, image_data, image_name, image_type, timestamp)
@@ -80,21 +94,23 @@ UPDATE Field SET order_num = ? WHERE field_id = ?;
 CREATE TABLE SampleData (
     sample_id INTEGER PRIMARY KEY AUTOINCREMENT,
     form_id INTEGER NOT NULL,
-    sample_collection_id INTEGER NOT NULL,  -- <--- Added
+    sample_collection_id INTEGER NOT NULL,
+    collector_name TEXT NOT NULL,      -- NEW column for the collector’s name
     date_collected_utc TEXT NOT NULL,
     location TEXT NOT NULL,
     FOREIGN KEY (form_id) REFERENCES SampleForm(form_id) ON DELETE CASCADE
 );
 
 insertSampleData:
-INSERT INTO SampleData(form_id, sample_collection_id, date_collected_utc, location)
-VALUES(?,?,?,?);
+INSERT INTO SampleData(form_id, sample_collection_id, collector_name, date_collected_utc, location)
+VALUES(?,?,?,?,?);
 
 getAllSampleData:
 SELECT
   sample_id,
   form_id,
   sample_collection_id,
+  collector_name,
   date_collected_utc,
   location
 FROM SampleData;
@@ -104,6 +120,7 @@ SELECT
   sample_id,
   form_id,
   sample_collection_id,
+  collector_name,
   date_collected_utc,
   location
 FROM SampleData
@@ -114,6 +131,7 @@ SELECT
   sample_id,
   form_id,
   sample_collection_id,
+  collector_name,
   date_collected_utc,
   location
 FROM SampleData
@@ -160,7 +178,8 @@ DELETE FROM SampleData WHERE sample_id = ?;
 
 updateSampleData:
 UPDATE SampleData
-SET date_collected_utc = ?,
+SET collector_name = ?,
+    date_collected_utc = ?,
     location = ?
 WHERE sample_id = ?;
 

@@ -67,9 +67,10 @@ data class FieldNoID(
 data class SampleData(
     @SerialName("sample_id") val sampleId: Int,
     @SerialName("form_id") val formId: Int,
-    @SerialName("sample_collection_id") val sampleCollectionId: Int, // <-- NEW
+    @SerialName("sample_collection_id") val sampleCollectionId: Int,
+    @SerialName("collector_name") val collectorName: String,  // NEW field
     @SerialName("date_collected_utc") val dateCollectedUTC: String,
-    @SerialName("location") val location: String,
+    @SerialName("location") val location: String
 )
 
 @Serializable
@@ -86,6 +87,7 @@ data class SampleAndData(
     @SerialName("sample_id") val sampleId: Int,
     @SerialName("form_id") val formId: Int,
     @SerialName("sample_collection_id") val sampleCollectionId: Int,
+    @SerialName("collector_name") val collectorName: String,
     @SerialName("date_collected_utc") val dateCollectedUTC: String,
     @SerialName("location") val location: String,
     @SerialName("data_entries") val dataEntries: Map<Long, String>

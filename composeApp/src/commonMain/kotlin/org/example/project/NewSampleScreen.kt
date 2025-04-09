@@ -97,6 +97,13 @@ fun EditSampleScreen(
     val dateTimeString = localDateTime.toString()
     val pair = dateTimeString.split("T")
 
+    var sampleCollectorName by remember(key1 = CollectorSettings.defaultCollectorName) {
+        mutableStateOf(CollectorSettings.defaultCollectorName)
+    }
+    LaunchedEffect(Unit) {
+        sampleCollectorName = database?.getCollectorName() ?: CollectorSettings.defaultCollectorName
+    }
+
     var date by remember { mutableStateOf(pair[0]) }
     var time by remember { mutableStateOf(pair[1].substring(0,8)) }
 
@@ -179,8 +186,10 @@ fun EditSampleScreen(
                 val sampleId = database.insertSampleData(
                     formId = collectionValueState.toLong(),
                     dateCollectedUtc = "${date}T$time",
-                    location = locationString
+                    location = locationString,
+                    collectorName = sampleCollectorName  // NEW: pass the collector name
                 )
+
                 database.updateImageSampleId(0, sampleId)
 
                 // Store the ID in SampleManager
@@ -262,6 +271,22 @@ fun EditSampleScreen(
                         fontSize = 30.sp,
                     )
                 }
+            }
+
+            // NEW: Collector Name Input Field
+            item {
+                TextField(
+                    value = sampleCollectorName,
+                    onValueChange = { newName -> sampleCollectorName = newName },
+                    label = { Text("Collector Name") },
+                    modifier = Modifier.fillMaxWidth(),
+                    colors = OutlinedTextFieldDefaults.colors(
+                        focusedBorderColor = Color(0xFF0021A5),
+                        unfocusedBorderColor = Color(0xFF0021A5),
+                        focusedContainerColor = Color(0xFF0021A5).copy(0.1f),
+                        unfocusedContainerColor = Color(0xFF0021A5).copy(0.1f)
+                    )
+                )
             }
 
             // Error message display

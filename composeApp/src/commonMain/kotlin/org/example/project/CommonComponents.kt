@@ -27,3 +27,7 @@ fun SectionTitle(title: String) {
             .padding(horizontal = 8.dp)
     )
 }
+
+object CollectorSettings {
+    var defaultCollectorName: String = "User"
+}

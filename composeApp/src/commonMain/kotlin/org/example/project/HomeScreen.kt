@@ -46,6 +46,11 @@ import dev.jordond.compass.geolocation.mobile
 import kotlinx.datetime.Instant
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.toLocalDateTime
+import androidx.compose.material3.TextField
+import androidx.compose.material3.OutlinedTextFieldDefaults
+import androidx.compose.runtime.rememberCoroutineScope
+import kotlinx.coroutines.launch
+
 
 suspend fun GetCurrentLocation(): GeolocatorResult {
     val geolocator: Geolocator = Geolocator.mobile()
@@ -100,7 +105,8 @@ fun HomeScreen(navController: NavController, database: Database? = null) {
                 }
             }
         },
-            navController = navController
+            navController = navController,
+            database=database
         )
     }
 }
@@ -144,6 +150,7 @@ fun RecentSubmissionsSection(
             .padding(top = 64.dp)
             .padding(horizontal = 10.dp)
     ) {
+
         Text(
             text = "Recent Samples",
             style = TextStyle(fontFamily = KhandFontFamily(), fontWeight = FontWeight.Medium),
