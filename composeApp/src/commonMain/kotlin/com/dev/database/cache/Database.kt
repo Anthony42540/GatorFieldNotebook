@@ -62,9 +62,8 @@
             return SampleAndData(
                 sampleId = sampleData.sampleId,
                 formId = sampleData.formId,
-                // make sure to set it here:
                 sampleCollectionId = sampleData.sampleCollectionId,
-
+                collectorName = sampleData.collectorName,
                 dateCollectedUTC = sampleData.dateCollectedUTC,
                 location = sampleData.location,
                 dataEntries = dataEntriesMap
@@ -96,14 +95,16 @@
             formId: Long,
             dateCollectedUtc: String,
             location: String,
+            collectorName: String    // NEW parameter
         ): Long {
             // Generate the next local ID for this form
             val newLocalId = getNextCollectionIdForForm(formId)
 
-            // Insert row with the new local ID
+            // Insert row with the new local ID and collector name
             dbQuery.insertSampleData(
                 formId,
                 newLocalId,
+                collectorName,    // pass collectorName here
                 dateCollectedUtc,
                 location
             )
@@ -155,10 +156,12 @@
 
         internal fun updateSampleData(
             sampleId: Long,
+            newCollectorName: String,
             newDateCollectedUtc: String,
             newLocation: String
         ) {
             dbQuery.updateSampleData(
+                newCollectorName,
                 newDateCollectedUtc,
                 newLocation,
                 sampleId
@@ -214,6 +217,17 @@
             dbQuery.deleteAllSampleImages(sampleId)
         }
 
+        suspend fun saveCollectorName(newName: String) {
+            // This is a suspend function to save the collector name using your SQLDelight query
+            dbQuery.insertOrReplaceSetting("collectorName", newName)
+        }
+
+        fun getCollectorName(): String {
+            // Returns the stored collector name or a default if none exists.
+            return dbQuery.getSettingByKey("collectorName").executeAsOneOrNull() ?: "Default Collector"
+        }
+
+
         /************************** DELETE FUNCTIONS **************************/
         internal fun deleteSample(sampleId: Long) {
             dbQuery.transaction {
@@ -266,17 +280,20 @@
         sample_id: Long,
         form_id: Long,
         sample_collection_id: Long,
+        collector_name: String,
         date_collected_utc: String,
         location: String
     ): SampleData {
         return SampleData(
             sampleId = sample_id.toInt(),
             formId = form_id.toInt(),
-            sampleCollectionId = sample_collection_id.toInt(),  // pass it along
+            sampleCollectionId = sample_collection_id.toInt(),
+            collectorName = collector_name, // set the new field here
             dateCollectedUTC = date_collected_utc,
             location = location,
         )
     }
+
 
     private fun mapDataEntry(
         entry_id: Long,

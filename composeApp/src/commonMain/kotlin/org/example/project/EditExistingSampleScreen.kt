@@ -60,6 +60,7 @@ fun EditExistingSampleScreen(
     var errorMessage by remember { mutableStateOf<String?>(null) }
     var isSaving by remember { mutableStateOf(false) }
     val coroutineScope = rememberCoroutineScope()
+    var sampleCollectorName by remember { mutableStateOf("") }
 
     // We’ll also store date/time in separate strings for convenience
     var date by remember { mutableStateOf("") }
@@ -97,6 +98,8 @@ fun EditExistingSampleScreen(
             collectedData = sampleAndData
                 .dataEntries
                 .mapKeys { it.key.toInt() }  // convert Long -> Int
+
+            sampleCollectorName = sampleAndData.collectorName
         } catch (e: Exception) {
             errorMessage = "Failed to load sample: ${e.message}"
         }
@@ -120,6 +123,7 @@ fun EditExistingSampleScreen(
                 // 2A) Update the sample in SampleData
                 database.updateSampleData(
                     sampleId = sampleId,
+                    newCollectorName = sampleCollectorName,
                     newDateCollectedUtc = dateTimeString,
                     newLocation = locationString
                 )
@@ -190,6 +194,21 @@ fun EditExistingSampleScreen(
                             .padding(horizontal = 16.dp, vertical = 8.dp)
                     )
                 }
+            }
+
+            item {
+                TextField(
+                    value = sampleCollectorName,
+                    onValueChange = { newName -> sampleCollectorName = newName },
+                    label = { Text("Collector Name") },
+                    modifier = Modifier.fillMaxWidth(),
+                    colors = OutlinedTextFieldDefaults.colors(
+                        focusedBorderColor = Color(0xFF0021A5),
+                        unfocusedBorderColor = Color(0xFF0021A5),
+                        focusedContainerColor = Color(0xFF0021A5).copy(0.1f),
+                        unfocusedContainerColor = Color(0xFF0021A5).copy(0.1f)
+                    )
+                )
             }
 
             // Date / Time

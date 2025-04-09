@@ -230,7 +230,7 @@ private fun DetailedSampleContent(
             if (form != null) {
                 DetailRow("Sample from Collection", form.formName)
             }
-
+            DetailRow("Collector Name", sample.collectorName)
             // Show the local ID for this collection
             DetailRow("Sample ID", sample.sampleCollectionId.toString())
 
