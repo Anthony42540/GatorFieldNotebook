@@ -1,7 +1,7 @@
 package org.example.project
 
-import android.R
-import android.util.DisplayMetrics
+//import android.R
+//import android.util.DisplayMetrics
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -26,8 +26,8 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.dantsu.escposprinter.EscPosPrinter
 import com.dantsu.escposprinter.connection.bluetooth.BluetoothConnection
-import com.dantsu.escposprinter.connection.bluetooth.BluetoothPrintersConnections
-import com.dantsu.escposprinter.textparser.PrinterTextParserImg
+//import com.dantsu.escposprinter.connection.bluetooth.BluetoothPrintersConnections
+//import com.dantsu.escposprinter.textparser.PrinterTextParserImg
 
 
 @Composable
@@ -36,9 +36,6 @@ actual fun LabelPrint(navController: NavController, bt: BluetoothHandler) {
     // place holder
 
     var sampleName by remember { mutableStateOf("") }
-    var sampleDetails by remember { mutableStateOf("Sample details will appear here...") }
-    var selectedPrinter by remember { mutableStateOf("Sample Printer 223442") }
-    var printerStatus by remember { mutableStateOf("online") }
 
     val scrollState = rememberScrollState(0)
 
@@ -88,26 +85,24 @@ actual fun LabelPrint(navController: NavController, bt: BluetoothHandler) {
                         Color.White
                     )
                     ActionButton("Print", onClick = {
-                        if ((bt as BluetoothHandlerImp).getConnection() == "Printooth") {
-                            bt.printoothBT.printLabel("Hello World")
-                        }
-                        else {
-                            val printer = EscPosPrinter(
+                        println("Click")
+                        val printer = EscPosPrinter(
 //                                BluetoothPrintersConnections.selectFirstPaired(),
-                                (bt.printer as BluetoothConnection),
-                                300,
-                                48f,
-                                20
+                            ((bt as BluetoothHandlerImp).printer as BluetoothConnection),
+                            300,
+                            48f,
+                            20
+                        )
+                        printer.printFormattedText(
+                                """
+                                \nHELLO WORLD
+                                """
+                                    .trimIndent()
                             )
-                            printer.printFormattedText(
-                                    """
-                                    [L]<b>HELLO WORLD </b>[R]
-                                    """.trimIndent()
-                                )
-                        }
                     }, Color(0xFF12BF7A), Color.White)
                 }
             }
         }
     }
 }
+

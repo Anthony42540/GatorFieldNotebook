@@ -6,11 +6,9 @@ import android.net.Uri
 import android.os.Environment
 import android.provider.Settings
 import android.app.AlertDialog
-import android.bluetooth.BluetoothAdapter
 import android.content.pm.PackageManager
 import android.os.Build
 import android.os.Bundle
-import android.widget.Button
 import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
@@ -18,29 +16,16 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.annotation.RequiresApi
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
-import androidx.lifecycle.lifecycleScope
 import com.dev.database.cache.AndroidDatabaseProvider
 import com.dev.database.cache.DatabaseProvider
-import kotlinx.coroutines.launch
-import android.bluetooth.BluetoothManager
-
 
 class MainActivity : ComponentActivity() {
-    @SuppressLint("NewApi")
+//    @SuppressLint("NewApi")
 
     // set up Bluetooth
     private val bt : BluetoothHandlerImp by lazy {
-        BluetoothHandlerImp(applicationContext, scanLauncher)
+        BluetoothHandlerImp(applicationContext)
     }
-    private val printoothBTInit: PrintoothBT by lazy {
-        PrintoothBT(this, scanLauncher)
-    }
-
-    // Printooth
-    private val scanLauncher = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
-        bt.printoothBT.handleScanResult(result.resultCode)
-    }
-
 
     /* Set up Runtime Permissions */
     @RequiresApi(Build.VERSION_CODES.S)
@@ -179,7 +164,6 @@ class MainActivity : ComponentActivity() {
 
         // Get Bluetooth Permissions
         checkBluetoothPermissions()
-        bt.printoothBT = printoothBTInit
 
         setContent {
             App(bt)

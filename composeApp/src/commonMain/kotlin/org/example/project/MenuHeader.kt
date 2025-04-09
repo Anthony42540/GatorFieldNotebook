@@ -122,10 +122,8 @@ fun MenuHeader(
                         label = {
                             Text(
                                 text = "printer",
-                                style = TextStyle(
-                                    fontSize = 30.sp,
-                                    color = Color.Black
-                                )
+                                style = TextStyle(fontFamily = KhandFontFamily(), fontSize = 30.sp,
+                                    color = Color.Black)
                             )
                         },
                         selected = false,
