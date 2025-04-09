@@ -105,7 +105,8 @@ fun HomeScreen(navController: NavController, database: Database? = null) {
                 }
             }
         },
-            navController = navController
+            navController = navController,
+            database=database
         )
     }
 }
@@ -118,11 +119,6 @@ fun RecentSubmissionsSection(
     var recentSamples by remember { mutableStateOf<List<SampleAndData>>(emptyList()) }
     var isLoading by remember { mutableStateOf(true) }
     var error by remember { mutableStateOf<String?>(null) }
-    // Load the persisted collector name from the database if available, or use a default.
-    val collectorNameFromDb = database?.let { it.getCollectorName() } ?: "Default Collector"
-    var collectorName by remember { mutableStateOf(collectorNameFromDb) }
-    // Set up a coroutine scope to call suspend functions.
-    val coroutineScope = rememberCoroutineScope()
 
     LaunchedEffect(Unit) {
         if (database == null) {
@@ -154,37 +150,6 @@ fun RecentSubmissionsSection(
             .padding(top = 64.dp)
             .padding(horizontal = 10.dp)
     ) {
-        Text(
-            text = "Collector Name",
-            style = TextStyle(fontFamily = KhandFontFamily(), fontWeight = FontWeight.Medium),
-            fontSize = 25.sp,
-            modifier = Modifier.padding(top = 16.dp, bottom = 8.dp)
-        )
-
-        TextField(
-            value = collectorName,
-            onValueChange = { newName ->
-                collectorName = newName
-                CollectorSettings.defaultCollectorName = newName
-                // Save the new value persistently by calling your suspend save function.
-                if (database != null) {
-                    coroutineScope.launch {
-                        database.saveCollectorName(newName)
-                    }
-                }
-            },
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(horizontal = 16.dp),
-            colors = OutlinedTextFieldDefaults.colors(
-                focusedBorderColor = Color(0xFF0021A5),
-                unfocusedBorderColor = Color(0xFF0021A5),
-                focusedContainerColor = Color(0xFF0021A5).copy(0.1f),
-                unfocusedContainerColor = Color(0xFF0021A5).copy(0.1f)
-            )
-        )
-
-        Spacer(modifier = Modifier.height(16.dp))
 
         Text(
             text = "Recent Samples",

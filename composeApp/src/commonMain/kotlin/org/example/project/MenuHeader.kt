@@ -37,6 +37,11 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import kotlinx.coroutines.launch
+import androidx.compose.runtime.*
+import androidx.compose.material3.TextField
+import androidx.compose.material3.OutlinedTextFieldDefaults
+import com.dev.database.cache.Database
+import androidx.compose.foundation.layout.fillMaxSize
 
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -45,80 +50,131 @@ import kotlinx.coroutines.launch
 @Composable
 fun MenuHeader(
     content: @Composable (PaddingValues) -> Unit,
-    navController: NavController
+    navController: NavController,
+    database: Database? = null
 ) {
     val drawerState = rememberDrawerState(initialValue = DrawerValue.Closed)
     val scope = rememberCoroutineScope()
 
     ModalNavigationDrawer(
         drawerContent = {
-            ModalDrawerSheet (
+            ModalDrawerSheet(
                 drawerContainerColor = Color.White
             ) {
                 Column(
-                    modifier = Modifier.padding(horizontal = 16.dp)
-                        .verticalScroll(rememberScrollState())
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .fillMaxSize()
+                        .padding(horizontal = 16.dp)
+                        .verticalScroll(rememberScrollState()),
+                    verticalArrangement = Arrangement.SpaceBetween
                 ) {
-                    Spacer(Modifier.height(50.dp))
 
-                    NavigationDrawerItem(
-                        label = {
-                            Text(
-                                text = "Create new sample",
-                                style = TextStyle(fontFamily = KhandFontFamily(), fontSize = 30.sp,
-                                    color = Color.Black)
-                            )
-                        },
-                        selected = false,
-                        onClick = { navController.navigate("selectCollection") }
-                    )
-                    NavigationDrawerItem(
-                        label = {
-                            Text(
-                                text = "Create new form",
-                                style = TextStyle(fontFamily = KhandFontFamily(), fontSize = 30.sp,
-                                    color = Color.Black)
+                    // ----- TOP: All the nav items -----
+                    Column {
+                        Spacer(Modifier.height(50.dp))
+                        NavigationDrawerItem(
+                            label = {
+                                Text(
+                                    text = "Create new sample",
+                                    style = TextStyle(fontFamily = KhandFontFamily(), fontSize = 30.sp, color = Color.Black)
+                                )
+                            },
+                            selected = false,
+                            onClick = { navController.navigate("selectCollection") }
+                        )
+                        NavigationDrawerItem(
+                            label = {
+                                Text(
+                                    text = "Create new form",
+                                    style = TextStyle(fontFamily = KhandFontFamily(), fontSize = 30.sp, color = Color.Black)
+                                )
+                            },
+                            selected = false,
+                            onClick = { navController.navigate("newForm") }
+                        )
+                        NavigationDrawerItem(
+                            label = {
+                                Text(
+                                    text = "View all samples",
+                                    style = TextStyle(fontFamily = KhandFontFamily(), fontSize = 30.sp, color = Color.Black)
+                                )
+                            },
+                            selected = false,
+                            onClick = { navController.navigate("viewSampleCollection") }
+                        )
+                        NavigationDrawerItem(
+                            label = {
+                                Text(
+                                    text = "View all forms",
+                                    style = TextStyle(fontFamily = KhandFontFamily(), fontSize = 30.sp, color = Color.Black)
+                                )
+                            },
+                            selected = false,
+                            onClick = { /* add form screen */ }
+                        )
+                        NavigationDrawerItem(
+                            label = {
+                                Text(
+                                    text = "Q/A",
+                                    style = TextStyle(fontFamily = KhandFontFamily(), fontSize = 30.sp, color = Color.Black)
+                                )
+                            },
+                            selected = false,
+                            onClick = { navController.navigate("QandA_screen") }
+                        )
+                    }
 
+                    // ----- BOTTOM: Collector Name field -----
+                    Column(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(vertical = 16.dp),
+                        horizontalAlignment = Alignment.CenterHorizontally
+                    ) {
+                        val coroutineScope = rememberCoroutineScope()
+                        var collectorName by remember { mutableStateOf(CollectorSettings.defaultCollectorName) }
 
+                        LaunchedEffect(Unit) {
+                            if (database != null) {
+                                val savedName = database.getCollectorName()
+                                collectorName = savedName
+                                CollectorSettings.defaultCollectorName = savedName
+                            }
+                        }
+
+                        Text(
+                            text = "Collector Name",
+                            style = TextStyle(
+                                fontFamily = KhandFontFamily(),
+                                fontSize = 18.sp,
+                                fontWeight = FontWeight.Medium
+                            ),
+                            modifier = Modifier
+                                .padding(bottom = 4.dp)
+                                .align(Alignment.Start)
+                        )
+
+                        TextField(
+                            value = collectorName,
+                            onValueChange = { newName ->
+                                collectorName = newName
+                                CollectorSettings.defaultCollectorName = newName
+                                database?.let {
+                                    coroutineScope.launch {
+                                        it.saveCollectorName(newName)
+                                    }
+                                }
+                            },
+                            modifier = Modifier.fillMaxWidth(),
+                            colors = OutlinedTextFieldDefaults.colors(
+                                focusedBorderColor = Color(0xFF0021A5),
+                                unfocusedBorderColor = Color(0xFF0021A5),
+                                focusedContainerColor = Color(0xFF0021A5).copy(0.1f),
+                                unfocusedContainerColor = Color(0xFF0021A5).copy(0.1f)
                             )
-                        },
-                        selected = false,
-                        onClick = { navController.navigate("newForm") }
-                    )
-                    NavigationDrawerItem(
-                        label = {
-                            Text(
-                                text = "View all samples",
-                                style = TextStyle(fontFamily = KhandFontFamily(), fontSize = 30.sp,
-                                    color = Color.Black)
-                            )
-                        },
-                        selected = false,
-                        onClick = { navController.navigate("viewSampleCollection") }
-                    )
-                    NavigationDrawerItem(
-                        label = {
-                            Text(
-                                text = "View all forms",
-                                style = TextStyle(fontFamily = KhandFontFamily(), fontSize = 30.sp,
-                                    color = Color.Black)
-                            )
-                        },
-                        selected = false,
-                        onClick = { /* add form screen */ },
-                    )
-                    NavigationDrawerItem(
-                        label = {
-                            Text(
-                                text = "Q/A",
-                                style = TextStyle(fontFamily = KhandFontFamily(), fontSize = 30.sp,
-                                    color = Color.Black)
-                            )
-                        },
-                        selected = false,
-                        onClick = { navController.navigate("QandA_screen") },
-                    )
-                    Spacer(Modifier.height(12.dp))
+                        )
+                    }
                 }
             }
         },
