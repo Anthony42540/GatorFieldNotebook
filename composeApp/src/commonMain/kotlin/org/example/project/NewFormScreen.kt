@@ -22,6 +22,7 @@ import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import com.dev.database.cache.Database
 import com.dev.database.cache.ftToStr
+import com.dev.database.entity.FieldDisplayable
 import com.dev.database.entity.FieldNoID
 import kotlinx.coroutines.launch
 import org.example.project.viewModels.FormViewModel
@@ -299,7 +300,7 @@ fun NewFormScreen(
 
 //function to display added fields
 @Composable
-fun FieldDisplay(field: FieldNoID) {
+fun FieldDisplay(field: FieldDisplayable) {
     Column {
         when (ftToStr(field.fieldType)) {
             "SHORT_STRING", "NUMBER" -> {

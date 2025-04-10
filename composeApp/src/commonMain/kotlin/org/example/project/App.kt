@@ -171,6 +171,17 @@ fun AppNavigation() {
                 )
             }
             composable(
+                route = "formDetail/{formId}",
+                arguments = listOf(navArgument("formId") { type = NavType.LongType })
+            ) { backStackEntry ->
+                val formId = backStackEntry.arguments?.getLong("formId") ?: return@composable
+                DetailedFormScreen(
+                    navController = navController,
+                    database = database,
+                    formId = formId
+                )
+            }
+            composable(
                 route = "sampleImages/{sampleId}",
                 arguments = listOf(navArgument("sampleId") { type = NavType.LongType })
             ) { backStackEntry ->

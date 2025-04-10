@@ -153,6 +153,8 @@ fun ViewAllFormsScreen(navController: NavController, database: Database? = null)
                                     .fillMaxWidth()
                                     .padding(horizontal = 12.dp, vertical = 8.dp)
                                     .clickable {
+                                        GlobalState.formId = form.formId
+                                        navController.navigate("formDetail/${form.formId}")
                                     },
                                 colors = CardDefaults.cardColors(containerColor = Color(0xFFFFFFFF)),
                                 elevation = CardDefaults.cardElevation(defaultElevation = 4.dp),

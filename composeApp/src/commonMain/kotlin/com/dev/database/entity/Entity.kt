@@ -43,24 +43,31 @@ data class SampleForm(
     @SerialName("form_active") val formActive: Int
 )
 
+interface FieldDisplayable {
+    val fieldName: String
+    val fieldType: FieldType
+    val isRequired: Boolean
+    val options: List<String>?
+}
+
 @Serializable
 data class Field(
     @SerialName("field_id") val fieldId: Int,
     @SerialName("form_id") val formId: Int,
-    @SerialName("field_name") val fieldName: String,
+    @SerialName("field_name") override val fieldName: String,
     @SerialName("order_num") val orderNum: Int,
-    @SerialName("field_type") val fieldType: FieldType,
-    @SerialName("is_required") val isRequired: Boolean,
-    @SerialName("options") val options: List<String>? = null, //list of options, if drop down or multi-select field type
-)
+    @SerialName("field_type") override val fieldType: FieldType,
+    @SerialName("is_required") override val isRequired: Boolean,
+    @SerialName("options") override val options: List<String>? = null, //list of options, if drop down or multi-select field type
+) : FieldDisplayable
 
 @Serializable
 data class FieldNoID(
-    @SerialName("field_name") val fieldName: String,
-    @SerialName("field_type") val fieldType: FieldType,
-    @SerialName("is_required") val isRequired: Boolean,
-    @SerialName("options") val options: List<String>? = null, //list of options, if drop down or multi-select field type
-)
+    @SerialName("field_name") override val fieldName: String,
+    @SerialName("field_type") override val fieldType: FieldType,
+    @SerialName("is_required") override val isRequired: Boolean,
+    @SerialName("options") override val options: List<String>? = null, //list of options, if drop down or multi-select field type
+) : FieldDisplayable
 
 // Stores actual form entries (Combines sample data and data entries for that sample)
 @Serializable

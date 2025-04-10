@@ -64,6 +64,7 @@ import kotlinx.datetime.toLocalDateTime
 
 object GlobalState {
     var sampleId: Long? = null
+    var formId: Long? = null
 }
 
 expect fun exportToCSV(form: String, database: Database? = null, groupedSamples: Map<String, List<SampleAndData>>): Boolean
