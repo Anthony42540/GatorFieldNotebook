@@ -50,14 +50,10 @@ fun DetailedSampleScreen(
             images = database.getSampleImages(sampleId)
           //  database.getImageById()
 
-
             // Get image count for this sample
             imageCount = database.getSampleImagesForSample(sampleId).size
             print("Image size:")
             print(images.size)
-
-
-
 
             isLoading = false
         } catch (e: Exception) {

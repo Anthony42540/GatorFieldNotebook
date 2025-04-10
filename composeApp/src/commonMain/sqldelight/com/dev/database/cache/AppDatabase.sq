@@ -46,7 +46,16 @@ INSERT INTO SampleForm(form_name, form_active)
 VALUES(?,?);
 
 getAllSampleForms:
+SELECT * FROM SampleForm;
+
+getActiveSampleForms:
 SELECT * FROM SampleForm WHERE form_active = 1;
+
+deactivateForm:
+UPDATE SampleForm SET form_active = 0 WHERE form_id = ?;
+
+deactivateAllForms:
+UPDATE SampleForm SET form_active = 0;
 
 getSampleForm:
 SELECT * FROM SampleForm WHERE form_id = ?;

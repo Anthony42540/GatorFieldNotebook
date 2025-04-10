@@ -50,7 +50,7 @@ fun SelectCollectionScreen(
         database?.let { db ->
             try {
                 println("Loading available forms")
-                val forms = db.getAllSampleForms()
+                val forms = db.getActiveSampleForms()
                 //map list of forms to available forms map
                 availableForms = forms.associate { it.formId to it.formName }
                 selectedCollection = forms.first().formName

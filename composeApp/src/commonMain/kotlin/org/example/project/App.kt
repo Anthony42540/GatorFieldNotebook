@@ -156,7 +156,9 @@ fun AppNavigation() {
             composable("QandA_screen") {
                 QandAScreen(navController, database)
             }
-
+            composable("viewAllForms") {
+                ViewAllFormsScreen(navController, database)
+            }
             composable(
                 route = "sampleDetail/{sampleId}",
                 arguments = listOf(navArgument("sampleId") { type = NavType.LongType })
@@ -168,7 +170,6 @@ fun AppNavigation() {
                     sampleId = sampleId
                 )
             }
-
             composable(
                 route = "sampleImages/{sampleId}",
                 arguments = listOf(navArgument("sampleId") { type = NavType.LongType })
@@ -180,8 +181,6 @@ fun AppNavigation() {
                     sampleId = sampleId
                 )
             }
-
-
             composable(
                 route = "EditExistingSampleScreen/{sampleId}"
             ) { backStackEntry ->

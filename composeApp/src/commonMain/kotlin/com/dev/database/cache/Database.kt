@@ -14,14 +14,15 @@
         private val database = AppDatabase(databaseDriverFactory.createDriver())
         private val dbQuery = database.appDatabaseQueries
 
-
         //list to track new fields when creating a new form
         var newFieldsList = mutableListOf<FieldNoID>()
-        private var newFormName = ""
 
         /************************** GETTER FUNCTIONS **************************/
         internal fun getAllSampleForms(): List<SampleForm> { //get a list of all sample forms (to choose from when adding new sample)
             return dbQuery.getAllSampleForms(::mapSampleForm).executeAsList()
+        }
+        internal fun getActiveSampleForms(): List<SampleForm> {
+            return dbQuery.getActiveSampleForms(::mapSampleForm).executeAsList()
         }
         internal fun getSampleForm(formId: Long): SampleForm { //get a form by form ID
             return dbQuery.getSampleForm(formId, ::mapSampleForm).executeAsOne()
@@ -62,16 +63,22 @@
             return SampleAndData(
                 sampleId = sampleData.sampleId,
                 formId = sampleData.formId,
-                // make sure to set it here:
                 sampleCollectionId = sampleData.sampleCollectionId,
-
                 dateCollectedUTC = sampleData.dateCollectedUTC,
                 location = sampleData.location,
                 dataEntries = dataEntriesMap
             )
         }
-
-        /************************** GETTER FUNCTIONS **************************/
+        internal fun getSampleImages(sampleId: Long): List<SampleImage> {
+            return dbQuery.getSampleImages(sampleId, ::mapSampleImage).executeAsList()
+        }
+        internal fun getSampleImagesForSample(sampleId: Long): List<SampleImage> {
+            return dbQuery.getSampleImages(sampleId, ::mapSampleImage).executeAsList()
+        }
+        internal fun getImageById(imageId: Long): SampleImage? {
+            return dbQuery.getImageById(imageId, ::mapSampleImage).executeAsOneOrNull()
+        }
+        /************************** END GETTER FUNCTIONS **************************/
 
         /************************** INSERT FUNCTIONS **************************/
         internal fun insertSampleForm(formName: String, formActive: Long): Long { //add new sample form and return unique sample ID
@@ -89,9 +96,6 @@
             dbQuery.insertField(formId, fieldName, orderNum, ftToStr(fieldType), if (isRequired) 1 else 0, listToJsonString(options))
             return dbQuery.getLastRowID().executeAsOne()
         }
-        internal fun updateImageSampleId(oldSampleId: Long, newSampleId: Long) {
-            dbQuery.updateImageSampleId(newSampleId, oldSampleId)
-        }
         internal fun insertSampleData(
             formId: Long,
             dateCollectedUtc: String,
@@ -99,7 +103,6 @@
         ): Long {
             // Generate the next local ID for this form
             val newLocalId = getNextCollectionIdForForm(formId)
-
             // Insert row with the new local ID
             dbQuery.insertSampleData(
                 formId,
@@ -107,12 +110,9 @@
                 dateCollectedUtc,
                 location
             )
-
             // Return the primary key for the newly inserted row
             return dbQuery.getLastRowID().executeAsOne()
         }
-
-
         internal fun insertDataEntry(
             sampleId: Long,
             fieldId: Long,
@@ -121,62 +121,6 @@
             dbQuery.insertDataEntry(sampleId, fieldId, userInput)
             return dbQuery.getLastRowID().executeAsOne()
         }
-
-
-        /************************** HELPER FUNCTIONS **************************/
-        internal fun insertFieldsFromList(
-            formId: Long
-        ) {
-            newFieldsList.forEachIndexed { index, field ->
-                insertField(
-                    formId = formId,
-                    fieldName = field.fieldName,
-                    orderNum = index.toLong(),
-                    fieldType = field.fieldType,
-                    isRequired = field.isRequired,
-                    options = field.options
-                )
-            }
-            newFieldsList.clear()
-        }
-        internal fun clearFieldsList() {
-            newFieldsList.clear()
-        }
-        /************************** HELPER FUNCTIONS **************************/
-
-        internal fun deleteAllSamples() {
-            dbQuery.transaction {
-                dbQuery.clearAllDataEntries()
-                dbQuery.clearAllSamples()
-            }
-        }
-
-        /************************** EDIT FUNCTIONS **************************/
-
-        internal fun updateSampleData(
-            sampleId: Long,
-            newDateCollectedUtc: String,
-            newLocation: String
-        ) {
-            dbQuery.updateSampleData(
-                newDateCollectedUtc,
-                newLocation,
-                sampleId
-            )
-        }
-
-        internal fun updateDataEntry(
-            sampleId: Long,
-            fieldId: Long,
-            newUserInput: String
-        ) {
-            dbQuery.updateDataEntry(
-                newUserInput,
-                sampleId,
-                fieldId
-            )
-        }
-        /************************** IMAGE FUNCTIONS **************************/
         internal fun insertSampleImage(
             sampleId: Long,
             imageData: ByteArray,
@@ -193,26 +137,62 @@
             )
             return dbQuery.getLastRowID().executeAsOne()
         }
-
-        internal fun getSampleImages(sampleId: Long): List<SampleImage> {
-            return dbQuery.getSampleImages(sampleId, ::mapSampleImage).executeAsList()
+        internal fun insertFieldsFromList(
+            formId: Long
+        ) {
+            newFieldsList.forEachIndexed { index, field ->
+                insertField(
+                    formId = formId,
+                    fieldName = field.fieldName,
+                    orderNum = index.toLong(),
+                    fieldType = field.fieldType,
+                    isRequired = field.isRequired,
+                    options = field.options
+                )
+            }
+            newFieldsList.clear()
         }
+        /************************** END INSERT FUNCTIONS **************************/
 
-        internal fun getSampleImagesForSample(sampleId: Long): List<SampleImage> {
-            return dbQuery.getSampleImages(sampleId, ::mapSampleImage).executeAsList()
+        /************************** HELPER FUNCTIONS **************************/
+        internal fun clearFieldsList() {
+            newFieldsList.clear()
         }
+        /************************** END HELPER FUNCTIONS **************************/
 
-        internal fun getImageById(imageId: Long): SampleImage? {
-            return dbQuery.getImageById(imageId, ::mapSampleImage).executeAsOneOrNull()
+        /************************** EDIT FUNCTIONS **************************/
+        internal fun updateSampleData(
+            sampleId: Long,
+            newDateCollectedUtc: String,
+            newLocation: String
+        ) {
+            dbQuery.updateSampleData(
+                newDateCollectedUtc,
+                newLocation,
+                sampleId
+            )
         }
-
-        internal fun deleteSampleImage(imageId: Long) {
-            dbQuery.deleteSampleImage(imageId)
+        internal fun updateDataEntry(
+            sampleId: Long,
+            fieldId: Long,
+            newUserInput: String
+        ) {
+            dbQuery.updateDataEntry(
+                newUserInput,
+                sampleId,
+                fieldId
+            )
         }
-
-        internal fun deleteAllSampleImages(sampleId: Long) {
-            dbQuery.deleteAllSampleImages(sampleId)
+        internal fun updateImageSampleId(oldSampleId: Long, newSampleId: Long) {
+            dbQuery.updateImageSampleId(newSampleId, oldSampleId)
         }
+        internal fun deactivateForm(formId: Long) {
+            dbQuery.deactivateForm(formId)
+        }
+        internal fun deactivateAllForms() {
+            dbQuery.deactivateAllForms()
+        }
+        /************************** END EDIT FUNCTIONS **************************/
 
         /************************** DELETE FUNCTIONS **************************/
         internal fun deleteSample(sampleId: Long) {
@@ -225,7 +205,19 @@
                 dbQuery.deleteSample(sampleId)
             }
         }
-
+        internal fun deleteAllSamples() {
+            dbQuery.transaction {
+                dbQuery.clearAllDataEntries()
+                dbQuery.clearAllSamples()
+            }
+        }
+        internal fun deleteSampleImage(imageId: Long) {
+            dbQuery.deleteSampleImage(imageId)
+        }
+        internal fun deleteAllSampleImages(sampleId: Long) {
+            dbQuery.deleteAllSampleImages(sampleId)
+        }
+        /************************** END DELETE FUNCTIONS **************************/
     }
 
     private fun mapSampleForm(
@@ -234,7 +226,7 @@
         form_active: Long,
     ): SampleForm {
         return SampleForm(
-            formId = form_id.toLong(),
+            formId = form_id,
             formName = form_name,
             formActive = form_active.toInt()
         )
@@ -272,7 +264,7 @@
         return SampleData(
             sampleId = sample_id.toInt(),
             formId = form_id.toInt(),
-            sampleCollectionId = sample_collection_id.toInt(),  // pass it along
+            sampleCollectionId = sample_collection_id.toInt(),
             dateCollectedUTC = date_collected_utc,
             location = location,
         )

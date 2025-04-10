@@ -48,7 +48,7 @@ fun NewFormScreen(
     fun isFormNameDuplicate(formName: String): Boolean {
         // Query your database to check if a form with the same name exists
         if (database != null) {
-            return database.getAllSampleForms().any { it.formName == formName }
+            return database.getActiveSampleForms().any { it.formName == formName }
         }
 
         return false
