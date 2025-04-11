@@ -12,6 +12,7 @@ import android.content.IntentFilter
 import android.os.Handler
 import android.os.Looper
 import android.util.Log
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -23,11 +24,16 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
@@ -80,7 +86,7 @@ class TSPLPrinter {
             outputStream = bluetoothSocket?.outputStream
 
             // Example TSPL Commands
-            val labelConfig = "SIZE 50 mm,30 mm\nGAP 2 mm,0 mm\nCLS\n"
+            val labelConfig = "SIZE 50 mm,30 mm\nGAP 2.5 mm,0 mm\nCLS\n"
             val textCommand = "TEXT 10,10,\"3\",0,1,1,\"$message\"\n"
             val printCommand = "PRINT 1\n"
 
@@ -116,7 +122,7 @@ actual fun PrintScreen(navController: NavController) {
     val context = LocalContext.current
     var sampleName by remember { mutableStateOf("") }
     var sampleDetails by remember { mutableStateOf("Sample details will appear here...") }
-    var printerStatus by remember { mutableStateOf("online") }
+    var isLoading by remember { mutableStateOf("") }
     val discoveredDevices = remember { mutableStateListOf<BluetoothDevice>() }
     var selectedDevice by remember { mutableStateOf<BluetoothDevice?>(null) }
 
@@ -149,6 +155,38 @@ actual fun PrintScreen(navController: NavController) {
     }
 
     var pairedDevices = bluetoothAdapter?.bondedDevices ?: emptySet()
+
+    fun refreshDeviceList(context: Context, bluetoothAdapter: BluetoothAdapter?, discoveredDevices: MutableList<BluetoothDevice>) {
+        isLoading = true.toString()
+        discoveredDevices.clear()
+
+        bluetoothAdapter?.startDiscovery()
+
+        // Register the receiver to get newly discovered devices
+        val receiver = object : BroadcastReceiver() {
+            override fun onReceive(ctx: Context, intent: Intent) {
+                if (intent.action == BluetoothDevice.ACTION_FOUND) {
+                    val device: BluetoothDevice? =
+                        intent.getParcelableExtra(BluetoothDevice.EXTRA_DEVICE)
+                    device?.let {
+                        if (!discoveredDevices.contains(it)) {
+                            discoveredDevices.add(it)
+                        }
+                    }
+                }
+            }
+        }
+
+        val filter = IntentFilter(BluetoothDevice.ACTION_FOUND)
+        context.registerReceiver(receiver, filter)
+
+        // Cancel discovery when done
+        Handler(Looper.getMainLooper()).postDelayed({
+            bluetoothAdapter?.cancelDiscovery()
+            context.unregisterReceiver(receiver)
+            isLoading = false.toString()
+        }, 12000)
+    }
 
     Column(
         modifier = Modifier
@@ -188,8 +226,53 @@ actual fun PrintScreen(navController: NavController) {
 
             Spacer(modifier = Modifier.height(16.dp))
 
-            // Printer Options Section
-            SectionTitle("Printer Options")
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .background(Color(0xFF0021A5))
+                    .padding(vertical = 6.dp)
+                    .padding(horizontal = 8.dp),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Box(
+                ) {
+                    // Printer Options Section
+                    Text(
+                        style = TextStyle(fontFamily = KhandFontFamily(), fontWeight = FontWeight.Medium),
+                        text = "Printer Options",
+                        fontSize = 25.sp,
+                        color = Color(0xFFFFFFFF),
+                    )
+                }
+
+                Spacer(modifier = Modifier.width(2.dp))
+
+                Box (
+                    modifier = Modifier.offset(x = 18.dp)
+                ) {
+                    Button(
+                        onClick = {
+                            refreshDeviceList(context, bluetoothAdapter, discoveredDevices)
+                        },
+                        modifier = Modifier
+                            .padding(16.dp)
+                            .size(width = 140.dp, height = 45.dp),
+                        colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF0021A5)),
+                        border = BorderStroke(2.dp, Color.White)
+                    ) {
+                        if (isLoading == "true") {
+                            CircularProgressIndicator(
+                                modifier = Modifier.size(24.dp),
+                                color = Color.White
+                            )
+                        } else {
+                            Text("Refresh", color = Color.White, fontSize = 22.sp, style = TextStyle(fontFamily = KhandFontFamily(), fontWeight = FontWeight.Medium))
+                        }
+                    }
+                }
+            }
+            
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -280,4 +363,6 @@ actual fun PrintScreen(navController: NavController) {
             }
         }
     }
+
+
 }
