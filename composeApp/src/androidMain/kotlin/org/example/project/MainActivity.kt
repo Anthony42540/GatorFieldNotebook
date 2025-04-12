@@ -32,7 +32,6 @@ class MainActivity : ComponentActivity() {
 
         if (bluetoothConnectGranted && bluetoothScanGranted && bluetoothAdminGranted) {
             // Both permissions granted
-            initializeBluetooth()
         } else {
             // Permissions denied, show a message
             Toast.makeText(this, "Bluetooth permissions are required to proceed.", Toast.LENGTH_SHORT).show()
@@ -88,7 +87,7 @@ class MainActivity : ComponentActivity() {
                     )
                 )
             } else {
-                initializeBluetooth()
+
             }
         } else {
             // Check and request permissions for Android 11 and below
@@ -103,7 +102,7 @@ class MainActivity : ComponentActivity() {
                         android.Manifest.permission.BLUETOOTH)
                 )
             } else {
-                initializeBluetooth()
+
             }
         }
     }
@@ -114,7 +113,7 @@ class MainActivity : ComponentActivity() {
         val locationGranted = permissions[android.Manifest.permission.ACCESS_FINE_LOCATION] ?: false
 
         if (locationGranted) {
-            initializeBluetooth()
+
         } else {
             Toast.makeText(this, "Location permission is required to use Bluetooth features.", Toast.LENGTH_SHORT).show()
         }
@@ -131,12 +130,6 @@ class MainActivity : ComponentActivity() {
             )
         )
     }
-
-    private fun initializeBluetooth() {
-        Toast.makeText(this, "Bluetooth initialized successfully!", Toast.LENGTH_SHORT).show()
-        // Add Bluetooth logic here
-    }
-
 
     @RequiresApi(Build.VERSION_CODES.S)
     override fun onCreate(savedInstanceState: Bundle?) {
