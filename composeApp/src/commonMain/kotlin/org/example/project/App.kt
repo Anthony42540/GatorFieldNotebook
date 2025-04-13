@@ -136,8 +136,16 @@ fun AppNavigation() {
             composable("editSample") {
                 EditSampleScreen(navController, database, collectionViewModel, collectionValueState)
             }
-            composable("print") {
-                PrintScreen(navController, database)
+            composable(
+                route = "print/{sampleId}",
+                arguments = listOf(navArgument("sampleId") { type = NavType.LongType })
+            ) { backStackEntry ->
+                val sampleId = backStackEntry.arguments?.getLong("sampleId") ?: return@composable
+                PrintScreen(
+                    navController = navController,
+                    database = database,
+                    sampleId = sampleId
+                )
             }
             composable("viewSampleCollection") {
                 ViewSampleCollectionScreen(navController)
@@ -147,9 +155,6 @@ fun AppNavigation() {
             }
             composable("addField") {
                 AddFieldScreen(navController, database)
-            }
-            composable("print") {
-                PrintScreen(navController, database)
             }
             composable("viewSampleCollection") {
                 ViewSampleCollectionScreen(navController, database)

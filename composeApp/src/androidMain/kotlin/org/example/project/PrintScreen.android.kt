@@ -140,16 +140,31 @@ class TSPLPrinter {
 
 @SuppressLint("MissingPermission")
 @Composable
-actual fun PrintScreen(navController: NavController, database: Database?) {
+actual fun PrintScreen(navController: NavController, database: Database?, sampleId: Long) {
     val context = LocalContext.current
-    var isLoading by remember { mutableStateOf("") }
+    var isLoading by remember { mutableStateOf("true") }
     val discoveredDevices = remember { mutableStateListOf<BluetoothDevice>() }
     var selectedDevice by remember { mutableStateOf<BluetoothDevice?>(null) }
     var errorMessage by remember { mutableStateOf<String?>(null) }
-    var selectedSample by remember { mutableStateOf<SampleData?>(null) }
+    var sample by remember { mutableStateOf<SampleData?>(null) }
     var expanded by remember { mutableStateOf(false) }
-    var samples by remember { mutableStateOf(emptyList<SampleData>()) }
     var form by remember { mutableStateOf<String?>(null)}
+
+    LaunchedEffect(sampleId) {
+        try {
+            if (database == null) {
+                errorMessage = "Database not initialized"
+                return@LaunchedEffect
+            }
+            if (database != null) {
+                sample = database.getSampleData(sampleId)
+            }
+            isLoading = false.toString()
+        } catch (e: Exception) {
+            errorMessage = "Failed to load sample: ${e.message}"
+            isLoading = false.toString()
+        }
+    }
 
     val receiver = remember {
         object : BroadcastReceiver() {
@@ -176,23 +191,6 @@ actual fun PrintScreen(navController: NavController, database: Database?) {
         onDispose {
             bluetoothAdapter?.cancelDiscovery()
             context.unregisterReceiver(receiver)
-        }
-    }
-
-    LaunchedEffect(Unit) {
-        database.let { db ->
-            try {
-                println("Loading available samples")
-                if (db != null) {
-                    samples = db.getAllSampleData()
-                }
-                errorMessage = null
-                println("Loaded ${samples.size} samples")
-            } catch (e: Exception) {
-                errorMessage = "Failed to load samples: ${e.message}"
-                println("Error loading samples: ${e.message}")
-                e.printStackTrace()
-            }
         }
     }
 
@@ -256,14 +254,13 @@ actual fun PrintScreen(navController: NavController, database: Database?) {
                 )
             }
 
-            // Choose Sample Section
-            SectionTitle("Choose Sample")
+            SectionTitle("Print Sample")
             if (database != null) {
-                form = selectedSample?.let { database.getSampleForm(it.formId.toLong()).formName }
+                form = sample?.let { database.getSampleForm(it.formId.toLong()).formName }
             }
             TextField(
-                value = if (form != null && selectedSample != null) {
-                    "$form #${selectedSample!!.sampleCollectionId}"
+                value = if (form != null && sample != null) {
+                    "$form #${sample!!.sampleCollectionId}"
                 } else {
                     "Select Sample"
                 },
@@ -293,26 +290,7 @@ actual fun PrintScreen(navController: NavController, database: Database?) {
                 modifier = Modifier
                     .fillMaxWidth()
             ) {
-                DropdownMenu(
-                    expanded = expanded,
-                    onDismissRequest = { expanded = false },
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .background(Color(0xFFFFFFFF))
-                        .border(1.dp, Color(0xFF0021A5))
-                ) {
-                    samples.forEach { type ->
-                        DropdownMenuItem(
-                            onClick = {
-                                selectedSample = type
-                                expanded = false
-                            },
-                            text = {
-                                Text(text = database?.getSampleForm(type.formId.toLong())?.formName.toString() + " #${type.sampleCollectionId}")
-                            }
-                        )
-                    }
-                }
+                //TODO: add sample title
             }
 
             Row(
@@ -443,17 +421,17 @@ actual fun PrintScreen(navController: NavController, database: Database?) {
                     ActionButton("Print", onClick = {
                         val printer = TSPLPrinter()
                         val printerMacAddress = selectedDevice?.address
-                        val formName = selectedSample?.formId?.toLong()
+                        val formName = sample?.formId?.toLong()
                             ?.let { database?.getSampleForm(it)?.formName }
 
                         if (printerMacAddress != null) {
-                            val splitLocation = selectedSample?.location?.split(",")
+                            val splitLocation = sample?.location?.split(",")
                             val altitudeSplit = splitLocation?.get(1)?.split("|")
                             val message = listOf (
                                 ("Form: ${formName ?: "Unknown"}"),
-                                ("Collector: ${selectedSample?.collectorName ?: "Unknown"}"),
-                                ("Sample ID: ${selectedSample?.sampleCollectionId ?: "Unknown"}"),
-                                ("Date: ${selectedSample?.dateCollectedUTC ?: "Unknown"}"),
+                                ("Collector: ${sample?.collectorName ?: "Unknown"}"),
+                                ("Sample ID: ${sample?.sampleCollectionId ?: "Unknown"}"),
+                                ("Date: ${sample?.dateCollectedUTC ?: "Unknown"}"),
                                 ("Location:"),
                                 ("${splitLocation?.get(0) ?: "Unknown"},${altitudeSplit?.get(0) ?: "Unknown"}"),
                                 (altitudeSplit?.get(1) ?: ""),

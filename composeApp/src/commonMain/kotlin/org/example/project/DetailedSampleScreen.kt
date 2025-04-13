@@ -196,7 +196,7 @@ fun DetailedSampleScreen(
                 )
                 ActionButton(
                     "Print",
-                    onClick = { navController.navigate("print") },
+                    onClick = { navController.navigate("print/$sampleId") },
                     Color(0xFF12BF7A),
                     Color.White
                 )

@@ -41,6 +41,7 @@ fun DetailedFormScreen(
     val scrollState = rememberScrollState()
 
     var fields by remember { mutableStateOf<List<Field>>(emptyList()) }
+    var formName by remember {mutableStateOf<String?>(null)}
 
     LaunchedEffect(formId) {
         try {
@@ -50,6 +51,7 @@ fun DetailedFormScreen(
             }
 
             fields = database.getFormFields(formId)
+            formName = database.getSampleForm(formId).formName
 
             isLoading = false
         } catch (e: Exception) {
@@ -78,13 +80,15 @@ fun DetailedFormScreen(
             horizontalAlignment = Alignment.Start
         ) {
             item {
-                Text(
-                    style = TextStyle(fontFamily = KhandFontFamily(), fontWeight = FontWeight.Medium),
-                    text = "Form: ",
-                    color = Color(0x000000).copy(alpha = 1.0f),
-                    fontSize = 40.sp,
-                    modifier = Modifier.fillMaxWidth().wrapContentWidth(Alignment.CenterHorizontally)
-                )
+                formName?.let {
+                    Text(
+                        style = TextStyle(fontFamily = KhandFontFamily(), fontWeight = FontWeight.Medium),
+                        text = it,
+                        color = Color(0x000000).copy(alpha = 1.0f),
+                        fontSize = 40.sp,
+                        modifier = Modifier.fillMaxWidth().wrapContentWidth(Alignment.CenterHorizontally)
+                    )
+                }
             }
             errorMessage?.let { error ->
                 item {

@@ -5,5 +5,9 @@ import androidx.navigation.NavController
 import com.dev.database.cache.Database
 
 @Composable
-actual fun PrintScreen(navController: NavController, database: Database?) {
+actual fun PrintScreen(
+    navController: NavController,
+    database: Database?,
+    sampleId: Long
+) {
 }
