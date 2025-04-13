@@ -3,8 +3,6 @@ package org.example.project.RemoteDatabase
 import com.dev.database.cache.Database
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.flow.collect
-import kotlinx.coroutines.launch
 
 
 // class to handle the synchronization  between local (SQLDelight) and remote (Firestore) databases
@@ -25,6 +23,7 @@ class SampleSynchronizer(
                 val sampleMap = mapOf(
                     "sampleId" to sampleData.sampleId,
                     "formId" to sampleData.formId,
+                    "collectorName" to sampleData.collectorName,   // NEW: include collector name
                     "dateCollectedUTC" to sampleData.dateCollectedUTC,
                     "location" to sampleData.location,
                     "dataEntries" to dataEntries.map { entry ->
@@ -51,7 +50,8 @@ class SampleSynchronizer(
                 val sampleId = localDatabase.insertSampleData(
                     formId = (sampleMap["formId"] as Number).toLong(),
                     dateCollectedUtc = sampleMap["dateCollectedUTC"] as String,
-                    location = sampleMap["location"] as String
+                    location = sampleMap["location"] as String,
+                    collectorName = sampleMap["collectorName"] as String
                 )
 
                 // Insert associated data entries

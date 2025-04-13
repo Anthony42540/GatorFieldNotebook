@@ -5,11 +5,34 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.interaction.PressInteraction
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import androidx.compose.material3.*
-import androidx.compose.runtime.*
+import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.DropdownMenu
+import androidx.compose.material3.DropdownMenuItem
+import androidx.compose.material3.OutlinedTextFieldDefaults
+import androidx.compose.material3.Text
+import androidx.compose.material3.TextField
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -24,9 +47,9 @@ import com.dev.database.cache.listToJsonString
 import com.dev.database.entity.Field
 import dev.jordond.compass.Location
 import kotlinx.coroutines.launch
-import kotlinx.datetime.*
-import org.example.project.GlobalState.sampleId
-import org.example.project.RemoteDatabase.FirebaseDatabase
+import kotlinx.datetime.Clock
+import kotlinx.datetime.TimeZone
+import kotlinx.datetime.toLocalDateTime
 import org.example.project.viewModels.CollectionViewModel
 
 // Add this at the top level of your file or in a Constants.kt file
@@ -73,6 +96,13 @@ fun EditSampleScreen(
     val localDateTime = currentDateAndTime.toLocalDateTime(TimeZone.currentSystemDefault())
     val dateTimeString = localDateTime.toString()
     val pair = dateTimeString.split("T")
+
+    var sampleCollectorName by remember(key1 = CollectorSettings.defaultCollectorName) {
+        mutableStateOf(CollectorSettings.defaultCollectorName)
+    }
+    LaunchedEffect(Unit) {
+        sampleCollectorName = database?.getCollectorName() ?: CollectorSettings.defaultCollectorName
+    }
 
     var date by remember { mutableStateOf(pair[0]) }
     var time by remember { mutableStateOf(pair[1].substring(0,8)) }
@@ -156,8 +186,10 @@ fun EditSampleScreen(
                 val sampleId = database.insertSampleData(
                     formId = collectionValueState.toLong(),
                     dateCollectedUtc = "${date}T$time",
-                    location = locationString
+                    location = locationString,
+                    collectorName = sampleCollectorName  // NEW: pass the collector name
                 )
+
                 database.updateImageSampleId(0, sampleId)
 
                 // Store the ID in SampleManager
@@ -239,6 +271,22 @@ fun EditSampleScreen(
                         fontSize = 30.sp,
                     )
                 }
+            }
+
+            // NEW: Collector Name Input Field
+            item {
+                TextField(
+                    value = sampleCollectorName,
+                    onValueChange = { newName -> sampleCollectorName = newName },
+                    label = { Text("Collector Name") },
+                    modifier = Modifier.fillMaxWidth(),
+                    colors = OutlinedTextFieldDefaults.colors(
+                        focusedBorderColor = Color(0xFF0021A5),
+                        unfocusedBorderColor = Color(0xFF0021A5),
+                        focusedContainerColor = Color(0xFF0021A5).copy(0.1f),
+                        unfocusedContainerColor = Color(0xFF0021A5).copy(0.1f)
+                    )
+                )
             }
 
             // Error message display

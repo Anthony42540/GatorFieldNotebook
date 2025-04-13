@@ -1,12 +1,20 @@
 package org.example.project
 
 import KhandFontFamily
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.size
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
-import androidx.compose.runtime.*
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -21,19 +29,12 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
 import com.dev.database.cache.DatabaseProvider
+import org.example.project.RemoteDatabase.SampleSynchronizer
 import org.example.project.viewModels.CollectionViewModel
 import org.example.project.viewModels.FormViewModel
 import org.jetbrains.compose.ui.tooling.preview.Preview
 import org.koin.compose.KoinContext
 import org.koin.compose.viewmodel.koinViewModel
-import dev.gitlive.firebase.Firebase
-import dev.gitlive.firebase.firestore.FirebaseFirestore
-import dev.gitlive.firebase.firestore.firestore
-import dev.gitlive.firebase.initialize
-import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.map
-import org.example.project.RemoteDatabase.FirebaseDatabase
-import org.example.project.RemoteDatabase.SampleSynchronizer
 
 @Composable
 @Preview
@@ -136,7 +137,7 @@ fun AppNavigation() {
                 EditSampleScreen(navController, database, collectionViewModel, collectionValueState)
             }
             composable("print") {
-                PrintScreen(navController)
+                PrintScreen(navController, database)
             }
             composable("viewSampleCollection") {
                 ViewSampleCollectionScreen(navController)
@@ -148,7 +149,7 @@ fun AppNavigation() {
                 AddFieldScreen(navController, database)
             }
             composable("print") {
-                PrintScreen(navController)
+                PrintScreen(navController, database)
             }
             composable("viewSampleCollection") {
                 ViewSampleCollectionScreen(navController, database)

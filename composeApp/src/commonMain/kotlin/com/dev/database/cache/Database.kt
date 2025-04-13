@@ -1,11 +1,11 @@
     package com.dev.database.cache
+    import com.dev.database.entity.DataEntry
     import com.dev.database.entity.Field
     import com.dev.database.entity.FieldNoID
     import com.dev.database.entity.FieldType
-    import com.dev.database.entity.SampleForm
-    import com.dev.database.entity.SampleData
-    import com.dev.database.entity.DataEntry
     import com.dev.database.entity.SampleAndData
+    import com.dev.database.entity.SampleData
+    import com.dev.database.entity.SampleForm
     import com.dev.database.entity.SampleImage
     import kotlinx.serialization.encodeToString
     import kotlinx.serialization.json.Json
@@ -64,6 +64,7 @@
                 sampleId = sampleData.sampleId,
                 formId = sampleData.formId,
                 sampleCollectionId = sampleData.sampleCollectionId,
+                collectorName = sampleData.collectorName,
                 dateCollectedUTC = sampleData.dateCollectedUTC,
                 location = sampleData.location,
                 dataEntries = dataEntriesMap
@@ -77,6 +78,9 @@
         }
         internal fun getImageById(imageId: Long): SampleImage? {
             return dbQuery.getImageById(imageId, ::mapSampleImage).executeAsOneOrNull()
+        }
+        fun getCollectorName(): String {
+            return dbQuery.getSettingByKey("collectorName").executeAsOneOrNull() ?: "Default Collector"
         }
         /************************** END GETTER FUNCTIONS **************************/
 
@@ -100,13 +104,16 @@
             formId: Long,
             dateCollectedUtc: String,
             location: String,
+            collectorName: String    // NEW parameter
         ): Long {
             // Generate the next local ID for this form
             val newLocalId = getNextCollectionIdForForm(formId)
-            // Insert row with the new local ID
+
+            // Insert row with the new local ID and collector name
             dbQuery.insertSampleData(
                 formId,
                 newLocalId,
+                collectorName,
                 dateCollectedUtc,
                 location
             )
@@ -163,10 +170,12 @@
         /************************** EDIT FUNCTIONS **************************/
         internal fun updateSampleData(
             sampleId: Long,
+            newCollectorName: String,
             newDateCollectedUtc: String,
             newLocation: String
         ) {
             dbQuery.updateSampleData(
+                newCollectorName,
                 newDateCollectedUtc,
                 newLocation,
                 sampleId
@@ -192,7 +201,12 @@
         internal fun deactivateAllForms() {
             dbQuery.deactivateAllForms()
         }
+        suspend fun saveCollectorName(newName: String) {
+            // This is a suspend function to save the collector name using your SQLDelight query
+            dbQuery.insertOrReplaceSetting("collectorName", newName)
+        }
         /************************** END EDIT FUNCTIONS **************************/
+
 
         /************************** DELETE FUNCTIONS **************************/
         internal fun deleteSample(sampleId: Long) {
@@ -258,6 +272,7 @@
         sample_id: Long,
         form_id: Long,
         sample_collection_id: Long,
+        collector_name: String,
         date_collected_utc: String,
         location: String
     ): SampleData {
@@ -265,10 +280,12 @@
             sampleId = sample_id.toInt(),
             formId = form_id.toInt(),
             sampleCollectionId = sample_collection_id.toInt(),
+            collectorName = collector_name,
             dateCollectedUTC = date_collected_utc,
             location = location,
         )
     }
+
 
     private fun mapDataEntry(
         entry_id: Long,

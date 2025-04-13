@@ -3,11 +3,33 @@ package org.example.project
 import KhandFontFamily
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.interaction.PressInteraction
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import androidx.compose.material3.*
-import androidx.compose.runtime.*
+import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.DropdownMenu
+import androidx.compose.material3.DropdownMenuItem
+import androidx.compose.material3.OutlinedTextFieldDefaults
+import androidx.compose.material3.Text
+import androidx.compose.material3.TextField
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -18,13 +40,8 @@ import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import com.dev.database.cache.Database
 import com.dev.database.cache.ftToStr
-import com.dev.database.cache.listToJsonString
 import com.dev.database.entity.Field
-import dev.jordond.compass.Location
 import kotlinx.coroutines.launch
-import kotlinx.datetime.Clock
-import kotlinx.datetime.TimeZone
-import kotlinx.datetime.toLocalDateTime
 import org.example.project.viewModels.CollectionViewModel
 
 @Composable
@@ -43,6 +60,7 @@ fun EditExistingSampleScreen(
     var errorMessage by remember { mutableStateOf<String?>(null) }
     var isSaving by remember { mutableStateOf(false) }
     val coroutineScope = rememberCoroutineScope()
+    var sampleCollectorName by remember { mutableStateOf("") }
 
     // We’ll also store date/time in separate strings for convenience
     var date by remember { mutableStateOf("") }
@@ -80,6 +98,8 @@ fun EditExistingSampleScreen(
             collectedData = sampleAndData
                 .dataEntries
                 .mapKeys { it.key.toInt() }  // convert Long -> Int
+
+            sampleCollectorName = sampleAndData.collectorName
         } catch (e: Exception) {
             errorMessage = "Failed to load sample: ${e.message}"
         }
@@ -103,6 +123,7 @@ fun EditExistingSampleScreen(
                 // 2A) Update the sample in SampleData
                 database.updateSampleData(
                     sampleId = sampleId,
+                    newCollectorName = sampleCollectorName,
                     newDateCollectedUtc = dateTimeString,
                     newLocation = locationString
                 )
@@ -151,7 +172,7 @@ fun EditExistingSampleScreen(
                     horizontalAlignment = Alignment.CenterHorizontally
                 ) {
                     Text(
-                        text = "Edit Sample\n$collectionName",
+                        text = "Edit Sample: $collectionName #${database?.getSampleAndData(sampleId)?.sampleCollectionId}",
                         style = TextStyle(
                             fontFamily = KhandFontFamily(),
                             fontWeight = FontWeight.Medium,
@@ -173,6 +194,21 @@ fun EditExistingSampleScreen(
                             .padding(horizontal = 16.dp, vertical = 8.dp)
                     )
                 }
+            }
+
+            item {
+                TextField(
+                    value = sampleCollectorName,
+                    onValueChange = { newName -> sampleCollectorName = newName },
+                    label = { Text("Collector Name") },
+                    modifier = Modifier.fillMaxWidth(),
+                    colors = OutlinedTextFieldDefaults.colors(
+                        focusedBorderColor = Color(0xFF0021A5),
+                        unfocusedBorderColor = Color(0xFF0021A5),
+                        focusedContainerColor = Color(0xFF0021A5).copy(0.1f),
+                        unfocusedContainerColor = Color(0xFF0021A5).copy(0.1f)
+                    )
+                )
             }
 
             // Date / Time

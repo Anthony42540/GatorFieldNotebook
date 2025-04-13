@@ -1,14 +1,11 @@
 package org.example.project.RemoteDatabase
 
 // org.example.project.database/FirebaseDatabase.kt
-import kotlinx.serialization.Serializable
 import dev.gitlive.firebase.Firebase
 import dev.gitlive.firebase.firestore.FirebaseFirestore
 import dev.gitlive.firebase.firestore.firestore
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
-import dev.gitlive.firebase.firestore.DocumentSnapshot
-import dev.gitlive.firebase.firestore.*
 
 object FirebaseDatabase {
     private val db: FirebaseFirestore by lazy { Firebase.firestore }

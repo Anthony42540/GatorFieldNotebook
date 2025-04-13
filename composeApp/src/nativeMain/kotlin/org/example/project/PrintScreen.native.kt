@@ -5,4 +5,5 @@ import androidx.navigation.NavController
 import com.dev.database.cache.Database
 
 @Composable
-expect fun PrintScreen(navController: NavController, database: Database? = null)
+actual fun PrintScreen(navController: NavController, database: Database?) {
+}

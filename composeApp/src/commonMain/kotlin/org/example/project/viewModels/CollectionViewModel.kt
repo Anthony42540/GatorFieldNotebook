@@ -1,8 +1,8 @@
 package org.example.project.viewModels
 
+import androidx.lifecycle.ViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
-import androidx.lifecycle.ViewModel
 
 class CollectionViewModel : ViewModel() {
     // Define the counter variable using StateFlow
