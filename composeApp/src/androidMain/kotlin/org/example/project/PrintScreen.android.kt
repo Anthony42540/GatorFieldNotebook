@@ -16,6 +16,8 @@ import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.interaction.MutableInteractionSource
+import androidx.compose.foundation.interaction.PressInteraction
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -34,10 +36,14 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.DropdownMenu
+import androidx.compose.material3.DropdownMenuItem
+import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
@@ -55,6 +61,10 @@ import kotlinx.io.IOException
 import java.io.OutputStream
 import java.util.UUID
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.text.substring
+import com.dev.database.cache.Database
+import com.dev.database.entity.SampleData
+import com.dev.database.entity.SampleForm
 
 class TSPLPrinter {
 
@@ -75,7 +85,7 @@ class TSPLPrinter {
     }
 
     @SuppressLint("MissingPermission")
-    fun connectAndPrint(macAddress: String, message: String = "Hello World") {
+    fun connectAndPrint(macAddress: String, message: List<String>) {
         try {
             bluetoothAdapter = BluetoothAdapter.getDefaultAdapter()
             bluetoothDevice = bluetoothAdapter?.getRemoteDevice(macAddress)
@@ -86,13 +96,25 @@ class TSPLPrinter {
             outputStream = bluetoothSocket?.outputStream
 
             // Example TSPL Commands
-            val labelConfig = "SIZE 50 mm,30 mm\nGAP 2.5 mm,0 mm\nCLS\n"
-            val textCommand = "TEXT 10,10,\"3\",0,1,1,\"$message\"\n"
+            val labelConfig = "SIZE 57 mm,100 mm\nGAP 2.5 mm,0 mm\nCLS\n"
+
+            var baseX = 10
+            var baseY = 10
+            val lineSpacing = 35
+
+            val textCommands = message.mapIndexed { index, line ->
+                val y = baseY + index * lineSpacing
+                "TEXT $baseX,$y,\"3\",0,1,1,\"${line}\"\n"
+            }
+
             val printCommand = "PRINT 1\n"
 
             outputStream?.apply {
                 write(labelConfig.toByteArray())
-                write(textCommand.toByteArray())
+                textCommands.forEach { textCommand ->
+                    write(textCommand.toByteArray())
+                    println(textCommand)
+                }
                 write(printCommand.toByteArray())
                 flush()
             }
@@ -118,13 +140,16 @@ class TSPLPrinter {
 
 @SuppressLint("MissingPermission")
 @Composable
-actual fun PrintScreen(navController: NavController) {
+actual fun PrintScreen(navController: NavController, database: Database?) {
     val context = LocalContext.current
-    var sampleName by remember { mutableStateOf("") }
-    var sampleDetails by remember { mutableStateOf("Sample details will appear here...") }
     var isLoading by remember { mutableStateOf("") }
     val discoveredDevices = remember { mutableStateListOf<BluetoothDevice>() }
     var selectedDevice by remember { mutableStateOf<BluetoothDevice?>(null) }
+    var errorMessage by remember { mutableStateOf<String?>(null) }
+    var selectedSample by remember { mutableStateOf<SampleData?>(null) }
+    var expanded by remember { mutableStateOf(false) }
+    var samples by remember { mutableStateOf(emptyList<SampleData>()) }
+    var form by remember { mutableStateOf<String?>(null)}
 
     val receiver = remember {
         object : BroadcastReceiver() {
@@ -151,6 +176,23 @@ actual fun PrintScreen(navController: NavController) {
         onDispose {
             bluetoothAdapter?.cancelDiscovery()
             context.unregisterReceiver(receiver)
+        }
+    }
+
+    LaunchedEffect(Unit) {
+        database.let { db ->
+            try {
+                println("Loading available samples")
+                if (db != null) {
+                    samples = db.getAllSampleData()
+                }
+                errorMessage = null
+                println("Loaded ${samples.size} samples")
+            } catch (e: Exception) {
+                errorMessage = "Failed to load samples: ${e.message}"
+                println("Error loading samples: ${e.message}")
+                e.printStackTrace()
+            }
         }
     }
 
@@ -204,27 +246,74 @@ actual fun PrintScreen(navController: NavController) {
             verticalArrangement = Arrangement.Top,
             horizontalAlignment = Alignment.Start
         ) {
+            errorMessage?.let { error ->
+                Text(
+                    text = error,
+                    color = Color.Red,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(horizontal = 16.dp, vertical = 8.dp)
+                )
+            }
+
             // Choose Sample Section
             SectionTitle("Choose Sample")
+            if (database != null) {
+                form = selectedSample?.let { database.getSampleForm(it.formId.toLong()).formName }
+            }
             TextField(
-                value = sampleName,
-                onValueChange = { sampleName = it },
+                value = if (form != null && selectedSample != null) {
+                    "$form #${selectedSample!!.sampleCollectionId}"
+                } else {
+                    "Select Sample"
+                },
+                onValueChange = {},
+                readOnly = true,
                 modifier = Modifier.fillMaxWidth(),
-                placeholder = { Text("Sample Name") }
+                colors = OutlinedTextFieldDefaults.colors(
+                    focusedBorderColor = Color(0xFF0021A5),
+                    unfocusedBorderColor = Color(0xFF0021A5),
+                    focusedContainerColor = Color(0xFF0021A5).copy(0.1f),
+                    unfocusedContainerColor = Color(0xFF0021A5).copy(0.1f)
+                ),
+                interactionSource = remember { MutableInteractionSource() }
+                    .also { interactionSource ->
+                        LaunchedEffect(interactionSource) {
+                            interactionSource.interactions.collect {
+                                if (it is PressInteraction.Release) {
+                                    expanded = !expanded
+                                }
+                            }
+                        }
+                    }
             )
-
-            Spacer(modifier = Modifier.height(16.dp))
-
-            // Sample Details Section
-            SectionTitle("Sample Details")
-            TextField(
-                value = sampleDetails,
-                onValueChange = { sampleDetails = it },
-                modifier = Modifier.fillMaxWidth(),
-                readOnly = true
-            )
-
-            Spacer(modifier = Modifier.height(16.dp))
+            Spacer(modifier = Modifier.height(8.dp))
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+                modifier = Modifier
+                    .fillMaxWidth()
+            ) {
+                DropdownMenu(
+                    expanded = expanded,
+                    onDismissRequest = { expanded = false },
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .background(Color(0xFFFFFFFF))
+                        .border(1.dp, Color(0xFF0021A5))
+                ) {
+                    samples.forEach { type ->
+                        DropdownMenuItem(
+                            onClick = {
+                                selectedSample = type
+                                expanded = false
+                            },
+                            text = {
+                                Text(text = database?.getSampleForm(type.formId.toLong())?.formName.toString() + " #${type.sampleCollectionId}")
+                            }
+                        )
+                    }
+                }
+            }
 
             Row(
                 modifier = Modifier
@@ -354,8 +443,24 @@ actual fun PrintScreen(navController: NavController) {
                     ActionButton("Print", onClick = {
                         val printer = TSPLPrinter()
                         val printerMacAddress = selectedDevice?.address
+                        val formName = selectedSample?.formId?.toLong()
+                            ?.let { database?.getSampleForm(it)?.formName }
+
                         if (printerMacAddress != null) {
-                            printer.connectAndPrint(printerMacAddress, "Hello World")
+                            val splitLocation = selectedSample?.location?.split(",")
+                            val altitudeSplit = splitLocation?.get(1)?.split("|")
+                            val message = listOf (
+                                ("Form: ${formName ?: "Unknown"}"),
+                                ("Collector: ${selectedSample?.collectorName ?: "Unknown"}"),
+                                ("Sample ID: ${selectedSample?.sampleCollectionId ?: "Unknown"}"),
+                                ("Date: ${selectedSample?.dateCollectedUTC ?: "Unknown"}"),
+                                ("Location:"),
+                                ("${splitLocation?.get(0) ?: "Unknown"},${altitudeSplit?.get(0) ?: "Unknown"}"),
+                                (altitudeSplit?.get(1) ?: ""),
+                                ("---------------------------")
+                            )
+
+                            printer.connectAndPrint(printerMacAddress, message)
                         }
                     },
                         Color(0xFF12BF7A), Color.White)

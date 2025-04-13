@@ -137,7 +137,7 @@ fun AppNavigation() {
                 EditSampleScreen(navController, database, collectionViewModel, collectionValueState)
             }
             composable("print") {
-                PrintScreen(navController)
+                PrintScreen(navController, database)
             }
             composable("viewSampleCollection") {
                 ViewSampleCollectionScreen(navController)
@@ -149,7 +149,7 @@ fun AppNavigation() {
                 AddFieldScreen(navController, database)
             }
             composable("print") {
-                PrintScreen(navController)
+                PrintScreen(navController, database)
             }
             composable("viewSampleCollection") {
                 ViewSampleCollectionScreen(navController, database)
