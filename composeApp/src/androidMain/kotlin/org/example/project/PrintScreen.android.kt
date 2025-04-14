@@ -9,10 +9,13 @@ import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
+import android.graphics.Bitmap
 import android.os.Handler
 import android.os.Looper
+import androidx.compose.ui.unit.LayoutDirection
 import android.util.Log
 import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -30,6 +33,7 @@ import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -51,7 +55,14 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.geometry.Size
+import androidx.compose.ui.graphics.Canvas
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.ImageBitmap
+import androidx.compose.ui.graphics.asAndroidBitmap
+import androidx.compose.ui.graphics.drawscope.CanvasDrawScope
+import androidx.compose.ui.graphics.drawscope.DrawScope
+import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
@@ -61,10 +72,16 @@ import kotlinx.io.IOException
 import java.io.OutputStream
 import java.util.UUID
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.text.substring
+import androidx.compose.ui.unit.Density
 import com.dev.database.cache.Database
+import com.dev.database.entity.SampleAndData
 import com.dev.database.entity.SampleData
 import com.dev.database.entity.SampleForm
+import qrgenerator.qrkitpainter.rememberQrKitPainter
+import kotlin.experimental.or
 
 class TSPLPrinter {
 
@@ -85,19 +102,15 @@ class TSPLPrinter {
     }
 
     @SuppressLint("MissingPermission")
-    fun connectAndPrint(macAddress: String, message: List<String>) {
+    fun connectAndPrint(macAddress: String, message: List<String>, qrImage: Bitmap?) {
         try {
             bluetoothAdapter = BluetoothAdapter.getDefaultAdapter()
             bluetoothDevice = bluetoothAdapter?.getRemoteDevice(macAddress)
-
             bluetoothSocket = bluetoothDevice?.createRfcommSocketToServiceRecord(uuid)
             bluetoothSocket?.connect()
-
             outputStream = bluetoothSocket?.outputStream
 
-            // Example TSPL Commands
             val labelConfig = "SIZE 57 mm,100 mm\nGAP 2.5 mm,0 mm\nCLS\n"
-
             var baseX = 10
             var baseY = 10
             val lineSpacing = 35
@@ -107,14 +120,18 @@ class TSPLPrinter {
                 "TEXT $baseX,$y,\"3\",0,1,1,\"${line}\"\n"
             }
 
+            val imageY = baseY + message.size * lineSpacing + 10
+            val bitmapCommand = qrImage?.let {
+                val monoBitmap = it
+                bitmapToTSPLCommand(monoBitmap, 10, imageY)
+            }
+
             val printCommand = "PRINT 1\n"
 
             outputStream?.apply {
                 write(labelConfig.toByteArray())
-                textCommands.forEach { textCommand ->
-                    write(textCommand.toByteArray())
-                    println(textCommand)
-                }
+                textCommands.forEach { write(it.toByteArray()) }
+                bitmapCommand?.let { write(it) }
                 write(printCommand.toByteArray())
                 flush()
             }
@@ -140,16 +157,36 @@ class TSPLPrinter {
 
 @SuppressLint("MissingPermission")
 @Composable
-actual fun PrintScreen(navController: NavController, database: Database?) {
+actual fun PrintScreen(navController: NavController, database: Database?, sampleId: Long) {
     val context = LocalContext.current
-    var isLoading by remember { mutableStateOf("") }
+    var isLoading by remember { mutableStateOf("true") }
     val discoveredDevices = remember { mutableStateListOf<BluetoothDevice>() }
     var selectedDevice by remember { mutableStateOf<BluetoothDevice?>(null) }
     var errorMessage by remember { mutableStateOf<String?>(null) }
-    var selectedSample by remember { mutableStateOf<SampleData?>(null) }
-    var expanded by remember { mutableStateOf(false) }
-    var samples by remember { mutableStateOf(emptyList<SampleData>()) }
-    var form by remember { mutableStateOf<String?>(null)}
+    var formName by remember { mutableStateOf<String?>(null) }
+    var sample by remember { mutableStateOf<SampleAndData?>(null) }
+
+    val painter = rememberQrKitPainter(data = "myapp://sample/$sampleId")
+    val size = painter.intrinsicSize
+    val density = LocalDensity.current
+    val direction = LocalLayoutDirection.current
+    val QRBitmap = painter.toBitmap(size, density, direction)
+    val scaledBitmap = Bitmap.createScaledBitmap(QRBitmap, 200, 200, true)
+
+    LaunchedEffect(sampleId) {
+        try {
+            if (database == null) {
+                errorMessage = "Database not initialized"
+                return@LaunchedEffect
+            }
+            sample = database.getSampleAndData(sampleId)
+            formName = database.getSampleForm(database.getSampleAndData(sampleId).formId.toLong()).formName
+            isLoading = false.toString()
+        } catch (e: Exception) {
+            errorMessage = "Failed to load sample: ${e.message}"
+            isLoading = false.toString()
+        }
+    }
 
     val receiver = remember {
         object : BroadcastReceiver() {
@@ -176,23 +213,6 @@ actual fun PrintScreen(navController: NavController, database: Database?) {
         onDispose {
             bluetoothAdapter?.cancelDiscovery()
             context.unregisterReceiver(receiver)
-        }
-    }
-
-    LaunchedEffect(Unit) {
-        database.let { db ->
-            try {
-                println("Loading available samples")
-                if (db != null) {
-                    samples = db.getAllSampleData()
-                }
-                errorMessage = null
-                println("Loaded ${samples.size} samples")
-            } catch (e: Exception) {
-                errorMessage = "Failed to load samples: ${e.message}"
-                println("Error loading samples: ${e.message}")
-                e.printStackTrace()
-            }
         }
     }
 
@@ -256,65 +276,27 @@ actual fun PrintScreen(navController: NavController, database: Database?) {
                 )
             }
 
-            // Choose Sample Section
-            SectionTitle("Choose Sample")
-            if (database != null) {
-                form = selectedSample?.let { database.getSampleForm(it.formId.toLong()).formName }
-            }
-            TextField(
-                value = if (form != null && selectedSample != null) {
-                    "$form #${selectedSample!!.sampleCollectionId}"
-                } else {
-                    "Select Sample"
-                },
-                onValueChange = {},
-                readOnly = true,
-                modifier = Modifier.fillMaxWidth(),
-                colors = OutlinedTextFieldDefaults.colors(
-                    focusedBorderColor = Color(0xFF0021A5),
-                    unfocusedBorderColor = Color(0xFF0021A5),
-                    focusedContainerColor = Color(0xFF0021A5).copy(0.1f),
-                    unfocusedContainerColor = Color(0xFF0021A5).copy(0.1f)
-                ),
-                interactionSource = remember { MutableInteractionSource() }
-                    .also { interactionSource ->
-                        LaunchedEffect(interactionSource) {
-                            interactionSource.interactions.collect {
-                                if (it is PressInteraction.Release) {
-                                    expanded = !expanded
-                                }
-                            }
-                        }
-                    }
-            )
+            SectionTitle("Print Sample")
             Spacer(modifier = Modifier.height(8.dp))
             Row(
                 verticalAlignment = Alignment.CenterVertically,
                 modifier = Modifier
                     .fillMaxWidth()
             ) {
-                DropdownMenu(
-                    expanded = expanded,
-                    onDismissRequest = { expanded = false },
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .background(Color(0xFFFFFFFF))
-                        .border(1.dp, Color(0xFF0021A5))
+                Box(
                 ) {
-                    samples.forEach { type ->
-                        DropdownMenuItem(
-                            onClick = {
-                                selectedSample = type
-                                expanded = false
-                            },
-                            text = {
-                                Text(text = database?.getSampleForm(type.formId.toLong())?.formName.toString() + " #${type.sampleCollectionId}")
-                            }
-                        )
-                    }
+                    Text(
+                        text = "$formName: #${sample?.sampleCollectionId}",
+                        fontSize = 25.sp,
+                        modifier = Modifier.fillMaxWidth().wrapContentWidth(Alignment.CenterHorizontally)
+                    )
                 }
             }
-
+            Image(
+                painter = painter,
+                contentDescription = null,
+                modifier = Modifier.size(100.dp).fillMaxWidth().wrapContentWidth(Alignment.CenterHorizontally)
+            )
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -443,24 +425,21 @@ actual fun PrintScreen(navController: NavController, database: Database?) {
                     ActionButton("Print", onClick = {
                         val printer = TSPLPrinter()
                         val printerMacAddress = selectedDevice?.address
-                        val formName = selectedSample?.formId?.toLong()
-                            ?.let { database?.getSampleForm(it)?.formName }
-
                         if (printerMacAddress != null) {
-                            val splitLocation = selectedSample?.location?.split(",")
+                            val splitLocation = sample?.location?.split(",")
                             val altitudeSplit = splitLocation?.get(1)?.split("|")
                             val message = listOf (
                                 ("Form: ${formName ?: "Unknown"}"),
-                                ("Collector: ${selectedSample?.collectorName ?: "Unknown"}"),
-                                ("Sample ID: ${selectedSample?.sampleCollectionId ?: "Unknown"}"),
-                                ("Date: ${selectedSample?.dateCollectedUTC ?: "Unknown"}"),
+                                ("Collector: ${sample?.collectorName ?: "Unknown"}"),
+                                ("Sample ID: ${sample?.sampleCollectionId ?: "Unknown"}"),
+                                ("Date: ${sample?.dateCollectedUTC ?: "Unknown"}"),
                                 ("Location:"),
                                 ("${splitLocation?.get(0) ?: "Unknown"},${altitudeSplit?.get(0) ?: "Unknown"}"),
                                 (altitudeSplit?.get(1) ?: ""),
                                 ("---------------------------")
                             )
 
-                            printer.connectAndPrint(printerMacAddress, message)
+                            printer.connectAndPrint(printerMacAddress, message, scaledBitmap)
                         }
                     },
                         Color(0xFF12BF7A), Color.White)
@@ -468,6 +447,44 @@ actual fun PrintScreen(navController: NavController, database: Database?) {
             }
         }
     }
+}
 
+fun Painter.toBitmap(
+    size: Size,
+    density: Density,
+    layoutDirection: LayoutDirection,
+): Bitmap {
+    val bitmap = ImageBitmap(size.width.toInt(), size.height.toInt())
+    val canvas = Canvas(bitmap)
+    CanvasDrawScope().draw(density, layoutDirection, canvas, size) {
+        draw(size)
+    }
+    return bitmap.asAndroidBitmap()
+}
 
+fun bitmapToTSPLCommand(bitmap: Bitmap, x: Int, y: Int): ByteArray {
+    val width = bitmap.width
+    val height = bitmap.height
+    val widthBytes = (width + 7) / 8
+
+    val imageData = ByteArray(widthBytes * height)
+
+    for (j in 0 until height) {
+        for (i in 0 until width) {
+            val pixel = bitmap.getPixel(i, j)
+            val isBlack = pixel != 0xFF000000.toInt()
+            if (isBlack) {
+                val byteIndex = j * widthBytes + i / 8
+                imageData[byteIndex] = imageData[byteIndex] or (0x80 shr (i % 8)).toByte()
+            }
+        }
+    }
+
+    val header = "BITMAP $x,$y,$widthBytes,$height,0,"
+    val headerBytes = header.toByteArray()
+    val combined = ByteArray(headerBytes.size + imageData.size + 1)
+    System.arraycopy(headerBytes, 0, combined, 0, headerBytes.size)
+    System.arraycopy(imageData, 0, combined, headerBytes.size, imageData.size)
+    combined[combined.lastIndex] = '\n'.code.toByte()
+    return combined
 }

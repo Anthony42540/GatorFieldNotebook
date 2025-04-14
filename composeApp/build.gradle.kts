@@ -87,7 +87,7 @@ kotlin {
         }
         commonMain.dependencies {
             implementation("com.github.skydoves:landscapist-coil3:2.4.0")
-
+            implementation(libs.qr.kit)
             implementation(compose.runtime)
             implementation(compose.foundation)
             implementation(compose.material3)

@@ -28,6 +28,7 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
+import androidx.navigation.navDeepLink
 import com.dev.database.cache.DatabaseProvider
 import org.example.project.RemoteDatabase.SampleSynchronizer
 import org.example.project.viewModels.CollectionViewModel
@@ -136,8 +137,16 @@ fun AppNavigation() {
             composable("editSample") {
                 EditSampleScreen(navController, database, collectionViewModel, collectionValueState)
             }
-            composable("print") {
-                PrintScreen(navController, database)
+            composable(
+                route = "print/{sampleId}",
+                arguments = listOf(navArgument("sampleId") { type = NavType.LongType })
+            ) { backStackEntry ->
+                val sampleId = backStackEntry.arguments?.getLong("sampleId") ?: return@composable
+                PrintScreen(
+                    navController = navController,
+                    database = database,
+                    sampleId = sampleId
+                )
             }
             composable("viewSampleCollection") {
                 ViewSampleCollectionScreen(navController)
@@ -148,19 +157,19 @@ fun AppNavigation() {
             composable("addField") {
                 AddFieldScreen(navController, database)
             }
-            composable("print") {
-                PrintScreen(navController, database)
-            }
             composable("viewSampleCollection") {
                 ViewSampleCollectionScreen(navController, database)
             }
             composable("QandA_screen") {
                 QandAScreen(navController, database)
             }
-
+            composable("viewAllForms") {
+                ViewAllFormsScreen(navController, database)
+            }
             composable(
                 route = "sampleDetail/{sampleId}",
-                arguments = listOf(navArgument("sampleId") { type = NavType.LongType })
+                arguments = listOf(navArgument("sampleId") { type = NavType.LongType }),
+                deepLinks = listOf(navDeepLink { uriPattern = "myapp://sample/{sampleId}" })
             ) { backStackEntry ->
                 val sampleId = backStackEntry.arguments?.getLong("sampleId") ?: return@composable
                 DetailedSampleScreen(
@@ -169,7 +178,17 @@ fun AppNavigation() {
                     sampleId = sampleId
                 )
             }
-
+            composable(
+                route = "formDetail/{formId}",
+                arguments = listOf(navArgument("formId") { type = NavType.LongType })
+            ) { backStackEntry ->
+                val formId = backStackEntry.arguments?.getLong("formId") ?: return@composable
+                DetailedFormScreen(
+                    navController = navController,
+                    database = database,
+                    formId = formId
+                )
+            }
             composable(
                 route = "sampleImages/{sampleId}",
                 arguments = listOf(navArgument("sampleId") { type = NavType.LongType })
@@ -181,8 +200,6 @@ fun AppNavigation() {
                     sampleId = sampleId
                 )
             }
-
-
             composable(
                 route = "EditExistingSampleScreen/{sampleId}"
             ) { backStackEntry ->

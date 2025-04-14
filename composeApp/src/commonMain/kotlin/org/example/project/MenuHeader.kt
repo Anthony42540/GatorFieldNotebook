@@ -111,7 +111,7 @@ fun MenuHeader(
                                 )
                             },
                             selected = false,
-                            onClick = { /* add form screen */ }
+                            onClick = { navController.navigate("viewAllForms") }
                         )
                         NavigationDrawerItem(
                             label = {

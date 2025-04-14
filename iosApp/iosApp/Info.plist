@@ -50,5 +50,7 @@
     <string>This permission is needed for coordinate retrieval</string>
     <key>NSLocationAlwaysAndWhenInUseUsageDescription</key>
     <string>This permission is needed for coordinate retrieval</string>
+    <key>NSCameraUsageDescription</key><string>$(PRODUCT_NAME) camera description.</string>
+    <key>NSPhotoLibraryUsageDescription</key><string>$(PRODUCT_NAME) photos description.</string>
 </dict>
 </plist>
