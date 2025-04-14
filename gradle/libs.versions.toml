@@ -17,6 +17,7 @@ ktor = "2.3.7"
 lifecycleViewmodel = "2.8.2"
 mapcomposeMp = "0.9.3"
 navigationCompose = "2.8.0-alpha10"
+qrKit = "3.0.6"
 sqlDelight = "2.0.2"
 foundationAndroid = "1.7.4"
 uiGraphicsAndroid = "1.7.4"
@@ -64,6 +65,7 @@ ktor-serialization-kotlinx-json = { module = "io.ktor:ktor-serialization-kotlinx
 mapcompose-mp = { module = "ovh.plrapps:mapcompose-mp", version.ref = "mapcomposeMp" }
 native-driver = { module = "app.cash.sqldelight:native-driver", version.ref = "sqlDelight" }
 navigation-compose = { module = "org.jetbrains.androidx.navigation:navigation-compose", version.ref = "navigationCompose" }
+qr-kit = { module = "network.chaintech:qr-kit", version.ref = "qrKit" }
 runtime = { module = "app.cash.sqldelight:runtime", version.ref = "sqlDelight" }
 androidx-foundation-android = { group = "androidx.compose.foundation", name = "foundation-android", version.ref = "foundationAndroid" }
 androidx-ui-graphics-android = { group = "androidx.compose.ui", name = "ui-graphics-android", version.ref = "uiGraphicsAndroid" }

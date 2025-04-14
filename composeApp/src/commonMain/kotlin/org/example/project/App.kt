@@ -28,6 +28,7 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
+import androidx.navigation.navDeepLink
 import com.dev.database.cache.DatabaseProvider
 import org.example.project.RemoteDatabase.SampleSynchronizer
 import org.example.project.viewModels.CollectionViewModel
@@ -167,7 +168,8 @@ fun AppNavigation() {
             }
             composable(
                 route = "sampleDetail/{sampleId}",
-                arguments = listOf(navArgument("sampleId") { type = NavType.LongType })
+                arguments = listOf(navArgument("sampleId") { type = NavType.LongType }),
+                deepLinks = listOf(navDeepLink { uriPattern = "myapp://sample/{sampleId}" })
             ) { backStackEntry ->
                 val sampleId = backStackEntry.arguments?.getLong("sampleId") ?: return@composable
                 DetailedSampleScreen(
