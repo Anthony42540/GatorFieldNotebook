@@ -165,14 +165,13 @@ actual fun PrintScreen(navController: NavController, database: Database?, sample
     var errorMessage by remember { mutableStateOf<String?>(null) }
     var formName by remember { mutableStateOf<String?>(null) }
     var sample by remember { mutableStateOf<SampleAndData?>(null) }
-    var expanded by remember { mutableStateOf(false) }
-    var form by remember { mutableStateOf<String?>(null)}
 
     val painter = rememberQrKitPainter(data = "myapp://sample/$sampleId")
     val size = painter.intrinsicSize
     val density = LocalDensity.current
     val direction = LocalLayoutDirection.current
     val QRBitmap = painter.toBitmap(size, density, direction)
+    val scaledBitmap = Bitmap.createScaledBitmap(QRBitmap, 200, 200, true)
 
     LaunchedEffect(sampleId) {
         try {
@@ -181,7 +180,7 @@ actual fun PrintScreen(navController: NavController, database: Database?, sample
                 return@LaunchedEffect
             }
             sample = database.getSampleAndData(sampleId)
-            formName = database.getSampleForm(sampleId).formName
+            formName = database.getSampleForm(database.getSampleAndData(sampleId).formId.toLong()).formName
             isLoading = false.toString()
         } catch (e: Exception) {
             errorMessage = "Failed to load sample: ${e.message}"
@@ -440,7 +439,7 @@ actual fun PrintScreen(navController: NavController, database: Database?, sample
                                 ("---------------------------")
                             )
 
-                            printer.connectAndPrint(printerMacAddress, message, QRBitmap)
+                            printer.connectAndPrint(printerMacAddress, message, scaledBitmap)
                         }
                     },
                         Color(0xFF12BF7A), Color.White)
