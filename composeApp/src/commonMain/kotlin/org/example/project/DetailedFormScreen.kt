@@ -190,22 +190,37 @@ fun DetailedFormScreen(
                 Spacer(modifier = Modifier.height(16.dp))
             }
         }
-
+    }
+    Box(
+        modifier = Modifier
+            .fillMaxSize()
+    ) {
         Row(
-            horizontalArrangement = Arrangement.SpaceEvenly,
+            horizontalArrangement = Arrangement.SpaceBetween,
             modifier = Modifier
-                .padding(8.dp)
                 .fillMaxWidth()
                 .align(Alignment.BottomCenter)
+                .padding(16.dp)
         ) {
-
-            //cancel button
-            Button(
-                onClick = { cancel() },
-                colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF0021A5))
-            ) {
-                Text("Cancel", color = Color.White, fontSize = fontSizeVal, style = TextStyle(fontFamily = KhandFontFamily(), fontWeight = FontWeight.Medium))
-            }
+            ActionButton(
+                "Back",
+                onClick = { navController.popBackStack() },
+                Color(0xFF0021A5),
+                Color.White
+            )
+            // DELETE SAMPLE
+            ActionButton(
+                "Delete",
+                onClick = {
+                    if (database != null) {
+                        database.deactivateForm(formId)
+                        // After deleting, navigate back
+                        navController.popBackStack()
+                    }
+                },
+                buttonColor = Color.Red,
+                textColor = Color.White
+            )
         }
     }
 }
