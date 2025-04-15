@@ -14,6 +14,7 @@ import android.os.Handler
 import android.os.Looper
 import androidx.compose.ui.unit.LayoutDirection
 import android.util.Log
+import androidx.compose.animation.animateContentSize
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -29,19 +30,29 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.KeyboardArrowDown
+import androidx.compose.material.icons.filled.KeyboardArrowUp
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.Divider
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
+import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
@@ -74,6 +85,7 @@ import java.util.UUID
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalLayoutDirection
+import androidx.compose.ui.text.font.FontFamily.Companion.Monospace
 import androidx.compose.ui.text.substring
 import androidx.compose.ui.unit.Density
 import com.dev.database.cache.Database
@@ -172,6 +184,11 @@ actual fun PrintScreen(navController: NavController, database: Database?, sample
     val direction = LocalLayoutDirection.current
     val QRBitmap = painter.toBitmap(size, density, direction)
     val scaledBitmap = Bitmap.createScaledBitmap(QRBitmap, 200, 200, true)
+
+    var expandedPrinterOptions by remember { mutableStateOf(false) }
+    var expandedPreview by remember { mutableStateOf(false) }
+
+    var isPaired by remember { mutableStateOf(false) }
 
     LaunchedEffect(sampleId) {
         try {
@@ -286,130 +303,222 @@ actual fun PrintScreen(navController: NavController, database: Database?, sample
                 Box(
                 ) {
                     Text(
-                        text = "$formName: #${sample?.sampleCollectionId}",
+                        text = "$formName #${sample?.sampleCollectionId}",
                         fontSize = 25.sp,
                         modifier = Modifier.fillMaxWidth().wrapContentWidth(Alignment.CenterHorizontally)
                     )
                 }
             }
-            Image(
-                painter = painter,
-                contentDescription = null,
-                modifier = Modifier.size(100.dp).fillMaxWidth().wrapContentWidth(Alignment.CenterHorizontally)
-            )
-            Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .background(Color(0xFF0021A5))
-                    .padding(vertical = 6.dp)
-                    .padding(horizontal = 8.dp),
-                horizontalArrangement = Arrangement.SpaceBetween,
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                Box(
-                ) {
-                    // Printer Options Section
-                    Text(
-                        style = TextStyle(fontFamily = KhandFontFamily(), fontWeight = FontWeight.Medium),
-                        text = "Printer Options",
-                        fontSize = 25.sp,
-                        color = Color(0xFFFFFFFF),
-                    )
-                }
-
-                Spacer(modifier = Modifier.width(2.dp))
-
-                Box (
-                    modifier = Modifier.offset(x = 18.dp)
-                ) {
-                    Button(
-                        onClick = {
-                            refreshDeviceList(context, bluetoothAdapter, discoveredDevices)
-                        },
-                        modifier = Modifier
-                            .padding(16.dp)
-                            .size(width = 140.dp, height = 45.dp),
-                        colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF0021A5)),
-                        border = BorderStroke(2.dp, Color.White)
-                    ) {
-                        if (isLoading == "true") {
-                            CircularProgressIndicator(
-                                modifier = Modifier.size(24.dp),
-                                color = Color.White
-                            )
-                        } else {
-                            Text("Refresh", color = Color.White, fontSize = 22.sp, style = TextStyle(fontFamily = KhandFontFamily(), fontWeight = FontWeight.Medium))
-                        }
-                    }
-                }
-            }
-            
-            Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .background(Color(0xFF0021A5))
-                    .padding(vertical = 6.dp)
-                    .padding(horizontal = 8.dp),
-                horizontalArrangement = Arrangement.SpaceBetween,
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                Text(
-                    style = TextStyle(fontFamily = KhandFontFamily(), fontWeight = FontWeight.Medium),
-                    text = "Choose Printer",
-                    fontSize = 20.sp,
-                    color = Color.White
-                )
-                Text(
-                    style = TextStyle(fontFamily = KhandFontFamily(), fontWeight = FontWeight.Medium),
-                    text = "Status",
-                    fontSize = 20.sp,
-                    color = Color.White
-                )
-            }
-
-            Box(
-                modifier = Modifier
-                    .fillMaxSize()
+            Box (
             ) {
                 LazyColumn(
                     modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(16.dp)
-                    .padding(bottom = 70.dp)
+                        .fillMaxSize()
+                        .padding(bottom = 70.dp)
                 ) {
-                    items(discoveredDevices) { device ->
-                        val isPaired = pairedDevices.contains(selectedDevice)
-
-                        Row(
+                    item {
+                        Card(
                             modifier = Modifier
                                 .fillMaxWidth()
-                                .background(if (selectedDevice == device) Color(0xFFCCE5FF) else Color.White)
-                                .padding(8.dp)
-                                .clickable { selectedDevice = device }
-                                .border(1.dp, Color.Gray, shape = RoundedCornerShape(8.dp)),
-                            horizontalArrangement = Arrangement.SpaceBetween,
-                            verticalAlignment = Alignment.CenterVertically
+                                .padding(horizontal = 12.dp, vertical = 8.dp)
+                                .clickable {
+                                    expandedPreview = !expandedPreview
+                                },
+                            colors = CardDefaults.cardColors(containerColor = Color(0xFFFFFFFF)),
+                            elevation = CardDefaults.cardElevation(defaultElevation = 4.dp),
+                            shape = RoundedCornerShape(12.dp)
                         ) {
-                            Box(
+                            Column(
                                 modifier = Modifier
-                                    .padding(horizontal = 12.dp, vertical = 8.dp)
+                                    .fillMaxWidth()
+                                    .padding(16.dp)
+                                    .animateContentSize()
                             ) {
-                                Text(
-                                    text = device.name ?: device.address,
-                                    fontSize = 16.sp,
-                                    color = Color.Black
-                                )
+                                Row(
+                                    verticalAlignment = Alignment.CenterVertically
+                                ) {
+                                    Text(
+                                        style = TextStyle(fontFamily = KhandFontFamily(), fontWeight = FontWeight.Medium),
+                                        text = "Preview Label",
+                                        fontSize = 25.sp,
+                                    )
+                                    Icon(
+                                        imageVector = if (expandedPreview) Icons.Default.KeyboardArrowUp else Icons.Default.KeyboardArrowDown,
+                                        contentDescription = "Expand/Collapse"
+                                    )
+                                }
+                                if (expandedPreview) {
+                                    Divider(color = Color.Gray, thickness = 1.dp, modifier = Modifier.padding(vertical = 8.dp))
+                                    Column(
+                                    ) {
+                                        Row(
+                                            modifier = Modifier
+                                                .fillMaxWidth()
+                                                .padding(8.dp)
+                                                .border(1.dp, Color.Gray, shape = RoundedCornerShape(8.dp)),
+                                            horizontalArrangement = Arrangement.SpaceBetween,
+                                            verticalAlignment = Alignment.Top
+                                        ){
+                                            Box(
+                                                modifier = Modifier
+                                                    .padding(horizontal = 12.dp, vertical = 8.dp)
+                                            ) {
+                                                Column(
+                                                    horizontalAlignment = Alignment.CenterHorizontally, // center image
+                                                    modifier = Modifier.fillMaxWidth()
+                                                ) {
+                                                    val splitLocation = sample?.location?.split(",")
+                                                    val altitudeSplit = splitLocation?.get(1)?.split("|")
+                                                    Text(
+                                                        text = "Form: ${formName ?: "Unknown"} " +
+                                                                "\nCollector: ${sample?.collectorName ?: "Unknown"}" +
+                                                                "\nSample ID: ${sample?.sampleCollectionId ?: "Unknown"}" +
+                                                                "\nDate: ${sample?.dateCollectedUTC ?: "Unknown"}" +
+                                                                "\nLocation:" +
+                                                                "\n${splitLocation?.get(0) ?: "Unknown"}," +
+                                                                "${altitudeSplit?.get(0) ?: "Unknown"}" +
+                                                                "\n-----------------------------" +
+                                                                "\nScan to view sample data\n",
+                                                        fontSize = 18.sp,
+                                                        fontFamily = Monospace,
+                                                    )
+                                                    Image(
+                                                        painter = painter,
+                                                        contentDescription = null,
+                                                        modifier = Modifier
+                                                            .size(100.dp)
+                                                            .align(Alignment.Start)
+                                                    )
+                                                    Spacer(modifier = Modifier.height(80.dp))
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
                             }
-                            Spacer(modifier = Modifier.width(8.dp))
-                            Box(
+                        }
+                    }
+                    item {
+                        Card(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(horizontal = 12.dp, vertical = 8.dp)
+                                .clickable {
+                                    expandedPrinterOptions = !expandedPrinterOptions
+                                },
+                            colors = CardDefaults.cardColors(containerColor = Color(0xFFFFFFFF)),
+                            elevation = CardDefaults.cardElevation(defaultElevation = 4.dp),
+                            shape = RoundedCornerShape(12.dp)
+                        ) {
+                            Column(
                                 modifier = Modifier
-                                    .padding(horizontal = 12.dp, vertical = 8.dp)
+                                    .fillMaxWidth()
+                                    .padding(16.dp)
+                                    .animateContentSize()
                             ) {
-                                Text(
-                                    text = if (isPaired && device == selectedDevice) "connected" else "not connected",
-                                    fontSize = 16.sp,
-                                    color = if (isPaired && device == selectedDevice) Color.Green else Color.Red,
-                                )
+                                Row(
+                                    verticalAlignment = Alignment.CenterVertically
+                                ) {
+                                    Text(
+                                        style = TextStyle(fontFamily = KhandFontFamily(), fontWeight = FontWeight.Medium),
+                                        text = "Printer Options",
+                                        fontSize = 25.sp,
+                                    )
+                                    Icon(
+                                        imageVector = if (expandedPrinterOptions) Icons.Default.KeyboardArrowUp else Icons.Default.KeyboardArrowDown,
+                                        contentDescription = "Expand/Collapse"
+                                    )
+                                }
+                                if (expandedPrinterOptions) {
+                                    Divider(color = Color.Gray, thickness = 1.dp, modifier = Modifier.padding(vertical = 8.dp))
+                                    Column(
+                                    ) {
+                                        Row(
+                                            modifier = Modifier.fillMaxWidth(),
+                                            horizontalArrangement = Arrangement.SpaceBetween,
+                                            verticalAlignment = Alignment.CenterVertically
+                                        ) {
+                                            Text(
+                                                style = TextStyle(fontFamily = KhandFontFamily(), fontWeight = FontWeight.Medium),
+                                                text = "Choose Printer",
+                                                fontSize = 20.sp,
+                                            )
+                                            Button(
+                                                onClick = {
+                                                    refreshDeviceList(context, bluetoothAdapter, discoveredDevices)
+                                                },
+                                                modifier = Modifier
+                                                    .size(width = 140.dp, height = 45.dp),
+                                                colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF0021A5)),
+                                                border = BorderStroke(2.dp, Color.White)
+                                            ) {
+                                                if (isLoading == "true") {
+                                                    CircularProgressIndicator(
+                                                        modifier = Modifier.size(24.dp),
+                                                        color = Color.White
+                                                    )
+                                                } else {
+                                                    Text("Refresh", color = Color.White, fontSize = 22.sp, style = TextStyle(fontFamily = KhandFontFamily(), fontWeight = FontWeight.Medium))
+                                                }
+                                            }
+                                        }
+                                        Row(
+                                            modifier = Modifier
+                                                .fillMaxWidth()
+                                                .padding(vertical = 6.dp)
+                                                .padding(horizontal = 8.dp),
+                                            horizontalArrangement = Arrangement.SpaceBetween,
+                                            verticalAlignment = Alignment.CenterVertically
+                                        ) {
+                                            Text(
+                                                style = TextStyle(fontFamily = KhandFontFamily(), fontWeight = FontWeight.Medium),
+                                                text = "Device",
+                                                fontSize = 20.sp,
+                                            )
+                                            Text(
+                                                style = TextStyle(fontFamily = KhandFontFamily(), fontWeight = FontWeight.Medium),
+                                                text = "Status",
+                                                fontSize = 20.sp,
+                                            )
+                                        }
+                                        discoveredDevices.forEach { device ->
+                                            isPaired = pairedDevices.contains(selectedDevice)
+
+                                            Row(
+                                                modifier = Modifier
+                                                    .fillMaxWidth()
+                                                    .background(if (selectedDevice == device) Color(0xFFCCE5FF) else Color.White)
+                                                    .padding(8.dp)
+                                                    .clickable { selectedDevice = device }
+                                                    .border(1.dp, Color.Gray, shape = RoundedCornerShape(8.dp)),
+                                                horizontalArrangement = Arrangement.SpaceBetween,
+                                                verticalAlignment = Alignment.CenterVertically
+                                            ) {
+                                                Box(
+                                                    modifier = Modifier
+                                                        .padding(horizontal = 12.dp, vertical = 8.dp)
+                                                ) {
+                                                    Text(
+                                                        text = device.name ?: device.address,
+                                                        fontSize = 16.sp,
+                                                        color = Color.Black
+                                                    )
+                                                }
+                                                Spacer(modifier = Modifier.width(8.dp))
+                                                Box(
+                                                    modifier = Modifier
+                                                        .padding(horizontal = 12.dp, vertical = 8.dp)
+                                                ) {
+                                                    Text(
+                                                        text = if (isPaired && device == selectedDevice) "connected" else "not connected",
+                                                        fontSize = 16.sp,
+                                                        color = if (isPaired && device == selectedDevice) Color.Green else Color.Red,
+                                                    )
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
                             }
                         }
                     }
@@ -422,27 +531,31 @@ actual fun PrintScreen(navController: NavController, database: Database?, sample
                         .align(Alignment.BottomCenter)
                 ) {
                     ActionButton("Back", onClick = { navController.popBackStack() }, Color(0xFF0021A5), Color.White)
-                    ActionButton("Print", onClick = {
-                        val printer = TSPLPrinter()
-                        val printerMacAddress = selectedDevice?.address
-                        if (printerMacAddress != null) {
-                            val splitLocation = sample?.location?.split(",")
-                            val altitudeSplit = splitLocation?.get(1)?.split("|")
-                            val message = listOf (
-                                ("Form: ${formName ?: "Unknown"}"),
-                                ("Collector: ${sample?.collectorName ?: "Unknown"}"),
-                                ("Sample ID: ${sample?.sampleCollectionId ?: "Unknown"}"),
-                                ("Date: ${sample?.dateCollectedUTC ?: "Unknown"}"),
-                                ("Location:"),
-                                ("${splitLocation?.get(0) ?: "Unknown"},${altitudeSplit?.get(0) ?: "Unknown"}"),
-                                (altitudeSplit?.get(1) ?: ""),
-                                ("---------------------------")
-                            )
-
-                            printer.connectAndPrint(printerMacAddress, message, scaledBitmap)
-                        }
-                    },
-                        Color(0xFF12BF7A), Color.White)
+                    ActionButton("Print",
+                        onClick = {
+                            val printer = TSPLPrinter()
+                            val printerMacAddress = selectedDevice?.address
+                            if (printerMacAddress != null) {
+                                val splitLocation = sample?.location?.split(",")
+                                val altitudeSplit = splitLocation?.get(1)?.split("|")
+                                val message = listOf (
+                                    ("Form: ${formName ?: "Unknown"}"),
+                                    ("Collector: ${sample?.collectorName ?: "Unknown"}"),
+                                    ("Sample ID: ${sample?.sampleCollectionId ?: "Unknown"}"),
+                                    ("Date: ${sample?.dateCollectedUTC ?: "Unknown"}"),
+                                    ("Location:"),
+                                    ("${splitLocation?.get(0) ?: "Unknown"},${altitudeSplit?.get(0) ?: "Unknown"}"),
+                                    (altitudeSplit?.get(1) ?: ""),
+                                    ("---------------------------"),
+                                    ("Scan to view sample data"),
+                                    (" "),
+                                )
+                                printer.connectAndPrint(printerMacAddress, message, scaledBitmap)
+                            }
+                        },
+                        Color(0xFF12BF7A),
+                        Color.White,
+                        enabled = isPaired)
                 }
             }
         }
