@@ -334,6 +334,7 @@ fun AddFieldScreen(
                             )
                         )
                         {
+
                             Icon(
                                 imageVector = Icons.Filled.Close,
                                 contentDescription = "Remove Option",
