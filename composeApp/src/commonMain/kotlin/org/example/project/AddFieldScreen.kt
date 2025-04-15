@@ -20,12 +20,15 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Close
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Checkbox
 import androidx.compose.material3.CheckboxDefaults
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
+import androidx.compose.material3.Icon
 import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
@@ -331,10 +334,12 @@ fun AddFieldScreen(
                             )
                         )
                         {
-                            Image(
-                                painter = painterResource(Res.drawable.close),
-                                contentDescription = null,
-                                modifier = Modifier.size(16.dp)
+                            Icon(
+                                imageVector = Icons.Filled.Close,
+                                contentDescription = "Remove Option",
+                                tint = Color.Red,
+                                modifier = Modifier
+                                    .size(24.dp)
                             )
                         }
                         Text(
