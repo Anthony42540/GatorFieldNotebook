@@ -83,9 +83,10 @@ fun App() {
 expect fun getScreenWidth(): Int
 
 @Composable
-fun ActionButton(text: String, onClick: () -> Unit, buttonColor: Color, textColor: Color) {
+fun ActionButton(text: String, onClick: () -> Unit, buttonColor: Color, textColor: Color, enabled: Boolean = true) {
     Button(
         onClick = onClick,
+        enabled = enabled,
         modifier = Modifier
             .size(width = 160.dp, height = 45.dp),
         colors = ButtonDefaults.buttonColors(

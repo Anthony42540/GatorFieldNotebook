@@ -112,13 +112,12 @@ Connects via Bluetooth to a portable printer to print the generated labels in re
 Works on iOS and Android devices.
 
 ### Completed Work
-- Basic UI: different screen navigation via button interaction
-- Navbar implementation
-- SQL setup: hooks for connection to the database have been implemented, tables have been added, and a database class has been made for interaction
-- Sample Saving: user can input sample information, save, and view all samples
-- Bluetooth library: implemented a base for bluetooth library implementation
-- Form Creation: user can create forms for new collections and select their forms when adding a new sample
-- Sample deletion: user can delete ALL samples from database
+- UI: navigation menu, consistent pages and formatting
+- SQL database
+- Samples: user can input sample information, save, edit, delete, and view all samples
+- Bluetooth: implemented bluetooth connection with TSPL
+- Printing: implemented printing functionality via bluetooth
+- Form Creation: user can create forms for new collections and select their forms when adding a new sample  
 
 ### SQLLight tables
 #### SampleForm
@@ -126,9 +125,10 @@ Works on iOS and Android devices.
 |-------------|------------|-------------|
 | `form_id`   | INTEGER    | Primary key |
 | `form_name` | TEXT       | Form name   |
+| `is_active` | BOOLEAN    | Form active |
 
 **Description:**  
-This stores the "head" of each form. For example, if there was a form for bug samples, this table would store the name "Bug Samples" and the ID. The form's fields are linked through the Field table.
+This stores the "head" of each form. For example, if there was a form for bug samples, this table would store the name "Bug Samples" and the ID. The form's fields are linked through the Field table. If form is inactive, it has been deleted. Deleted forms are preserved to preserve the sample associated with them.
 
 #### Field
 | Field Name  | Field Type | Description                                                                 |
@@ -166,11 +166,19 @@ This is the "head" of each sample collected. It is associated with a form and co
 **Description:**  
 Stores individual data entries for each sample. It is linked to the sample it is from and the type of field that it is. In the future, if fields are to be reused for multiple forms, the SampleData table will have to store a list linking each dataEntry to its fields. This will save space in the database.
 
-
-
 ### Known Bugs
-- There is no form field validation so leaving some fields empty might break the app
-- There is no scroll window implemented when fields overflow the screen, so for now sample fields are limited to one screen
 - There is no safeguard for submitting text with curly braces, but this should be implemented because it could mess up lists stored as json strings in the database
-- This is not a bug, but something to note for future work: Some logic (e.g. database connection) might have to be done twice for iOS and Android, respectively
+- No validation for submitting images, but they currently cannot be above a certain size. Submitting an image too large results in corrupting the sample data
 
+### Next Steps
+- Multi-select samples to print at once or specify number of copies to print, currently can only print one at a time
+- Add more options for exporting data to CSV, currently it is restricted to form groups. Users should be able to export single samples, all data, or filtered samples.
+- Implement additional filter and sort options, for example sort by most recent, alphabetical, etc.
+- Add more flexibility to form creation, implement form editing and deleting. Form deleting is implemented in the back end, but needs the UI added. For form editing, the user should be able to rearrange the fields on the form or delete fields when making the form (i.e. user notices an error on a field, currently they would need to redo the entire form)
+- Add a settings page for user information (name. account info when accounts are made), dark/light mode, printer settings (font size for printing, selecting a printer possibly)
+- Allow for larger photos to be added
+- Implement on IOS, some logic (e.g. database connection) might have to be done twice for iOS and Android, respectively
+- Add more export methods, i.e. export to pdf
+- Number fields could have an added option for units maybe
+- Currently, QR codes use a custom URI ("myapp://sample/{sampleId}"). Scanning this on the camera app does not correctly redirect to the application because browsers like Chrome do not handle custom schemes like myApp. In the future, this URI should instead be an https scheme, for example https://gatorfieldnotebook.com/<userID>/sample/{sampleID} or something similar. Then register that address to link to the custom URI, or to the app store if the app is not installed. The QR code still works as-is if used on a QR code app. Note that the current URI will link to any user's first sample, since sampleID is not unique among users.
+- For this app to be usable at Universities, Dr. Blanchard mentioned that the remote DB using FireStore does not meet University security requirements. Other remote databases should be explored in the future.
