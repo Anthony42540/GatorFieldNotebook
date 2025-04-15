@@ -190,7 +190,13 @@ fun DetailedSampleScreen(
             ) {
                 ActionButton(
                     "Back",
-                    onClick = { navController.popBackStack() },
+                    onClick = {
+                        if (!navController.popBackStack()) {
+                            navController.navigate("home") {
+                                launchSingleTop = true
+                            }
+                        }
+                    },
                     Color(0xFF0021A5),
                     Color.White
                 )
