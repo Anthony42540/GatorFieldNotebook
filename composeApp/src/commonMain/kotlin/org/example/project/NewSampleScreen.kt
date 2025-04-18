@@ -52,7 +52,6 @@ import kotlinx.datetime.TimeZone
 import kotlinx.datetime.toLocalDateTime
 import org.example.project.viewModels.CollectionViewModel
 
-// Add this at the top level of your file or in a Constants.kt file
 object SampleManager {
     private var _currentSampleId: Long = 0
 
@@ -72,12 +71,6 @@ fun EditSampleScreen(
     viewModel: CollectionViewModel,
     collectionValueState: Int
 ) {
-    // Add debug logging
-    LaunchedEffect(Unit) {
-        println("EditSampleScreen launched")
-        println("Database is ${if (database == null) "null" else "not null"}")
-    }
-
     // Mutable state variables for input fields
     var collectionName by remember { mutableStateOf("") }
     var fields by remember { mutableStateOf( listOf<Field>() )}
@@ -191,9 +184,6 @@ fun EditSampleScreen(
                 )
 
                 database.updateImageSampleId(0, sampleId)
-
-                // Store the ID in SampleManager
-                SampleManager.setSampleId(sampleId)
 
                 // For backward compatibility with existing code
                 GlobalState.sampleId = sampleId
@@ -420,16 +410,10 @@ fun EditSampleScreen(
                     contentAlignment = Alignment.Center
                 ) {
                     database?.let { db ->
-                        // Use the SampleManager to get the current sample ID
-                        val currentSampleId = SampleManager.getSampleId()
-                        print("Current Sample Id: ")
-                        print(currentSampleId)
-
-
                         ImageUploadScreen(
                             navController = navController,
                             database = db,
-                            sampleId = currentSampleId.toInt()
+                            sampleId = 0
                         )
 
                     }
