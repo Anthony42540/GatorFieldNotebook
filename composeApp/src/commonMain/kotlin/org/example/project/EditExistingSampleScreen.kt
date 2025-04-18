@@ -302,16 +302,10 @@ fun EditExistingSampleScreen(
                     contentAlignment = Alignment.Center
                 ) {
                     database?.let { db ->
-                        // Use the SampleManager to get the current sample ID
-                        val currentSampleId = SampleManager.getSampleId()
-                        print("Current Sample Id: ")
-                        print(currentSampleId)
-
-
                         ImageUploadScreen(
                             navController = navController,
                             database = db,
-                            sampleId = currentSampleId.toInt()
+                            sampleId = 0
                         )
 
                     }
